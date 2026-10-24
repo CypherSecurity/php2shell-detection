@@ -1338,3 +1338,53 @@ production hosts do not have.
   preconditions outright. Isolating session directories between pools removes condition 2.
 - **Validates our detection design again:** exploitation is a **sequence across requests**, so
   flow-correlation and worker-state rules are the right shape.
+
+## 34. MATERIAL (capability assessment) — 2026-10-24 — public exploit framework: arm64 demos, x86_64 reproduction fails
+
+### 34.1 What it is
+`JoasASantos/php2shell-exploit` (created 2026-10-22, pushed 24 Oct, **163★ / 43 forks**) — a
+substantial exploit framework, not a script drop: `exploit.py` (31 KB), `exploit_v2.py` (40 KB),
+modules for calibration/forging/leaking/payloads/transport/worker-pinning, Docker labs
+(php:8.4.26-apache, WordPress, phpMyAdmin), and recorded asciinema demos.
+
+Claims: **pre-auth, cookie-less, pure-HTTP RCE**; ASLR bypass via ~800 KB heap OOB read; v1
+`pDestructor=zif_system`; v2 `auto_prepend_file` overwrite ("crash-free after setup"); five chains
+(htaccess / gadget / zero / grooming). Its amd64 profile is labelled
+*"Verified 20/20 on stock php.ini-production."*
+
+### 34.2 Our reproduction — on their own lab, with their own offsets
+Executed `docker/docker-compose.yml` unchanged (Debian 13.7, **x86_64**, PHP/8.4.26, mod_php,
+`display_errors` empty ⇒ Off, `session.upload_progress.enabled=1`). Offsets extracted **with their
+tool**: `zif=0x465370 dtor=0x65eb60` (matches our independent extraction of the same image).
+
+| Run | Result |
+|---|---|
+| recon | PHP/8.4.26, mod_php probable, **MPM unknown**, `upload_progress` "inactive or hidden" (wrong — `ini_get` = 1) |
+| v1 webshell ×5 | A1 OOM → **HTTP 500 reached**, B1 leak → **"no heap pointers in leak window"** → 5/5 fail |
+| v2 `grooming` | gadget failed → htaccess fallback → same leak failure |
+| explicit amd64 profile + offsets | same leak failure |
+
+**Same failure stage as every prior public claim (9bie, xuehuolll): the leak/ASLR-bypass window is
+empty under `display_errors=Off`.**
+
+### 34.3 The architecture nuance (why the demos succeed)
+The recorded casts run on **`php-8.4.26-trixie-arm64`** with arm64 offsets
+(`zif=0x42cd70 dtor=0x638120`) and print `uid=33(www-data)`; v2 reports
+`RCE confirmed — crash-free via PG(auto_prepend_file)`. So the author's evidence is **ARM64**, and
+the x86_64 "verified 20/20" claim is **not reproducible**.
+
+### 34.4 What this changes — and what it does not
+- **Does not** establish a public working `display_errors=Off` exploit on x86_64. The watch item
+  stays open.
+- **Does** weaken any assumption that public PoCs are uniformly non-functional: there is now a
+  **polished, plausibly arm64-functional** framework. ARM estate (Apple Silicon dev images, ARM
+  servers, edge devices) should not be considered safe on "public PoCs fail" reasoning.
+- **Requirements keep it conditional:** mod_php + prefork only (no FPM), chunked TE must survive,
+  v2 needs a writable webroot; `session.upload_progress.enabled` must be on (PHP default).
+- **Mitigation unchanged and effective:** patch + restart PHP; `session.upload_progress.enabled=0`
+  removes the exploitation path; worker recycling/pinning defeats the stale-state technique.
+- **Detection unchanged:** oversized `PHPSESSID` response cookie, chunked multipart bodies,
+  worker deaths/502 bursts.
+
+Full evidence: `php2shell-intel/triage/joas-triage-2026-10-24.md`. Exploit code kept in the working
+tree only — **never** in the shareable package.

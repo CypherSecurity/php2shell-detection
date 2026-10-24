@@ -1,6 +1,6 @@
 # BUILD INFO — php2shell detection & response package
 
-**Build timestamp:** 2026-10-24 13:22 UTC
+**Build timestamp:** 2026-10-24 15:00 UTC
 **Package name:** `php2shell-detection-package-2026-10-24`
 **Why the name changed:** the package was first assembled on 2026-10-21 and then materially
 updated through 2026-10-22 (tested exploit results, corrected findings, repaired Suricata
@@ -176,6 +176,15 @@ The zip's own hash cannot be embedded inside itself, so it ships as a sidecar
     published automatically when the underlying facts change.
 37. This package is the **downloadable companion** to that page: full dossier, detection rules,
     hunting queries, SOC triage, patch matrix and PAN-OS exposure notes. No exploit code.
+
+## What changed in the 2026-10-24 16:00 rebuild
+
+38. **Triaged a major public exploit framework** — `JoasASantos/php2shell-exploit` (163★). Built and
+    ran its own Docker lab unchanged and used its own offsets: **v1 and v2 both fail at the leak
+    stage on x86_64**, despite its amd64 profile being labelled "verified 20/20". Its recorded demo
+    successes are on **arm64**. Added to the capability assessment in `INCIDENT-STATUS.md`.
+39. No change to detections. The framework uses the same primitives, so existing rules and the
+    `session.upload_progress.enabled=0` mitigation remain the correct response.
 
 ## Reading order
 

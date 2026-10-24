@@ -78,6 +78,16 @@ Attempts are failing **publicly**, but the exploit capability behind them is imp
   workers that don't recycle, and an app that calls `session_start()`. A stock single-pool 128M host
   does not match. Treat FPM as publicly tooled for multi-pool/shared-session deployments.
 
+- **Update 24 Oct — a polished public framework exists, and its own lab contradicts its x86_64
+  claim.** `JoasASantos/php2shell-exploit` (163★, 43 forks) ships exploit modules, Docker labs and
+  demo recordings, with its amd64 profile marked *"Verified 20/20 on stock php.ini-production"*.
+  We built their lab unchanged (PHP 8.4.26, Debian 13.7, x86_64, `display_errors` Off,
+  `session.upload_progress` On) and ran **their** tool with **their** offsets: v1 and v2 both fail at
+  the leak stage — *"no heap pointers in leak window"* — the same wall every other public claim hits.
+  Their recorded demos, however, run on **arm64** (`php-8.4.26-trixie-arm64`, arm64 offsets) and show
+  `uid=33(www-data)`. **Assessment: x86_64 public capability still unproven; arm64 plausibly works.
+  Do not assume ARM estates are safe on "public PoCs fail" reasoning.**
+
 **So the public story is "attempts fail"; the private story is "capability exists".** Today's
 absence of a confirmed victim is therefore a statement about *exploit availability and intent*, not
 about *inherent difficulty*. That gap is exactly what closes when a working public exploit appears.
