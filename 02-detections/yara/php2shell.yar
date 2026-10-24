@@ -360,3 +360,23 @@ rule Session_Serialize_Mismatch_Residue : php2shell session_file CVE_2026_109619
       Webshell_In_Session_File / Session_Serialize_Mismatch_Residue via
       separate scan roots rather than weakening the content conditions.
    ========================================================================== */
+
+rule PHP2Shell_Joas_Webshell_105B
+{
+    meta:
+        description = "105-byte webshell planted by JoasASantos/php2shell-exploit (.p2s.php): system() via ?c= and self-delete via ?rm="
+        author = "php2shell detection package"
+        date = "2026-10-24"
+        reference = "https://github.com/JoasASantos/php2shell-exploit"
+        severity = "critical"
+        confidence = "high"
+    strings:
+        $p1 = "isset($_GET[\"c\"])" ascii
+        $p2 = "system($_GET[\"c\"])" ascii
+        $p3 = "unlink(__FILE__)" ascii
+        $p4 = "removed" ascii
+    condition:
+        uint32(0) == 0x3f3c6870  // "<?ph"
+        and filesize < 2KB
+        and 3 of them
+}

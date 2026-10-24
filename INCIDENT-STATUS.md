@@ -78,15 +78,19 @@ Attempts are failing **publicly**, but the exploit capability behind them is imp
   workers that don't recycle, and an app that calls `session_start()`. A stock single-pool 128M host
   does not match. Treat FPM as publicly tooled for multi-pool/shared-session deployments.
 
-- **Update 24 Oct — a polished public framework exists, and its own lab contradicts its x86_64
-  claim.** `JoasASantos/php2shell-exploit` (163★, 43 forks) ships exploit modules, Docker labs and
-  demo recordings, with its amd64 profile marked *"Verified 20/20 on stock php.ini-production"*.
-  We built their lab unchanged (PHP 8.4.26, Debian 13.7, x86_64, `display_errors` Off,
-  `session.upload_progress` On) and ran **their** tool with **their** offsets: v1 and v2 both fail at
-  the leak stage — *"no heap pointers in leak window"* — the same wall every other public claim hits.
-  Their recorded demos, however, run on **arm64** (`php-8.4.26-trixie-arm64`, arm64 offsets) and show
-  `uid=33(www-data)`. **Assessment: x86_64 public capability still unproven; arm64 plausibly works.
-  Do not assume ARM estates are safe on "public PoCs fail" reasoning.**
+- **Update 24 Oct — PUBLIC WORKING EXPLOIT CONFIRMED (conditional).** The framework
+  `JoasASantos/php2shell-exploit` was run against its own lab (PHP 8.4.26, stock
+  `php.ini-production`, **`display_errors=Off`**, upload progress On). Result: **pre-auth RCE
+  reproduced** on **both x86_64 and arm64** — but **only when Apache prefork runs a single worker**.
+  Multi-worker pools failed at the memory-leak stage on both architectures. Proof was taken
+  independently of the tool's own output: the command wrote a file inside the target container
+  (`uid=33(www-data)`), read back with `docker exec`.
+  **What changed:** a public exploit now covers the `display_errors=Off` case that previously
+  required private tooling. **What did not:** it is not universal — it needs mod_php + prefork +
+  single worker + `session.upload_progress` enabled. FPM deployments are unaffected by this tool.
+  Mitigation is unchanged and still effective: patch, and/or `session.upload_progress.enabled=0`.
+  Detection: the tool plants `/.p2s.php` (also `/assets/.p2s.php`, `/tmp/.p2s.php`) and v2 uses
+  `/tmp/.p2s_v2.php` + `.htaccess`.
 
 **So the public story is "attempts fail"; the private story is "capability exists".** Today's
 absence of a confirmed victim is therefore a statement about *exploit availability and intent*, not

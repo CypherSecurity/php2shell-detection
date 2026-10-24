@@ -525,3 +525,51 @@ native banner query. Use (a) an authenticated/agentless scan against
 `rpm_packages` for `php-fpm`/`php-cli` versions. Compare against the same
 per-branch ceilings as §7.2. *Noise:* LOW, but inventory lags reality —
 cross-check the service banner.
+
+## H1. Public-exploit artefacts (`JoasASantos/php2shell-exploit`) — added 2026-10-24
+
+Reproduced by us on 2026-10-24: pre-auth RCE with `display_errors=Off` when Apache prefork runs a
+**single worker**. Artefacts are stable across runs and architectures.
+
+**H1.1 Access-log search — webshell access / execution**
+
+```text
+# Splunk
+index=web (uri_path="*/.p2s.php" OR uri_path="*/.p2s_v2.php")
+| stats count min(_time) as first max(_time) as last by host, clientip, uri_path, uri_query, status
+| convert ctime(first) ctime(last)
+```
+
+```text
+# Elastic / KQL
+http.request.uri.path : (*.p2s.php or *.p2s_v2.php)
+```
+
+**H1.2 Execution pattern** — `?c=` on a `*.p2s.php` path, plus the self-delete `?rm`:
+
+```text
+uri_query="*c=*" uri_path="*.p2s.php"
+uri_query="*rm=*" uri_path="*.p2s.php"
+```
+
+**H1.3 Webroot sweep for planted shells** (also catches renamed copies by content):
+
+```bash
+grep -rIl --include='*.php' -e 'unlink(__FILE__)' -e 'isset($_GET["c"])' /var/www 2>/dev/null
+find /var/www -name '.p2s*.php' -o -name '.p2s_v2.php' 2>/dev/null
+```
+
+**H1.4 `.htaccess` persistence (v2 technique)**
+
+```bash
+grep -rIl 'auto_prepend_file' /var/www 2>/dev/null
+grep -rIl '.p2s_v2.php' /var/www 2>/dev/null
+```
+
+**H1.5 Session-directory residue** — the tool writes multi-MB session files during the OOM stage:
+
+```bash
+find /tmp /var/lib/php/sessions -maxdepth 1 -type f -size +2M -printf '%p %s %TY-%Tm-%Td %TH:%TM\n' 2>/dev/null
+```
+
+Hunt window: from **2026-10-17** (pre-disclosure attempts) onward.

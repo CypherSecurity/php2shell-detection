@@ -192,3 +192,13 @@ alert http any any -> [$HOME_NET,$HTTP_SERVERS] any (msg:"ET LOCAL php2shell CVE
 alert http any any -> [$HOME_NET,$HTTP_SERVERS] any (msg:"ET LOCAL php2shell exploit marker - NUL byte in PHPSESSID cookie (invalid session id)"; flow:established,to_server; http.cookie; content:"PHPSESSID=|00|"; nocase; classtype:web-application-attack; sid:2202610114; rev:1; metadata:created_at 2026_10_22, cve CVE-2026-109618, cve CVE-2026-109619, confidence high, stage arm;)
 
 alert http any any -> [$HOME_NET,$HTTP_SERVERS] any (msg:"ET LOCAL php2shell exploit marker - percent-encoded NUL in PHPSESSID cookie"; flow:established,to_server; http.cookie; content:"PHPSESSID="; nocase; pcre:"/PHPSESSID=[^\x3b\r\n]{0,64}%00/i"; classtype:web-application-attack; sid:2202610115; rev:1; metadata:created_at 2026_10_22, cve CVE-2026-109618, cve CVE-2026-109619, confidence high, stage arm;)
+
+# ---------------------------------------------------------------------------
+# Public exploit artefacts — JoasASantos/php2shell-exploit (reproduced 2026-10-24)
+# The tool plants a webshell at /.p2s.php (also /assets/.p2s.php) and executes
+# commands via ?c=; v2 uses /tmp/.p2s_v2.php plus an .htaccess auto_prepend_file.
+# ---------------------------------------------------------------------------
+
+alert http any any -> [$HOME_NET,$HTTP_SERVERS] any (msg:"ET LOCAL php2shell exploit webshell URI access (*.p2s.php)"; flow:established,to_server; http.uri; content:".p2s.php"; nocase; fast_pattern; classtype:web-application-attack; sid:2202610116; rev:1; metadata:created_at 2026_10_24, cve CVE-2026-109618, cve CVE-2026-109619, confidence high, stage post-exploitation, reference url github.com/JoasASantos/php2shell-exploit;)
+
+alert http any any -> [$HOME_NET,$HTTP_SERVERS] any (msg:"ET LOCAL php2shell webshell payload served (system + self-delete handler)"; flow:established,to_client; file.data; content:"system($_GET"; nocase; content:"unlink(__FILE__)"; nocase; distance:0; within:160; classtype:web-application-attack; sid:2202610117; rev:1; metadata:created_at 2026_10_24, cve CVE-2026-109618, cve CVE-2026-109619, confidence high, stage post-exploitation;)

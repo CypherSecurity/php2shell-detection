@@ -1,6 +1,6 @@
 # BUILD INFO — php2shell detection & response package
 
-**Build timestamp:** 2026-10-24 15:00 UTC
+**Build timestamp:** 2026-10-24 15:37 UTC
 **Package name:** `php2shell-detection-package-2026-10-24`
 **Why the name changed:** the package was first assembled on 2026-10-21 and then materially
 updated through 2026-10-22 (tested exploit results, corrected findings, repaired Suricata
@@ -185,6 +185,20 @@ The zip's own hash cannot be embedded inside itself, so it ships as a sidecar
     successes are on **arm64**. Added to the capability assessment in `INCIDENT-STATUS.md`.
 39. No change to detections. The framework uses the same primitives, so existing rules and the
     `session.upload_progress.enabled=0` mitigation remain the correct response.
+
+## What changed in the 2026-10-24 17:00 rebuild — CAPABILITY CONFIRMED
+
+40. **A public pre-auth RCE was reproduced with `display_errors=Off`.** Running
+    `JoasASantos/php2shell-exploit` against its own stock lab (`php.ini-production`,
+    display_errors Off) achieved `uid=33(www-data)` on **x86_64 and arm64** — **when Apache prefork
+    runs a single worker**. Multi-worker pools failed at the leak stage on both architectures.
+    Verified independently of the tool's output (command wrote a file read back via `docker exec`).
+41. **What this does and does not mean:** the "public PoC cannot do display_errors=Off" assumption is
+    now **false**. But this is not a universal switch: it requires mod_php + prefork + single worker +
+    `session.upload_progress` enabled. FPM deployments are unaffected by this tool.
+42. **New detection content for this tool's artefacts:** Suricata rules for `*.p2s.php` URI access and
+    the webshell's distinctive body, a YARA rule for the 105-byte webshell, and hunting queries for
+    `.p2s.php` / `.p2s_v2.php` / `.htaccess` writes. See dossier §35.
 
 ## Reading order
 
