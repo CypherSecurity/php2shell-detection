@@ -1,0 +1,63 @@
+# Suricata rules — php2shell (CVE-2026-109618 / CVE-2026-109619)
+#
+# REQUIREMENTS: request-body inspection must be enabled in suricata.yaml:
+#   app-layer:
+#     protocols:
+#       http:
+#         libhtp:
+#           default-config:
+#             request-body-limit: 1mb     # default may be 100kb — too small for spray bodies
+#             request-body-inspect-window: 8kb
+#             request-body-minimal-inspect-size: 8kb
+#
+# SIDs use the local/unregistered range 2202610xxx — renumber to your scheme.
+
+# --- Core indicator: PHP_SESSION_UPLOAD_PROGRESS field in a multipart POST -------
+# Catches every variant of the exploit (all chains need it or the multipart parser).
+# Legitimate upload-progress-bar apps will trigger this: expect some FPs.
+alert http any any -> [$HOME_NET,$HTTP_SERVERS] any (msg:"ET LOCAL php2shell CVE-2026-109618/109619 PHP_SESSION_UPLOAD_PROGRESS in multipart POST"; flow:established,to_server; http.method; content:"POST"; http.request_header; content:"Content-Type|3a 20|multipart/form-data"; nocase; file.data; content:"PHP_SESSION_UPLOAD_PROGRESS"; classtype:attempted-admin; sid:2202610001; rev:1; metadata:created_at 2026_10_21, cve CVE-2026-109618, cve CVE-2026-109619;)
+
+# --- Session fixation primitive: PHPSESSID as a FORM FIELD in the body ----------
+# A session cookie name appearing as multipart form-data has no benign use.
+alert http any any -> [$HOME_NET,$HTTP_SERVERS] any (msg:"ET LOCAL php2shell CVE-2026-109618 session fixation - PHPSESSID as multipart form field"; flow:established,to_server; http.method; content:"POST"; http.request_header; content:"Content-Type|3a 20|multipart/form-data"; nocase; file.data; content:"form-data|3b 20|name=|22|PHPSESSID|22|"; classtype:attempted-admin; sid:2202610002; rev:1; metadata:created_at 2026_10_21, cve CVE-2026-109618;)
+
+# --- Payload in filename: PHP open tag (Chains A / file-injection variant) -------
+# filename="<?php" / filename="<?= — no legitimate browser or HTTP client does this.
+alert http any any -> [$HOME_NET,$HTTP_SERVERS] any (msg:"ET LOCAL php2shell CVE-2026-109618 PHP code in multipart filename"; flow:established,to_server; http.method; content:"POST"; file.data; content:"filename=|22 3c 3f|"; nocase; classtype:attempted-user; sid:2202610003; rev:1; metadata:created_at 2026_10_21, cve CVE-2026-109618;)
+
+# --- Payload in filename: serialized-object syntax (Chain C handler mismatch) ----
+# filename containing |O:<digits>:"  or  R:<digits>;  → deserialization payload.
+alert http any any -> [$HOME_NET,$HTTP_SERVERS] any (msg:"ET LOCAL php2shell CVE-2026-109618 serialized object payload in multipart filename"; flow:established,to_server; http.method; content:"POST"; file.data; pcre:"/filename\x3d\x22[^\x22\r\n]{0,256}(\|O:\d+\x3a\x22|R:\d+;)/"; classtype:attempted-admin; sid:2202610004; rev:1; metadata:created_at 2026_10_21, cve CVE-2026-109618, cve CVE-2026-109619;)
+
+# --- Heap-spray shape: unusually many multipart parts with binary payloads -------
+# The published exploit sprays ~149 identical 288-byte blobs. Heuristic: 60+
+# occurrences of Content-Disposition within one request body.
+alert http any any -> [$HOME_NET,$HTTP_SERVERS] any (msg:"ET LOCAL php2shell CVE-2026-109618 multipart part-count spray heuristic"; flow:established,to_server; http.method; content:"POST"; http.request_header; content:"Content-Type|3a 20|multipart/form-data"; nocase; file.data; content:"Content-Disposition|3a 20|form-data", depth 0; pcre:"/(Content-Disposition\x3a\x20form-data[\s\S]{0,200}){60,}/"; classtype:attempted-dos; sid:2202610005; rev:1; metadata:created_at 2026_10_21, cve CVE-2026-109619;)
+
+# =====================================================================================
+# BELOW: added 2026-10-21 after the official advisories (GHSA-w8hw-w9fx-j79w) listed
+# three concrete OOM trigger shapes. None of the rules above cover these.
+# =====================================================================================
+
+# --- OOM strategy 1 (official): multipart POST with chunked body / no usable ------
+# Content-Length — bypasses the initial post_max_size check.
+# "A multipart request without a usable declared content length may pass the
+#  initial post_max_size check and continue supplying decoded body data."
+# Note: some legit streaming upload clients use chunked — tune severity to medium
+# for vhosts where you know your client population.
+alert http any any -> [$HOME_NET,$HTTP_SERVERS] any (msg:"ET LOCAL php2shell CVE-2026-109618 OOM strategy - chunked multipart POST (post_max_size bypass)"; flow:established,to_server; http.method; content:"POST"; http.request_header; content:"Content-Type|3a 20|multipart/form-data"; nocase; http.request_header; content:"Transfer-Encoding|3a 20|chunked"; nocase; classtype:attempted-admin; sid:2202610006; rev:1; metadata:created_at 2026_10_21, cve CVE-2026-109618;)
+
+# --- OOM strategy 2 (official): header flood inside one multipart part ------------
+# Part headers consume far more memory inside PHP than their wire size, so a
+# request within post_max_size can exhaust memory_limit. 50+ consecutive
+# header-looking lines without a blank line has no legitimate multipart shape.
+alert http any any -> [$HOME_NET,$HTTP_SERVERS] any (msg:"ET LOCAL php2shell CVE-2026-109618 OOM strategy - multipart part header flood"; flow:established,to_server; http.method; content:"POST"; http.request_header; content:"Content-Type|3a 20|multipart/form-data"; nocase; file.data; pcre:"/(?:\r\n[A-Za-z0-9-]{1,50}\x3a\x20[^\r\n]{0,512}){50,}/"; classtype:attempted-admin; sid:2202610007; rev:1; metadata:created_at 2026_10_21, cve CVE-2026-109618;)
+
+# --- OOM strategy 3 (official): empty file controls flood (max_file_uploads -------
+# bypass) — empty filename= parts still allocate metadata arrays server-side.
+alert http any any -> [$HOME_NET,$HTTP_SERVERS] any (msg:"ET LOCAL php2shell CVE-2026-109618 OOM strategy - empty file-control flood (max_file_uploads bypass)"; flow:established,to_server; http.method; content:"POST"; http.request_header; content:"Content-Type|3a 20|multipart/form-data"; nocase; file.data; pcre:"/(?:filename\x3d\x22\x22[\s\S]{0,400}?){50,}/"; classtype:attempted-admin; sid:2202610008; rev:1; metadata:created_at 2026_10_21, cve CVE-2026-109618;)
+
+# --- OOM strategy 3 (official), variant: deeply nested field names ----------------
+# "Nested field names multiply the generated array work" — field names at or near
+# max_input_nesting_level (default 64). Benign forms rarely exceed 3-4 levels.
+alert http any any -> [$HOME_NET,$HTTP_SERVERS] any (msg:"ET LOCAL php2shell CVE-2026-109618 OOM strategy - deeply nested multipart field names"; flow:established,to_server; http.method; content:"POST"; http.request_header; content:"Content-Type|3a 20|multipart/form-data"; nocase; file.data; pcre:"/name\x3d\x22[^\x22]{0,64}(?:\x5b[^\x5d\x22]{0,32}\x5d){30,}\x22/"; classtype:attempted-admin; sid:2202610009; rev:1; metadata:created_at 2026_10_21, cve CVE-2026-109618;)

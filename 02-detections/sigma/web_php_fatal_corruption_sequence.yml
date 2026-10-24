@@ -1,0 +1,247 @@
+title: PHP Worker Fatal / Session-Corruption Sequence (php2shell CVE-2026-109618 / CVE-2026-109619)
+id: 8acb4d03-8514-4e12-a307-a428a7166e3f
+status: experimental
+description: >
+  Detects the production/consumer and heap-corruption artifacts that php2shell
+  exploitation leaves in webserver (Apache error_log, mod_php) and PHP-FPM
+  (php-fpm error log) logs.
+
+  LAB-VALIDATED 2026-10-21 in the php2shell validation lab (Ubuntu 24.04 +
+  Apache 2.4.58 prefork + mod_php 8.3.6, and the parity stack Ubuntu 26.04 +
+  PHP 8.5.4 + mod_php): every string in the selection_* blocks below was
+  captured verbatim in that lab, not inferred from the advisories. The OOM +
+  "in Unknown on line 0" line is the ARM (pre-RINIT memory exhaustion) event;
+  "Session ini settings cannot be changed when a session is active" is the
+  official CVE-2026-109619 consumer artifact (stale worker-global session state
+  consumed before request init); "zend_mm_heap corrupted", the dangling
+  PS(save_path) lines ("open(t Startup: ... in Unknown on line 0/sess_...") and
+  "session_encode(): Cannot encode non-existent session" were captured from the
+  kill/corruption cascade on the parity stack. The max_execution_time selection
+  matches the officially documented producer shape when it carries the pre-init
+  "in Unknown on line 0" marker.
+
+  CORRELATION INTENT (cannot be expressed in a single log event): the decisive
+  pattern is a multipart/form-data POST from client IP X followed within 60 s
+  by one of these fatals/warnings in a log event that also carries client IP X.
+  A multipart POST never appears in the same event as a PHP error line, so the
+  rules below are single-event, and the producer->consumer join is shipped as a
+  Sigma correlation rule (last document in this file, keyed on pid + client IP,
+  60 s) plus SIEM implementations in hunting/hunting-queries-v2.md §1-§4.
+
+  Field mapping: most shippers keep the raw Apache/PHP line in `message`
+  (Elastic `message`, Splunk `_raw`); some normalise to `error.message` or
+  `php.message` — adjust the field name below to match your pipeline.
+references:
+  - https://github.com/php/php-src/security/advisories/GHSA-w8hw-w9fx-j79w
+  - https://github.com/php/php-src/security/advisories/GHSA-6wmf-4rv5-p3rp
+  - https://www.php.net/archive/2026.php#2026-10-21
+  - https://sansec.io/research/php2shell
+  - https://www.huntress.com/blog/php2shell-leaked-critical-php-vulnerabilities
+author: detection engineering research
+date: 2026/10/21
+logsource:
+  category: webserver
+  # Also map: PHP-FPM error log (product: php, service: fpm) and any
+  # syslog/Filebeat/winlogbeat stream carrying Apache `[php:error]` lines.
+detection:
+  # --- ARM: pre-request-init OOM. Both strings must be present in one event. ---
+  selection_oom_preinit:
+    message|contains|all:
+      - 'PHP Fatal error: Allowed memory size of'
+      - 'in Unknown on line 0'
+  # --- Official producer shape: max_execution_time exceeded during request init ---
+  selection_maxtime_preinit:
+    message|contains|all:
+      - 'Maximum execution time'
+      - 'in Unknown on line 0'
+  # --- Official CVE-2026-109619 consumer artifact (stale session globals) ---
+  selection_session_ini_stale:
+    message|contains:
+      - 'PHP Request Startup: Session ini settings cannot be changed when a session is active'
+  # --- Chain E (FPM) consumer artifact: stale BG(unserialize) reached by the
+  #     rfc1867 upload-progress handler before normal request init. Documented and
+  #     verified by independent research (ikow, 2026-10-21) as the FPM RCE path:
+  #     producer = session_start() decoding a very large (~30MB) session that OOMs
+  #     mid-php_var_unserialize; consumer = upload_progress -> stale BG(unserialize).
+  #     FPM workers survive the producer fatal, so FPM estates ARE exploitable. ---
+  selection_session_obj_destroy_failed:
+    message|contains:
+      - 'Session object destruction failed'
+  # --- Allocator-detected corruption, immediately pre-SIGABRT ---
+  selection_heap_corrupted:
+    message|contains:
+      - 'zend_mm_heap corrupted'
+  # --- Orphaned session state (no live session to encode) ---
+  selection_encode_nonexistent:
+    message|contains:
+      - 'session_encode(): Cannot encode non-existent session'
+  # --- Dangling PS(save_path): the save_path string pointer now holds old log
+  #     text, so the path printed inside open(...) contains prior log strings. ---
+  selection_savepath_dangling:
+    message|re: 'open\([^)]*(?:in Unknown on line|Warning|Fatal)[^)]*/sess_'
+  # --- Same dangling path surfacing through PHP's session read/write failure ---
+  selection_session_io_fail_garbled:
+    message|re: 'Failed to (?:read|write) session data.*\(path: [^)]*(?:in Unknown on line|Warning|Fatal)'
+  # --- Plain session I/O failures: noisy alone; high value when they follow an
+  #     OOM from the same client (join on client IP within 60 s). ---
+  selection_session_io_fail:
+    message|contains:
+      - 'Failed to read session data'
+      - 'Failed to write session data'
+  # --- Worker death: Apache prefork/mod_php child segfault ---
+  selection_segv_apache:
+    message|contains:
+      - 'exit signal Segmentation fault'
+  # --- Worker death: PHP-FPM child killed by SIGSEGV ---
+  selection_segv_fpm:
+    message|contains:
+      - 'exited on signal 11'
+      - 'SIGSEGV'
+  # --- PHP 8.5 only: fatal_error_backtraces is the documented "basis of the
+  #     confirmed mod_php exploitation". A diagnostic naming it, emitted at
+  #     request startup or in Unknown, means the exploitation-enabling setting
+  #     is active on a worker that failed init. ---
+  selection_fatal_backtraces_diag:
+    message|re: 'fatal_error_backtraces.*(?:PHP Request Startup|in Unknown on line 0)|(?:PHP Request Startup|in Unknown on line 0).*fatal_error_backtraces'
+  filter_known_noise:
+    # Tune: staging/CI hosts and developer workstations that intentionally
+    # provoke OOM or segfaults are not production signal.
+    host|contains:
+      - 'ci-'
+      - 'staging-'
+      - 'dev-'
+  condition: 1 of selection_* and not filter_known_noise
+fields:
+  - message
+  - host
+  - c-ip
+  - pid
+falsepositives:
+  - Ordinary application-level memory_limit fatals — these normally name a real
+    script path and line number, NOT "in Unknown on line 0"; the "Unknown"
+    marker is what makes the event pre-request-init and suspicious.
+  - Legitimate large uploads/imports exhausting memory_limit inside a script
+    (again, a real file/line is present rather than Unknown).
+  - PHP-FPM request_terminate_timeout / max_execution_time hits on genuine
+    long-running reports — tune, and join to a preceding multipart POST.
+  - Nightly session-garbage-collection jobs that emit session I/O warnings.
+level: high
+tags:
+  - attack.execution
+  - attack.initial_access
+  - attack.t1190
+  - cve.2026-109618
+  - cve.2026-109619
+---
+title: php2shell Producer — Pre-Init Fatal in PHP Worker (correlation component)
+name: php2shell_producer_preinit_fatal
+id: 03194fe2-d898-450a-b2a1-f14f70ca57fd
+status: experimental
+description: >
+  COMPONENT RULE for the php2shell producer/consumer correlation. Not intended
+  for standalone paging — it is broad on purpose (any pre-init fatal can be the
+  producer the advisories describe). Alert on the correlation rule, not on this
+  component: a fatal alone is common, a fatal followed 60 s later by the stale
+  session warning from the same worker is not.
+  Lab-validated 2026-10-21: the ARM OOM carried the same pid as the following
+  "Session ini settings cannot be changed" warning.
+references:
+  - https://github.com/php/php-src/security/advisories/GHSA-w8hw-w9fx-j79w
+  - https://github.com/php/php-src/security/advisories/GHSA-6wmf-4rv5-p3rp
+  - https://www.php.net/archive/2026.php#2026-10-21
+author: detection engineering research
+date: 2026/10/21
+logsource:
+  category: webserver
+detection:
+  selection:
+    message|contains:
+      - 'PHP Fatal error'
+      - 'PHP Parse error'
+      - 'PHP Compile error'
+      - 'Maximum execution time'
+      - 'Uncaught Error'
+      - 'Uncaught Exception'
+      - 'Failed opening required'
+  filter_noise:
+    host|contains:
+      - 'ci-'
+      - 'staging-'
+      - 'dev-'
+  condition: selection and not filter_noise
+fields:
+  - message
+  - pid
+  - c-ip
+level: informational
+tags:
+  - attack.execution
+  - cve.2026-109618
+  - cve.2026-109619
+---
+title: php2shell Consumer — Stale Session INI Warning (correlation component)
+name: php2shell_consumer_stale_session_ini
+id: 505baa6f-18a7-4299-9d6c-206314ed759c
+status: experimental
+description: >
+  COMPONENT RULE for the php2shell producer/consumer correlation. Matches the
+  official CVE-2026-109619 consumer artifact — INI diagnostics raised before
+  request init while stale worker-global session state is still active. Rare on
+  healthy workers; keep at informational and rely on the correlation rule.
+  Lab-validated 2026-10-21 (verbatim string, same pid as the preceding OOM).
+references:
+  - https://github.com/php/php-src/security/advisories/GHSA-6wmf-4rv5-p3rp
+  - https://www.php.net/archive/2026.php#2026-10-21
+author: detection engineering research
+date: 2026/10/21
+logsource:
+  category: webserver
+detection:
+  selection:
+    message|contains:
+      - 'Session ini settings cannot be changed when a session is active'
+  condition: selection
+fields:
+  - message
+  - pid
+  - c-ip
+level: informational
+tags:
+  - attack.execution
+  - cve.2026-109619
+---
+title: php2shell Producer/Consumer Pair on Same Worker (fatal then stale-session warning)
+id: c270c5ad-3f1e-41c6-b9d9-bc758a255a9d
+status: experimental
+description: >
+  Temporal correlation: a pre-init PHP fatal (producer) followed within 60 s by
+  "Session ini settings cannot be changed when a session is active" (consumer)
+  on the same worker pid and, where available, the same client IP. This is the
+  cross-request stale-state pattern officially described for CVE-2026-109619
+  and reproduced in the 2026-10-21 validation lab. Requires log events to be
+  parsed into `pid` and `c-ip` fields; if only raw text exists, extract pid via
+  \[pid (\d+)(?::tid \d+)?\] before applying. Backends without Sigma correlation
+  support: use the Splunk (hunting-queries-v2.md §1.5), Elastic EQL (§2.2) or
+  Defender KQL (§3.1) equivalents.
+references:
+  - https://github.com/php/php-src/security/advisories/GHSA-w8hw-w9fx-j79w
+  - https://github.com/php/php-src/security/advisories/GHSA-6wmf-4rv5-p3rp
+  - https://www.php.net/archive/2026.php#2026-10-21
+author: detection engineering research
+date: 2026/10/21
+correlation:
+  type: temporal
+  rules:
+    - php2shell_producer_preinit_fatal
+    - php2shell_consumer_stale_session_ini
+  group-by:
+    - pid
+    - c-ip
+  timespan: 60s
+  generate: false
+level: critical
+tags:
+  - attack.execution
+  - attack.t1190
+  - cve.2026-109618
+  - cve.2026-109619

@@ -1,0 +1,50 @@
+title: Multipart POST with PHP Session Upload Progress Artifact (php2shell CVE-2026-109618/109619)
+id: a5e2c7d9-1f4b-4c8e-9a0d-2b3f6c8e4a15
+status: experimental
+description: >
+  Detects the on-the-wire artifacts of php2shell exploitation attempts: a
+  multipart/form-data POST containing a PHP_SESSION_UPLOAD_PROGRESS form field,
+  a PHPSESSID form field (session-fixation primitive), or PHP open tags /
+  serialized-object syntax inside a multipart filename= parameter.
+  PREREQUISITE: the log source must record request bodies (WAF audit logs such as
+  ModSecurity/Coraza, proxies with body capture, or nginx with $request_body
+  logging). Standard access logs do NOT contain bodies — use the accompanying
+  Suricata/ModSecurity rules there instead.
+  NOTE: a PHP_SESSION_UPLOAD_PROGRESS field alone can be legitimate (apps with
+  upload progress bars). Raise severity when combined with the other selections.
+references:
+  - https://sansec.io/research/php2shell
+  - https://github.com/ikow/php2shell-poc
+author: detection engineering research
+date: 2026/10/21
+logsource:
+  category: webserver
+detection:
+  selection_method:
+    sc-method: POST
+  selection_body_keywords:
+    request_body|contains:
+      - 'PHP_SESSION_UPLOAD_PROGRESS'
+  selection_fixation:
+    request_body|contains:
+      - 'name="PHPSESSID"'
+      - "name='PHPSESSID'"
+  selection_filename_payload:
+    request_body|re: 'filename="[^"\r\n]{0,256}(<\?php|<\?=|\|O:[0-9]+:|R:[0-9]+;)'
+  filter_known_upload_endpoints:
+    c-uri|endswith:
+      - '/upload'
+      - '/uploads'
+    # tune: add your application's genuine upload endpoints here
+  condition: selection_method and 1 of selection_body_keywords and not filter_known_upload_endpoints
+  # Strongest signal (rare, near-zero FPs) — consider a dedicated high-severity alert:
+  #   condition: selection_filename_payload
+falsepositives:
+  - Applications implementing native PHP upload progress bars
+  - API clients that legitimately send multipart bodies to .php endpoints
+level: high
+tags:
+  - attack.initial_access
+  - attack.t1190
+  - cve.2026-109618
+  - cve.2026-109619

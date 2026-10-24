@@ -1,0 +1,5 @@
+[Wed Oct 21 12:15:32.177908 2026] [core:warn] [pid 1429] AH00098: pid file /tmp/php2shell_repro/httpd.pid overwritten -- Unclean shutdown of previous Apache run?
+[Wed Oct 21 12:15:32.178394 2026] [unixd:alert] [pid 1429] AH02155: getpwuid: couldn't determine user name from uid 4294967295, you probably need to modify the User directive
+[Wed Oct 21 12:15:32.350240 2026] [php:error] [pid 1429] [client 127.0.0.1:55268] PHP Fatal error:  Allowed memory size of 8388608 bytes exhausted (tried to allocate 1802240 bytes) in Unknown on line 0
+[Wed Oct 21 12:15:32.350276 2026] [php:warn] [pid 1429] [client 127.0.0.1:55268] PHP Warning:  PHP Request Startup: Session ini settings cannot be changed when a session is active in Unknown on line 0
+[Wed Oct 21 12:15:33.380424 2026] [php:warn] [pid 1429] [client 127.0.0.1:55278] PHP Warning:  PHP Request Startup: Session ini settings cannot be changed when a session is active in Unknown on line 0

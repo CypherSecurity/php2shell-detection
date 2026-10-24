@@ -1,0 +1,194 @@
+# =====================================================================================
+# Suricata rules — php2shell (CVE-2026-109618 / CVE-2026-109619) — DETECTIONS v2
+# =====================================================================================
+# ADDITIONAL rules, SIDs 2202610100-2202610113 (14 rules). These EXTEND, and do not replace,
+#   detections/suricata/php2shell.rules  (SIDs 2202610001-2202610009).
+#
+# Scope: attack shapes confirmed in the official php.net / GHSA advisories of
+#   2026-10-21 14:00 UTC (OOM strategies 1-3) and in the local lab (1.3 MB and
+#   1.8 MB filename arm bodies, s[]/t[] spray, ~1-2 s mid-body stalls). Each rule
+#   below keys on a shape the earlier file does NOT already cover, or tightens a
+#   covered shape with a different anchor so the two do not double-alert on the
+#   same bytes. Overlap notes are inline.
+#
+# -------------------------------------------------------------------------------------
+# PREREQUISITES (same as v1 — body inspection is mandatory for the file.data rules)
+# -------------------------------------------------------------------------------------
+#   app-layer:
+#     protocols:
+#       http:
+#         libhtp:
+#           default-config:
+#             request-body-limit: 2mb        # 1 MB giant-filename rule needs >= 1mb body
+#             request-body-inspect-window: 1mb  # default 8kb WILL miss SIDs 0107/0108
+#             request-body-minimal-inspect-size: 8kb
+#   pcre.match-limit: 200000    # SIDs 0102/0109 count 100+ repeated structures; the
+#                              # default 35000 can cause silent no-match on big bodies.
+#   stream / flow memcap sized for your normal upload traffic.
+#   HTTP/1.1 only: chunked (SID 0100) and close-delimited (SID 0101) bodies need
+#   request-body inspection enabled for the *stream* reassembly path.
+#
+# -------------------------------------------------------------------------------------
+# TUNING / FALSE-POSITIVE EXPECTATIONS (per rule, below in the comments)
+# -------------------------------------------------------------------------------------
+#   Near-zero FP (deploy alerting):  0102 0103 0104 0105 0107 0108 0110 0111
+#   Low FP, client-population dep.:  0100 0101 0106 0109 0113
+#   Heuristic (gated chain):         0112  — only correlates on keep-alive flows;
+#                                    requires 0107/0108 -> 0111 to have fired first.
+#
+#   The OOM shapes are *amplification* shapes, not "large body" shapes: the
+#   confirmed exploit ran within default post_max_size / memory_limit. Do not add
+#   blanket dsize thresholds to these rules; that reserialises them into the exact
+#   false-positive profile the advisory warned about.
+#
+# SIDs remain in the local/unregistered range 2202610xxx — renumber to your scheme.
+# =====================================================================================
+
+
+# --- Shape 1 (official OOM #1): chunked multipart POST WITHOUT Content-Length -------
+# The advisory's exact words: "A multipart request without a usable declared content
+# length may pass the initial post_max_size check and continue supplying decoded body
+# data." The v1 rule 2202610006 fires on chunked + multipart alone (it does not care
+# whether Content-Length is also present, and will also fire on legitimate chunked
+# streaming uploads). This rule is the precise official shape: chunked AND no
+# Content-Length at all, which is what defeats the post_max_size pre-check.
+# NOTE: HTTP/1.1 forbids sending both; clients that send both are malformed and are
+# caught by the absence test failing — pair with 2202610006 for that case.
+alert http any any -> [$HOME_NET,$HTTP_SERVERS] any (msg:"ET LOCAL php2shell CVE-2026-109618 OOM shape 1 - chunked multipart POST with no Content-Length (post_max_size bypass)"; flow:established,to_server; http.method; content:"POST"; http.request_header; content:"Content-Type|3a 20|multipart/form-data"; nocase; http.request_header; content:"Transfer-Encoding|3a 20|chunked"; nocase; http.request_header; pcre:"/^(?![\s\S]*Content-Length\x3a)/i"; classtype:attempted-dos; sid:2202610100; rev:1; metadata:created_at 2026_10_21, cve CVE-2026-109618, cve CVE-2026-109619, confidence high, oom_shape 1;)
+
+# --- Shape 1 variant: close-delimited multipart POST (neither CL nor TE) ------------
+# Same post_max_size bypass achieved without chunking: HTTP/1.0-style
+# connection-close-delimited body. Rare with modern browsers; normal for a handful
+# of embedded/legacy upload clients. Kept separate from 0100 so you can disable it
+# per-vhost if you own such clients, without losing the chunked coverage.
+alert http any any -> [$HOME_NET,$HTTP_SERVERS] any (msg:"ET LOCAL php2shell CVE-2026-109618 OOM shape 1 variant - close-delimited multipart POST (no Content-Length, no Transfer-Encoding)"; flow:established,to_server; http.method; content:"POST"; http.request_header; content:"Content-Type|3a 20|multipart/form-data"; nocase; http.request_header; pcre:"/^(?![\s\S]*(?:Content-Length|Transfer-Encoding)\x3a)/i"; classtype:attempted-dos; sid:2202610101; rev:1; metadata:created_at 2026_10_21, cve CVE-2026-109618, cve CVE-2026-109619, confidence medium, oom_shape 1;)
+
+# --- Shape 2 (official OOM #2): part-header flood WITHOUT Content-Disposition -------
+# Advisory: part headers are amplified in memory far beyond their wire size, so a
+# request inside post_max_size can still exhaust memory_limit.
+# Design intent: v1 SID 2202610005 counts 60+ *Content-Disposition* occurrences, and
+# v1 SID 2202610007 counts 50+ generic header lines. This rule deliberately targets
+# the other half of the shape: 100+ header lines that are NOT Content-Disposition
+# (i.e. junk/duplicated custom part headers), in a body whose declared
+# Content-Length is still small (< 1 MB) so the flood is clearly amplification.
+# The negative lookahead also means a normal 100-part upload will not match here.
+# If your build lacks http.content_len, replace with "dsize:0<>1048576;" (coarser).
+alert http any any -> [$HOME_NET,$HTTP_SERVERS] any (msg:"ET LOCAL php2shell CVE-2026-109619 OOM shape 2 - multipart part-header flood without Content-Disposition (100+ header lines, <1MB body)"; flow:established,to_server; http.method; content:"POST"; http.request_header; content:"Content-Type|3a 20|multipart/form-data"; nocase; file.data; pcre:"/(?:\r\n(?!Content-Disposition\x3a)[A-Za-z0-9_-]{1,60}\x3a[^\r\n]{0,256}){100,}/"; classtype:attempted-dos; sid:2202610102; rev:1; metadata:created_at 2026_10_21, cve CVE-2026-109619, confidence high, oom_shape 2;)
+
+# --- Shape 2 variant: one part-header name repeated 60+ times ----------------------
+# A single part carrying the same header name 60+ times is the cheapest way to make
+# PHP's header array churn without changing the wire shape much. Backreference \1
+# makes this identical-name repetition, which no multipart producer does.
+alert http any any -> [$HOME_NET,$HTTP_SERVERS] any (msg:"ET LOCAL php2shell CVE-2026-109619 OOM shape 2 variant - identical multipart part-header repeated 60+ times"; flow:established,to_server; http.method; content:"POST"; http.request_header; content:"Content-Type|3a 20|multipart/form-data"; nocase; file.data; pcre:"/(?:\r\n([A-Za-z0-9_-]{3,40})\x3a[^\r\n]{0,96})(?:\r\n\1\x3a[^\r\n]{0,96}){59,}/"; classtype:attempted-dos; sid:2202610103; rev:1; metadata:created_at 2026_10_21, cve CVE-2026-109619, confidence high, oom_shape 2;)
+
+# --- Shape 3 (official OOM #3): empty file-control flood, 20+ ----------------------
+# filename="" file controls are exempt from max_file_uploads but still allocate
+# per-file metadata, so they are the cheapest metadata amplification.
+# Overlap: v1 SID 2202610008 is the same shape at 50+. This is the 20+ early-warning
+# tier, i.e. it fires strictly *before* 0008 and is intended for sensors that want
+# lead time; suppress one of the two if your console counts them as duplicates.
+alert http any any -> [$HOME_NET,$HTTP_SERVERS] any (msg:"ET LOCAL php2shell CVE-2026-109618 OOM shape 3 early tier - 20+ empty file controls (max_file_uploads bypass, pre-0008)"; flow:established,to_server; http.method; content:"POST"; http.request_header; content:"Content-Type|3a 20|multipart/form-data"; nocase; file.data; content:"filename=|22 22|"; pcre:"/(?:filename\x3d\x22\x22[\s\S]{0,400}?){20,}/"; classtype:attempted-dos; sid:2202610104; rev:1; metadata:created_at 2026_10_21, cve CVE-2026-109619, confidence high, oom_shape 3;)
+
+# --- Shape 3 (official OOM #3): nested field names, 5+ levels x 20+ parts ----------
+# Advisory: "Nested field names multiply the generated array work." The exploitable
+# shape is many parts EACH with a decent bracket depth — not one absurdly deep name,
+# which is what v1 SID 2202610009 counts (30+ levels in a single name). Benign forms
+# do use a[b][c] (2-3 levels); 20 parts at 5+ levels is not a form, it is array-work
+# amplification. Thresholds chosen so the two rules cannot both fire on one name.
+alert http any any -> [$HOME_NET,$HTTP_SERVERS] any (msg:"ET LOCAL php2shell CVE-2026-109618 OOM shape 3 - 20+ multipart parts with 5+ level nested field names"; flow:established,to_server; http.method; content:"POST"; http.request_header; content:"Content-Type|3a 20|multipart/form-data"; nocase; file.data; content:"name=|22|"; pcre:"/(?:[^\r\n]*name\x3d\x22[^\x22\r\n]{0,32}(?:\x5b[^\x5d\x22\r\n]{0,24}\x5d){5,}[^\x22\r\n]{0,32}\x22[^\r\n]*\r\n(?:[^\r\n]*\r\n){0,6}){20,}/"; classtype:attempted-dos; sid:2202610105; rev:1; metadata:created_at 2026_10_21, cve CVE-2026-109619, confidence high, oom_shape 3;)
+
+# --- Shape 4 (PHP 8.4+): multipart body on PUT / PATCH / DELETE --------------------
+# request_parse_body() in 8.4+ parses multipart on these methods too, so the parser
+# (CVE-2026-109619) and the upload-progress callback are reachable without POST.
+# Multipart is essentially never sent with a non-POST method except by REST clients
+# doing PUT uploads; those are rare enough to triage. Set confidence medium.
+alert http any any -> [$HOME_NET,$HTTP_SERVERS] any (msg:"ET LOCAL php2shell CVE-2026-109619 multipart body on non-POST method (PHP 8.4+ request_parse_body surface)"; flow:established,to_server; http.method; pcre:"/^(?:PUT|PATCH|DELETE)$/i"; http.request_header; content:"Content-Type|3a 20|multipart/form-data"; nocase; classtype:web-application-attack; sid:2202610106; rev:1; metadata:created_at 2026_10_21, cve CVE-2026-109618, cve CVE-2026-109619, confidence medium;)
+
+# --- Shape 5 (lab): giant filename value, 64 KB+ and 1 MB+ ------------------------
+# Lab-validated arm bodies carry a filename of 1.3 MB / 1.8 MB (and 256 KB in the
+# bundle's variant). The parser copies the filename several times before RINIT, which
+# is the pre-RINIT OOM primitive. No real client sends a 64 KB filename: browsers
+# truncate to ~255 bytes. This is one of the strongest wire indicators we have.
+# Requires request-body-inspect-window >= 1 MB or the 1 MB rule cannot see the tail.
+# Lower tier: >= 64 KB, kept at attempted-dos because some S3/backup CLIs can produce
+# path-derived long names (still nothing close to 64 KB, so FP is very low).
+alert http any any -> [$HOME_NET,$HTTP_SERVERS] any (msg:"ET LOCAL php2shell CVE-2026-109618 giant multipart filename 64KB+ (pre-RINIT OOM amplification)"; flow:established,to_server; http.method; content:"POST"; file.data; content:"filename=|22|"; pcre:"/filename\x3d\x22[^\x22\r\n]{65535,}/"; classtype:attempted-dos; flowint:php2shell_arm_seen,=,1; sid:2202610107; rev:1; metadata:created_at 2026_10_21, cve CVE-2026-109618, confidence high;)
+
+# Higher tier: >= 1 MB single filename value — matches the lab arm body exactly.
+alert http any any -> [$HOME_NET,$HTTP_SERVERS] any (msg:"ET LOCAL php2shell CVE-2026-109618 giant multipart filename 1MB+ (confirmed arm stage)"; flow:established,to_server; http.method; content:"POST"; file.data; content:"filename=|22|"; pcre:"/filename\x3d\x22[^\x22\r\n]{65535}[^\x22\r\n]{65535}[^\x22\r\n]{65535}[^\x22\r\n]{65535}[^\x22\r\n]{65535}[^\x22\r\n]{65535}[^\x22\r\n]{65535}[^\x22\r\n]{65535}[^\x22\r\n]{65535}[^\x22\r\n]{65535}[^\x22\r\n]{65535}[^\x22\r\n]{65535}[^\x22\r\n]{65535}[^\x22\r\n]{65535}[^\x22\r\n]{65535}[^\x22\r\n]{65535}[^\x22\r\n]{65535}/"; classtype:attempted-admin; flowint:php2shell_arm_seen,=,1; sid:2202610108; rev:1; metadata:created_at 2026_10_21, cve CVE-2026-109618, confidence high;)
+
+# --- Shape 6 (lab): s[] / t[] part-name spray, 100+ -------------------------------
+# The validated fire bodies use 150 x name="s[]" (288-byte zval spray) and 600 x
+# name="t[]" (small spray), then f/g 6 KB file parts. 100+ short array-named parts in
+# one request is a spray, not a form. Structure-anchored (boundary->CD->blank line->
+# one-line value) to keep PCRE work linear; a value containing CRLF will not match,
+# which is fine because the spray values are packed binary without CRLF.
+# Raise pcre.match-limit to 200000 for very large bodies (see header).
+alert http any any -> [$HOME_NET,$HTTP_SERVERS] any (msg:"ET LOCAL php2shell CVE-2026-109618 spray shape - 100+ s[]/t[] multipart parts (lab kill sequence)"; flow:established,to_server; http.method; content:"POST"; http.request_header; content:"Content-Type|3a 20|multipart/form-data"; nocase; file.data; content:"Content-Disposition|3a 20|form-data|3b 20|name=|22|"; pcre:"/(?:Content-Disposition\x3a form-data\x3b name\x3d\x22[st]\x5b\x5d\x22\r\n\r\n[^\r\n]{0,600}\r\n(?:--[^\r\n]{0,120}\r\n)?){100,}/"; classtype:attempted-admin; sid:2202610109; rev:1; metadata:created_at 2026_10_21, cve CVE-2026-109618, confidence high;)
+
+# --- Shape 7 (lab): multipart POST to a .php file under an uploads/web-content dir --
+# Two tiers, because "PHP under wp-content" is not uniformly anomalous:
+#   0110  .php under /wp-content/uploads/  — uploads must be static and
+#         non-executable; near-zero FP, this is the deploy-wide alerting tier.
+#   0113  .php directly under /wp-content/ (exactly one path segment, e.g. the lab
+#         target /wordpress/wp-content/index.php) — deliberately does NOT match
+#         /wp-content/plugins/... or /wp-content/themes/..., which legitimately
+#         contain hundreds of PHP entry points and would drown you in FPs.
+# Query strings are tolerated; a trailing .php.bak is not treated as PHP.
+alert http any any -> [$HOME_NET,$HTTP_SERVERS] any (msg:"ET LOCAL php2shell CVE-2026-109618 multipart POST to PHP file under wp-content/uploads (abnormal target)"; flow:established,to_server; http.method; content:"POST"; http.uri; content:"/wp-content/uploads/"; nocase; pcre:"/\/wp-content\/uploads\/(?:[^\s?#]+\/)*[^\s?#]+\.php(?:[?#]|$)/i"; http.request_header; content:"Content-Type|3a 20|multipart/form-data"; nocase; classtype:web-application-attack; sid:2202610110; rev:1; metadata:created_at 2026_10_21, cve CVE-2026-109618, cve CVE-2026-109619, confidence high;)
+
+# Tier 2: a .php sitting directly in wp-content (lab target shape), one segment deep.
+# advanced-cache.php / object-cache.php live there on some hosts, but they are not
+# normally POSTed a multipart body; if you see one from your own platform, whitelist
+# that exact URI. Thresholding by_uri is recommended if you run many WP sites.
+alert http any any -> [$HOME_NET,$HTTP_SERVERS] any (msg:"ET LOCAL php2shell CVE-2026-109618 multipart POST to PHP file directly under wp-content (lab target shape)"; flow:established,to_server; http.method; content:"POST"; http.uri; content:"/wp-content/"; nocase; pcre:"/\/wp-content\/[^\s\/?#]+\.php(?:[?#]|$)/i"; http.request_header; content:"Content-Type|3a 20|multipart/form-data"; nocase; classtype:web-application-attack; sid:2202610113; rev:1; metadata:created_at 2026_10_21, cve CVE-2026-109618, cve CVE-2026-109619, confidence medium;)
+
+# =====================================================================================
+# Shape 8 — ARM-THEN-FIRE chain. HEURISTIC, FLOW-SCOPED, AND GATED ON SHAPE 5.
+# =====================================================================================
+# Rationale: the lab arm request returns HTTP 500 (pre-RINIT OOM, worker survives),
+# then the attacker fires more multipart POSTs at the same worker. We approximate
+# "same worker" with "same TCP flow" (flowint state is per flow) plus a session tag.
+#
+# The chain is deliberately gated so it does NOT alert on ordinary application 500s:
+#   0107 / 0108  match the arm body itself (giant filename) and set
+#                flowint php2shell_arm_seen in that flow.
+#   0111         fires only on a 500 whose own flow already carried that arm body —
+#                i.e. the OOM receipt, not a random 500. This works even when the
+#                client closes the connection after the request (request+response
+#                share the flow), so it survives the validated PoC's behaviour.
+#   0112         fires on later multipart POSTs in the same flow, i.e. the retry/fire
+#                burst. Requires php2shell_armed (set by 0111).
+#
+# LIMITATION, stated plainly: 0112 only works against keep-alive/pipelined attackers,
+# because the validated public PoC opens a NEW connection per request
+# ("Connection: close"). For that client the arm receipt (0111) still fires, but the
+# follow-up will land in a different flow and 0112 will not correlate. The durable,
+# transport-independent signals remain: the host log line "Allowed memory size ...
+# exhausted ... in Unknown on line 0" on a multipart POST, the pre-RINIT "Session ini
+# settings cannot be changed" warning, and the Zeek notices in the companion policy.
+# Treat 0111 as real signal and 0112 as an opportunistic add-on.
+
+# --- Arm receipt: 500 inside a flow that already sent a giant-filename multipart ---
+# Near-zero FP once gated: a 500 following a 64 KB+ filename upload is the documented
+# pre-RINIT OOM receipt (lab: "Allowed memory size of 8388608 bytes exhausted").
+alert http any any -> any any (msg:"ET LOCAL php2shell CVE-2026-109618/109619 arm receipt - 500 after giant-filename multipart (pre-RINIT OOM, worker survived)"; flow:established,to_client; http.stat_code; content:"500"; flowint:php2shell_arm_seen,isset; flowint:php2shell_armed,=,1; tag:session,60,seconds; classtype:attempted-dos; sid:2202610111; rev:1; metadata:created_at 2026_10_21, cve CVE-2026-109618, cve CVE-2026-109619, confidence medium;)
+
+# --- Fire stage: multipart POST after the armed 500, same flow --------------------
+# detection_filter: alert only from the 2nd qualifying request per source in 60s,
+# i.e. "followed by MORE multipart POSTs" per the lab kill sequence. flowint is
+# checked with isset (no reset available in a single flowint option); the flow's
+# lifetime bounds the state, so a long keep-alive connection stays armed — acceptable
+# because the 2-in-60s filter still gates generation.
+alert http any any -> [$HOME_NET,$HTTP_SERVERS] any (msg:"ET LOCAL php2shell CVE-2026-109618/109619 fire stage heuristic - multipart POST after armed 500 on same flow"; flow:established,to_server; http.method; content:"POST"; http.request_header; content:"Content-Type|3a 20|multipart/form-data"; nocase; flowint:php2shell_armed,isset; detection_filter: track by_src, count 2, seconds 60; classtype:attempted-admin; sid:2202610112; rev:1; metadata:created_at 2026_10_21, cve CVE-2026-109618, cve CVE-2026-109619, confidence low, note pair-with-2202610111;)
+# --- Null-byte session id (added 2026-10-22): public exploit detail ---------
+# The 9bie chain sets PHPSESSID to a NUL byte to force PHP to mint a brand-new
+# session id while leaving session state dirty ("PHPSESSID=\x00 generates a new
+# id and sets send_cookie=1"). A legitimate PHP session id is never empty and
+# never contains NUL: it is 26 chars of [A-Za-z0-9,-]. Either the raw byte or
+# the %00 form is conclusively malicious in a Cookie header.
+# This is a PRE-CONDITION signal: it fires on the malicious request itself,
+# before any OOM/log artifact appears, so it catches the arm early.
+alert http any any -> [$HOME_NET,$HTTP_SERVERS] any (msg:"ET LOCAL php2shell exploit marker - NUL byte in PHPSESSID cookie (invalid session id)"; flow:established,to_server; http.cookie; content:"PHPSESSID=|00|"; nocase; classtype:web-application-attack; sid:2202610114; rev:1; metadata:created_at 2026_10_22, cve CVE-2026-109618, cve CVE-2026-109619, confidence high, stage arm;)
+
+alert http any any -> [$HOME_NET,$HTTP_SERVERS] any (msg:"ET LOCAL php2shell exploit marker - percent-encoded NUL in PHPSESSID cookie"; flow:established,to_server; http.cookie; content:"PHPSESSID="; nocase; pcre:"/PHPSESSID=[^\x3b\r\n]{0,64}%00/i"; classtype:web-application-attack; sid:2202610115; rev:1; metadata:created_at 2026_10_22, cve CVE-2026-109618, cve CVE-2026-109619, confidence high, stage arm;)

@@ -1,0 +1,48 @@
+title: PHP Process spawned Command Shell or System Utility (Windows)
+id: 3d8a1b4c-6e2f-4a9b-8c7d-1e0f5b3a9d12
+status: experimental
+description: >
+  Detects php.exe or php-cgi.exe (often embedded inside vendor appliances,
+  cPanel/Plesk-style panels, or XAMPP stacks) spawning cmd.exe, powershell.exe,
+  certutil.exe or similar system utilities — the Windows post-exploitation signal
+  for PHP RCE such as php2shell (CVE-2026-109618 / CVE-2026-109619).
+references:
+  - https://sansec.io/research/php2shell
+  - https://www.huntress.com/blog/php2shell-leaked-critical-php-vulnerabilities
+author: detection engineering research
+date: 2026/10/21
+logsource:
+  category: process_creation
+  product: windows
+detection:
+  selection_parent:
+    ParentImage|endswith:
+      - '\php.exe'
+      - '\php-cgi.exe'
+      - '\php-fpm.exe'
+      - '\httpd.exe'
+  selection_child:
+    Image|endswith:
+      - '\cmd.exe'
+      - '\powershell.exe'
+      - '\pwsh.exe'
+      - '\certutil.exe'
+      - '\curl.exe'
+      - '\wget.exe'
+      - '\bitsadmin.exe'
+      - '\mshta.exe'
+      - '\rundll32.exe'
+      - '\nc.exe'
+      - '\python.exe'
+      - '\perl.exe'
+  condition: selection_parent and selection_child
+falsepositives:
+  - PHP build/dev tooling on developer workstations (exclude dev machines by HostName)
+  - Web stacks that legitimately shell out to converters — tune by command line
+level: critical
+tags:
+  - attack.execution
+  - attack.t1059.003
+  - attack.t1059.001
+  - cve.2026-109618
+  - cve.2026-109619

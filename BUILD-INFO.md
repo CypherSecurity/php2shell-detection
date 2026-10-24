@@ -1,0 +1,201 @@
+# BUILD INFO — php2shell detection & response package
+
+**Build timestamp:** 2026-10-24 13:22 UTC
+**Package name:** `php2shell-detection-package-2026-10-24`
+**Why the name changed:** the package was first assembled on 2026-10-21 and then materially
+updated through 2026-10-22 (tested exploit results, corrected findings, repaired Suricata
+ruleset). The folder is now named for the **content date**, not the original assembly date.
+
+> ⚠️ **Supersedes** `php2shell-detection-package-2026-10-21.zip`. If you hold a copy with
+> that name, replace it — that build contained a Suricata ruleset that **failed to load**
+> (see `02-detections/DEPLOY-NOTES.md`), so it produced **no alerts** while appearing healthy.
+
+## Verify you have the current build
+
+```sh
+sha256sum php2shell-detection-package-2026-10-22.zip
+# compare against the .sha256 file distributed alongside the zip
+```
+
+The zip's own hash cannot be embedded inside itself, so it ships as a sidecar
+`php2shell-detection-package-2026-10-22.zip.sha256`.
+
+## What changed on 2026-10-22
+
+1. **Suricata ruleset repaired** — 4 defects (invalid `flowint ... set` syntax, PCRE2
+   quantifiers >65535, invalid `less_than` keyword, unescaped `;` in a pcre class) meant the
+   whole file failed to load. Now validated: `suricata -T` exit 0, 0 errors, 16 rules.
+2. **Zeek / YARA / ModSecurity** re-validated (Zeek 9.0.0 parses; YARA 4.5.5 compiles;
+   Apache mod_security2 `configtest` Syntax OK).
+3. **Public exploit results are now TESTED, not quoted:**
+   - ✅ RCE **confirmed** for `display_errors=On` (4 HTTP requests, `uid=33(www-data)`).
+   - ❌ `display_errors=Off` RCE **not reproduced** — earlier claim corrected.
+   - Detection validated: a 4,096-byte `PHPSESSID` cookie was observed exactly as our rule
+     targets, even while both public exploits failed to complete.
+4. **Scope clarification:** PHP **7.4 / 8.0 / 8.1 are affected** despite the CVE titles
+   saying "8.2–8.5" — they have no official release, only LTS backports.
+5. **New detection rules:** NUL byte in `PHPSESSID` (an arm-stage marker published with the
+   public exploit).
+
+## What changed in the 2026-10-22 afternoon rebuild
+
+6. **In-the-wild exploitation confirmed.** Amazon Threat Intelligence reports the first
+   PHP2Shell exploitation attempt on **2026-10-17**, four days before disclosure, from
+   anonymised infrastructure, with multiple actors active pre-release; AWS describes the
+   flaws as "broadly exploited in the wild." START-HERE now instructs hunting **back to
+   17 October**, and flags a KEV listing as likely imminent.
+   Source: AWS Security Blog (MadPot), corroborated by BleepingComputer.
+
+## What changed in the 2026-10-22 evening rebuild (SOC triage)
+
+7. **Added `06-soc-triage/`** — a four-document SOC module written for analysts who have not
+   read the dossier: severity ladder, per-alert triage with first-three-checks and escalation
+   criteria, false-positive tuning/baselining guidance, and an incident-response runbook
+   (including rotating credentials after a disclosure event, and scoping from **17 Oct**).
+   No detection content changed.
+
+## What changed in the 2026-10-23 rebuild
+
+8. **Ubuntu patch path documented.** USN-8948-1 / USN-8948-2 fix both CVEs; verified versions
+   for noble/jammy/focal/bionic/xenial/trusty (ESM). Added to START-HERE with a version table.
+9. **Monitor defect fixed:** the hourly watch was blind to Ubuntu (assumed a list-shaped API
+   that had changed, and only scanned the last 40 notices so the PHP USNs had scrolled out).
+   Now uses the per-CVE API and reports USN ids + per-release fixed versions.
+   **Ubuntu status was therefore missing from the first ~36 h of reporting** — corrected here.
+10. **Package renamed to the content date** (2026-10-23) per convention, since content changed
+    and the UTC day rolled.
+
+## What changed in the 2026-10-23 07:45 rebuild
+
+11. **Added `CLARIFICATION-second-vulnerability-claim.md`** — the "second unpatched PHP bug"
+    claim is **refuted by the PHP security team** (direct quote, dated, sourced). Includes a
+    paste-ready reply for stakeholders.
+12. **Added `PATCH-AVAILABILITY.md`** — verified fixed-version matrix by ecosystem (upstream,
+    EOL backports, Ubuntu incl. ESM, Debian, Docker images, RHEL/Remi caveat) plus
+    verification commands and the "app patching doesn't help / restart required" traps.
+13. **Debian 12 bookworm is NOW FIXED** — `8.2.35-1~deb12u1`, **DLA-4848-1**; Debian 13
+    `8.4.27-1~deb13u1`, **DSA-6574-1**. (bookworm was still vulnerable on 21-22 Oct.)
+14. START-HERE now answers both questions in a block above "What's in this package".
+
+## What changed in the 2026-10-23 11:00 rebuild
+
+15. **NEW: CVE-2026-115560** — PHP published an *informational advisory* (23 Oct, session upload
+    progress). **No patch yet** (next regular release). Narrow conditions: app sets
+    `session.serialize_handler` to `php_binary`/`php_serialize` then switches to `php` at runtime,
+    with upload progress enabled. PHP calls it an *"unlikely RCE vector"*. **Mitigation is
+    `session.upload_progress.enabled=0` — already step 1 of our containment order, and already
+    published in the 21 Oct advisory.** This is **not** a bypass of the critical fixes.
+16. `CLARIFICATION-second-vulnerability-claim.md` updated with a new **§6** so it cannot be accused
+    of over-claiming: the "patch is broken" claim remains false, but there is now one real, narrow,
+    already-mitigated caveat. Also added to `PATCH-AVAILABILITY.md` (§8b) and START-HERE.
+17. Dossier §28 records the advisory, exact conditions, and the probable link to the original
+    social-media noise (inference, marked as such).
+
+## What changed in the 2026-10-23 18:45 rebuild (IMPORTANT)
+
+18. **🚨 Palo Alto PAN-OS / Panorama confirmed affected** — no special configuration required,
+    **fixes not yet released** (ETAs 26–30 Oct). Added a prominent alert block to START-HERE, a
+    full section to `PATCH-AVAILABILITY.md` (§7b: pending versions per branch + interim
+    mitigations), dossier §29, and **SOC triage A11** for appliance management planes.
+19. **Industrial knock-on:** Siemens **SSA-566512** — RUGGEDCOM APE1808 hosting PAN-OS affected;
+    contact Siemens support. Cortex XCORE (21 Oct) and WildFire Cloud (22 Oct) already patched.
+20. **Threat numbers moved:** EPSS 109618 **5.31% → 11.62%** (96th pct); EPSS 109619 5.76% → 5.99%.
+    NVD both `Analyzed` (refs 5 / 14, incl. Siemens + new oss-security posts). **KEV catalog
+    1,754 → 1,755** but the addition is **CVE-2026-114625 (Arista VeloCloud)** — php2shell is
+    **still not listed**. PoC repos 786 → **835 (+49)**, the largest hourly jump since disclosure.
+21. Unit 42 states it has **seen PoC** and notes a European government took its website offline.
+
+## What changed in the 2026-10-23 19:00 rebuild
+
+22. Added a **citable community reference** to `CLARIFICATION-second-vulnerability-claim.md`:
+    Alexandre Daubois' independent analysis of the PHP2Shell rumours (21 Oct), with the useful
+    precision that `session.upload_progress.enabled=0` addresses the **session/upload-progress
+    arm (109619) only** — it is **not** a mitigation for the OOM arm (109618). Our own wording was
+    checked against this and is consistent ("breaks the upload-progress arm").
+
+## What changed in the 2026-10-23 20:15 rebuild
+
+23. **Added `PAN-OS-EXPOSURE.md`** — answers "how many are exposed / would the exploit actually work"
+    with published figures, the **exploit-capability reality** (public PoCs do not bypass ASLR on
+    x86-64; VulnCheck holds a private working exploit), PAN's **availability-only** assessment
+    (`VC:N/VI:N/VA:H`), estate-check commands, and the interim-control priority order.
+24. **PAN scope refinements (23 Oct advisory revision):** **WildFire WF-500 / WF-500-B** added as
+    affected; mgmt plane = **HTTPS web UI + XML API**, plus dataplane interfaces with a management
+    profile; GlobalProtect portal/gateway **not** in scope; **Panorama and WF-500 have no fix date**.
+25. START-HERE and `PATCH-AVAILABILITY.md` §7b updated to match.
+
+## What changed in the 2026-10-23 20:30 rebuild
+
+26. **Added `INCIDENT-STATUS.md`** — answers "has any company said it was a victim?". Position:
+    **no publicly confirmed compromise**. Includes the **Sophos retraction** (they reported one
+    successful exploitation, then corrected it), the French government / Orange precautionary
+    outages, the 18.8% of monitored sites pulled offline, attacker tooling evidence (~10 workspaces,
+    none with a shell), and — importantly — **why absence of victims is not evidence of safety**
+    (silent memory-disclosure path, pre-disclosure attempt on 17 Oct, disclosure lag).
+27. Dossier §30 mirrors it. Package rebuilt.
+
+## What changed in the 2026-10-23 21:30 rebuild (capability update)
+
+28. **`display_errors=Off` RCE is now CONFIRMED achievable** — by two independent teams with private
+    exploits: **VulnCheck** (x86-64, ASLR on, PHP 8.4.26) and **CovertSwarm** (AArch64, PHP 8.5.11,
+    plus one WordPress lab; their 8.5.12 controls did not execute). Neither tool is public.
+29. **Our earlier "display_errors=Off unverified" status was too comfortable and is corrected** in
+    START-HERE and dossier §31: do not treat `display_errors=Off` as a security control.
+30. **Hands-on test of the public claim (9bie repo, 1,218★): NOT REPRODUCED — 14/14 attempts failed**
+    against the exact stock image (`display_errors=Off`, prefork 150), at the leak stage. Binary hash
+    matches their offsets registry exactly (`51663cf8…`), so it is not a wrong-build artefact; an
+    independent researcher also failed to port their parameters to the official image.
+
+## What changed in the 2026-10-24 00:00 rebuild
+
+31. **PAN-OS signature coverage expanded ~5×** (advisory revision 24 Oct: "Threat ID released and
+    details updated"): from 5 IDs to **25** — `543004`, `97622`–`97625`, `97643`, `97647`, `97649`,
+    `97652`, `97653`, `97656`–`97659`, `97662`–`97664`, `97670`–`97674`, `97676`–`97678`, content
+    **9162/9163/9164+**. START-HERE, `PATCH-AVAILABILITY.md` §7b and SOC triage **A11** updated —
+    estates that enabled only the original five are under-covered and need content ≥9164.
+32. Still **no PAN-OS fixes** (20 ETA markers intact, 26–30 Oct); Panorama / WF-500 undated.
+33. Dossier §32. Package **renamed to 2026-10-24** (content changed + UTC day rolled).
+
+## What changed in the 2026-10-24 08:00 rebuild
+
+34. **First credible PUBLIC PHP-FPM chain documented** — `VABISMO/php2shell-nginx-fpm-full-rce`
+    (nginx + FPM, CVE-2026-109619, ASLR bypassed via HTTP stale-string leak, **no `display_errors`
+    dependency**, verified `uid=` output, per-version profiles, CI/live-FPM workflows). It is
+    **conditional**: requires two pools with *different* memory limits (consumer low enough to OOM on
+    a ~4 MB session), shared session dir, single-worker/pinned workers, and an app calling
+    `session_start()`. Not a stock-host tool.
+35. Added detection value from it — **FPM worker deaths / 502 bursts paired with large multipart
+    bodies**; the existing YARA `Oversized_Session_File` rule covers the planted 4 MB session artefact;
+    `session.upload_progress.enabled=0`, `pm.max_requests` recycling and per-pool memory parity break
+    the preconditions. Dossier §33, INCIDENT-STATUS §4b.
+
+## What changed in the 2026-10-24 14:00 rebuild
+
+36. **Published a live status page** — <https://f4n6.co.uk/php2shell/> — generated from the same
+    hourly monitoring, so public claims and this package share one source of truth. Updates are
+    published automatically when the underlying facts change.
+37. This package is the **downloadable companion** to that page: full dossier, detection rules,
+    hunting queries, SOC triage, patch matrix and PAN-OS exposure notes. No exploit code.
+
+## Reading order
+
+| File | Why |
+|---|---|
+| `START-HERE.md` | The one-pager: what to do, in order |
+| `01-threat-intel/php2shell-threat-intel-dossier.md` | Full dossier incl. §21 hands-on verification |
+| `02-detections/DEPLOY-NOTES.md` | **Suricata compatibility fixes — read before deploying** |
+| `03-hardening/` | Config mitigations |
+| `04-hunting/` | 29 hunting queries |
+| `05-validation/` | Lab validation evidence |
+| `06-soc-triage/` | **SOC alert triage, FP tuning, incident response** |
+| `CLARIFICATION-second-vulnerability-claim.md` | **Is there a second bug? Answered from primary sources** |
+| `PATCH-AVAILABILITY.md` | **Verified patch matrix by distro and ecosystem** |
+| `PAN-OS-EXPOSURE.md` | **PAN-OS: exposure numbers, exploit reality, estate checks** |
+
+## Honest limitations
+
+- Detection rules are validated as **loadable and syntactically correct**; they have not all
+  been tuned against production traffic volumes. Expect false positives on
+  `session.upload_progress`-heavy applications.
+- The `display_errors=Off` RCE claim from public research is **unverified** by us.
+- No KEV addition as of this build; the two CVEs remain NVD status `Modified`.

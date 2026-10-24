@@ -1,0 +1,18 @@
+Reading symbols from /usr/sbin/apache2...
+(No debugging symbols found in /usr/sbin/apache2)
+Function "php_var_serialize_init" not defined.
+Breakpoint 1 (php_var_serialize_init) pending.
+Function "php_var_serialize_destroy" not defined.
+Breakpoint 2 (php_var_serialize_destroy) pending.
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
+warning: Temporarily disabling breakpoints for unloaded shared library "/usr/lib/apache2/modules/libphp8.3.so"
+S_INIT level=0 data=(nil)
+S_INIT level=1 data=0x7ffff666d140
+S_DESTR entry level=2
+S_INIT level=1 data=0x7ffff666d140
+S_DESTR entry level=2
+
+Program terminated with signal SIGKILL, Killed.
+The program no longer exists.
+(gdb) 

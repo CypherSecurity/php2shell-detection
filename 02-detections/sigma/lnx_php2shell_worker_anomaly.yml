@@ -1,0 +1,341 @@
+# php2shell (CVE-2026-109618 / CVE-2026-109619) — Linux worker anomaly rules
+#
+# Multi-document Sigma file. Each YAML document is an independent rule; ingest
+# them individually (sigma convert handles one document per file, so split with
+# `csplit`/`yq` if your pipeline requires it):
+#
+#   yq -s '"rule_" + $index' lnx_php2shell_worker_anomaly.yml
+#
+# Two required behaviours are NOT expressible as Sigma events. Their hunting
+# implementations live here as documentation and are shipped as runnable queries
+# in ../hunting/hunting-queries-v2.md §5-§6:
+#
+# 1) ZOMBIE WORKER PILE-UP. A growing count of <defunct> apache2/php-fpm
+#    children (state Z) is a metric, not an event. Lab observation 2026-10-21:
+#    ~12 zombies accumulated on the parity stack (one per fire-250 kill) before
+#    the pile was noticed. Hunt:
+#      ps -eo stat,ppid,pid,user,comm | awk '$1 ~ /^Z/ && $5 ~ /(apache2|httpd|php-fpm)/'
+#      ps -eo stat | grep -c '^Z'          # baseline; alert on >N over 10 m
+#    Splunk: index=linux sourcetype=ps process_name IN (apache2,httpd,php-fpm) state=Z
+#            | stats count by host, process_name | where count > 5
+#    Rule "PHP Worker Zombie Pile-Up after Multipart Bursts" below is the same
+#    idea for process telemetry backends that expose a process-state field at
+#    exec/exit time (eBPF/audit-enriched, node_exporter process collector).
+#
+# 2) SESSION-FILE flock SELF-DEADLOCK. A php-fpm worker holding an exclusive
+#    flock on sess_<id> for >5 s while still processing the same request is a
+#    held-lock duration, not an event (observed as the workaround need for
+#    "fresh worker per attempt" in the 2026-10-21 lab). Hunt with:
+#      for p in $(pgrep -f 'php-fpm: pool'); do
+#        ls -l /proc/$p/fd 2>/dev/null | grep -q sess_ && \
+#        awk '/^lock:/{print FILENAME, $0}' /proc/$p/fdinfo/* 2>/dev/null; done
+#    or bpftrace: trace syscalls:sys_exit_flock, filter on sess_ fds and
+#    compute hold time; or `lsof -p <worker> | grep sess_` sampled every 1 s and
+#    alert if the same fd is held across >5 samples while the worker's
+#    %CPU/state indicates active processing.
+#    NOT SHIPPED AS A SIGMA RULE: a lock-hold duration has no event to key on,
+#    and `status: unsupported` documents without a detection block fail Sigma
+#    validation. The query above (and hunting-queries-v2.md §5.2) IS the
+#    detection; the 7383c8cf-26db-43ac-8003-006df3175e8a id is reserved for it
+#    if a duration-capable backend (eBPF sensor) is added later.
+---
+title: PHP Worker Zombie Pile-Up after Multipart Bursts (php2shell worker-kill artifact)
+id: 4dbca3d7-6d59-4ccf-8318-575e8091cb15
+status: experimental
+description: >
+  Detects the pile-up of <defunct> apache2/httpd/php-fpm workers that follows
+  repeated php2shell kill attempts. LAB-VALIDATED 2026-10-21 on the parity
+  stack: each fire-250 attempt killed its worker and left a zombie (12 observed
+  across the test envelope), which is why "the worker is alive" readings were
+  initially misleading.
+
+  IMPORTANT: this is a metric, not a discrete event. It only works on backends
+  whose process telemetry carries a state field (process.state / ps state) —
+  e.g. auditd/eBPF-enriched process events or a ps/node_exporter process
+  collector forwarded to the SIEM. Standard Sysmon-for-Linux process_creation
+  does NOT see zombies (no exec happens). If your backend cannot filter on
+  state, use the hunting query in the file header / hunting-queries-v2.md §5:
+  `ps -eo stat,ppid,user,comm | awk '$1 ~ /^Z/ ...'` and the
+  `| stats count by host, process_name where state=Z` metric.
+
+  Semantics: ParentImage is the worker's parent (apache2/httpd master or
+  php-fpm master); the zombie child is the worker itself (Image php-fpm/httpd
+  or the mod_php httpd child), state Z, never reaped. One or two transient
+  zombies is normal; a count that grows across a multipart-POST burst is not.
+references:
+  - https://github.com/php/php-src/security/advisories/GHSA-w8hw-w9fx-j79w
+  - https://www.php.net/archive/2026.php#2026-10-21
+  - https://sansec.io/research/php2shell
+author: detection engineering research
+date: 2026/10/21
+logsource:
+  category: process_creation
+  product: linux
+  definition: requires a process-state field (auditd/eBPF/ps-collector enriched); not raw execve telemetry
+detection:
+  selection_parent:
+    ParentImage|endswith:
+      - '/apache2'
+      - '/httpd'
+      - '/php-fpm'
+      - '/php-fpm7.4'
+      - '/php-fpm8.0'
+      - '/php-fpm8.1'
+      - '/php-fpm8.2'
+      - '/php-fpm8.3'
+      - '/php-fpm8.4'
+      - '/php-fpm8.5'
+  selection_worker:
+    Image|endswith:
+      - '/apache2'
+      - '/httpd'
+      - '/php-fpm'
+  selection_zombie_state:
+    process.state: 'Z'
+  condition: selection_parent and selection_worker and selection_zombie_state
+fields:
+  - Image
+  - ParentImage
+  - process.state
+  - process.pid
+  - process.parent.pid
+  - User
+falsepositives:
+  - A single briefly-unreaped worker during a graceful Apache/PHP-FPM restart or
+    a `kill -9`-driven reload — count over a window, do not alert per event.
+  - Broken init/supervisor configurations that never reap children (existing
+    low-rate zombie floor on the host — baseline it first).
+level: high
+tags:
+  - attack.impact
+  - attack.t1499
+  - cve.2026-109618
+  - cve.2026-109619
+---
+title: PHP Worker Read of /proc/<pid>/mem (php2shell leak read-back path)
+id: 6dfe1019-4095-4d9e-b42f-83aed0c5006c
+status: experimental
+description: >
+  Detects a PHP worker (php-fpm, php-cgi, mod_php httpd/apache2) causing a read
+  of /proc/self/mem or another process's /proc/<pid>/mem — the local read-back
+  path required to turn the php2shell LEAK stage (heap addresses written into the
+  session file) into a usable ASLR defeat (chains B/C in the ikow research; the
+  memory read-back path is not addressed by the official advisories).
+
+  HONEST LIMITATION: the leak read-back in the demonstrated chain happens
+  in-process (unserialize/serialize), which produces no child process and is
+  therefore invisible to process_creation. This rule catches the *observable*
+  variants: a worker shelling out to cat/dd/gdb/php/perl/python, a debugger
+  attaching, or a worker command line that explicitly names a mem file. For the
+  in-process case use the auditd/eBPF open() telemetry described in the file
+  header and in hunting-queries-v2.md §6 (key: open of /proc/*/mem with
+  comm=php-fpm and uid=pool user; auditd rule
+  `-a always,exit -F arch=b64 -S open,openat -F path=/proc/*/mem` needs the
+  newer `-F path` wildcard support or an eBPF sensor).
+
+  Lab/OS note: reading maps/mem of a process needs ptrace permissions — the
+  same-uid or CAP_SYS_PTRACE case in a container/lab; on hardened hosts this
+  signal may be absent because the read fails.
+references:
+  - https://github.com/ikow/php2shell-poc
+  - https://github.com/php/php-src/security/advisories/GHSA-w8hw-w9fx-j79w
+  - https://sansec.io/research/php2shell
+author: detection engineering research
+date: 2026/10/21
+logsource:
+  category: process_creation
+  product: linux
+detection:
+  selection_parent:
+    ParentImage|endswith:
+      - '/php-fpm'
+      - '/php'
+      - '/php-cgi'
+      - '/apache2'
+      - '/httpd'
+  selection_parent_versioned:
+    ParentImage|contains:
+      - '/php-fpm7.'
+      - '/php-fpm8.'
+      - '/php7.'
+      - '/php8.'
+  selection_mem_read:
+    CommandLine|re: '/proc/(?:self|[0-9]{1,10})/mem'
+  filter_package_managers:
+    # Legitimate tooling that touches /proc/*/mem: gdb batch jobs, valgrind,
+    # perf, coredump helpers, fpm status scripts. Tune by child Image/binary.
+    CommandLine|contains:
+      - 'gcore'
+      - 'coredumpctl'
+      - 'systemd-coredump'
+  condition: (selection_parent or selection_parent_versioned) and selection_mem_read and not filter_package_managers
+fields:
+  - Image
+  - CommandLine
+  - ParentImage
+  - ParentCommandLine
+  - User
+falsepositives:
+  - Debugging/profiling on developer or CI hosts (gdb, valgrind, perf, ASAN
+    runs) — exclude non-production hosts and known debug tooling.
+  - APM/profiling agents that inspect their own process memory via a helper.
+level: critical
+tags:
+  - attack.credential_access
+  - attack.t1003
+  - cve.2026-109618
+  - cve.2026-109619
+---
+title: Session File Written by Web Pool User with Anomalous Size (php2shell sess_* payload write)
+id: 64675d34-88ca-473f-8e5a-1138e770a14e
+status: experimental
+description: >
+  Detects a session file (sess_*) created or modified under a PHP session
+  save_path by the web pool user (www-data / apache / nginx / php-fpm) at a size
+  never produced by normal session payloads. Normal PHP sessions are tens to a
+  few hundred bytes (upload_progress entries can reach a few KB); php2shell
+  PRIME/LEAK sessions are multi-MB, and the LEAK stage writes heap-address
+  strings into the file. This rule supplies the file-path/size stream; the
+  CONTENT verdict (PHP tags, serialized objects, pointer-like hex) belongs to
+  the companion YARA rules `Webshell_In_Session_File` and
+  `Session_Serialize_Mismatch_Residue` in ../yara/php2shell.yar, run over
+  sess_* files found under the save path (that file's `Oversized_Session_File`
+  rule uses a 512 KB threshold and needs the `find -name 'sess_*'` wrapper
+  documented there). Pair: YARA hit = confirmed Chain A/C payload; this rule
+  alone = suspicious size only.
+
+  Backend note: `file.size|gte` requires a file_event source that reports size
+  (auditd PATH records with nametype=CREATE do not; Sysmon-for-Linux does not;
+  Elastic Malware/Filebeat, osquery file events, fanotify/eBPF sensors do).
+  If your backend has no size, drop the size selection and rely on the YARA
+  file scan plus the hunting query in hunting-queries-v2.md §5.
+  Session path list below is the Debian/Ubuntu/RHEL default set — add your
+  configured session.save_path.
+references:
+  - https://github.com/php/php-src/security/advisories/GHSA-w8hw-w9fx-j79w
+  - https://github.com/php/php-src/security/advisories/GHSA-6wmf-4rv5-p3rp
+  - https://github.com/ikow/php2shell-poc
+  - https://sansec.io/research/php2shell
+author: detection engineering research
+date: 2026/10/21
+logsource:
+  category: file_event
+  product: linux
+detection:
+  selection_session_path:
+    TargetFilename|startswith:
+      - '/var/lib/php/sessions/'
+      - '/var/lib/php/session/'
+      - '/var/lib/php5/'
+      - '/var/lib/php/'
+      - '/run/php/sessions/'
+      - '/tmp/sess_'
+  selection_session_name:
+    TargetFilename|re: '/sess_[^/]+$'
+  selection_pool_writer:
+    User:
+      - 'www-data'
+      - 'apache'
+      - 'nginx'
+      - 'php-fpm'
+  selection_large:
+    file.size|gte: 102400
+  condition: selection_session_path and selection_session_name and selection_pool_writer and selection_large
+fields:
+  - TargetFilename
+  - User
+  - Image
+  - file.size
+falsepositives:
+  - Applications that legitimately store large blobs in $_SESSION (cart
+    snapshots, cached API responses, uploaded-document state) — baseline max
+    session size per vhost before alerting.
+  - "upload_progress sessions for genuinely large uploads — size tracks the
+    in-flight upload metadata and can reach hundreds of KB; correlate with the
+    app's real upload endpoints."
+level: high
+tags:
+  - attack.persistence
+  - attack.t1505.003
+  - cve.2026-109618
+  - cve.2026-109619
+---
+title: Session Save Path Written by a Non-Pool Process (php2shell session tampering / auditd)
+id: d6cb2f28-85cc-46c0-ba48-1a6263a62b98
+status: experimental
+description: >
+  Detects any process OTHER than the expected web pool user/writer touching a
+  PHP session file or the session save_path directory. Normal traffic to
+  /var/lib/php/sessions is exclusively php-fpm/httpd workers running as the pool
+  user. A shell, cron job, backup agent, attacker tool, or a second service
+  writing there is either session tampering (planting a serialized object /
+  PHP-tag sess_ file for Chain A/C) or staging/exfiltration of session contents.
+
+  Lab-validated 2026-10-21 context: the dangling PS(save_path) corruption makes
+  PHP itself attempt writes to a garbage path whose prefix is still the session
+  dir — those come from the pool user and are covered by the previous rule, not
+  this one. This rule is the "someone else is in the session store" signal.
+
+  auditd mapping: if you ingest auditd SYSCALL/PATH records instead of a
+  file_event category, use type=SYSCALL with
+  `name`/`path` matching the session dir, `nametype` in (CREATE, NORMAL,
+  DELETE), and filter `auid`/`uid` of the pool user; the `exe` field is the
+  equivalent of Image and `comm` disambiguates php-fpm from a shell. Elastic
+  auditd manager / Filebeat auditd module field names: file.path, user.name,
+  process.executable.
+references:
+  - https://github.com/php/php-src/security/advisories/GHSA-w8hw-w9fx-j79w
+  - https://github.com/php/php-src/security/advisories/GHSA-6wmf-4rv5-p3rp
+  - https://sansec.io/research/php2shell
+author: detection engineering research
+date: 2026/10/21
+logsource:
+  category: file_event
+  product: linux
+detection:
+  selection_session_path:
+    TargetFilename|startswith:
+      - '/var/lib/php/sessions/'
+      - '/var/lib/php/session/'
+      - '/var/lib/php5/'
+      - '/run/php/sessions/'
+  filter_expected_writers:
+    Image|endswith:
+      - '/php-fpm'
+      - '/php'
+      - '/php-cgi'
+      - '/apache2'
+      - '/httpd'
+      - '/nginx'
+  filter_expected_users:
+    User:
+      - 'www-data'
+      - 'apache'
+      - 'nginx'
+      - 'php-fpm'
+  filter_maintenance:
+    # Tune: distro session GC cron (`php /usr/lib/php/sessionclean`) runs as root
+    # and is expected. Keep the allow-list as narrow as possible.
+    CommandLine|contains:
+      - 'sessionclean'
+      - 'php session gc'
+  condition: selection_session_path and not filter_expected_writers and not filter_expected_users and not filter_maintenance
+fields:
+  - TargetFilename
+  - Image
+  - CommandLine
+  - User
+falsepositives:
+  - Backup/AV/indexing agents that read (and occasionally touch) the session
+    directory — scope by Image rather than disabling the rule.
+  - Distro session garbage collection and admin maintenance scripts — add
+    narrowly to filter_maintenance.
+  - Container runtimes/overlayfs presenting host paths differently — verify the
+    path seen by the sensor before tuning.
+level: high
+tags:
+  - attack.persistence
+  - attack.t1505.003
+  - attack.t1070
+  - cve.2026-109618
+  - cve.2026-109619
