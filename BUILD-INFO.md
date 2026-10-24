@@ -1,6 +1,6 @@
 # BUILD INFO — php2shell detection & response package
 
-**Build timestamp:** 2026-10-24 15:37 UTC
+**Build timestamp:** 2026-10-24 17:56 UTC
 **Package name:** `php2shell-detection-package-2026-10-24`
 **Why the name changed:** the package was first assembled on 2026-10-21 and then materially
 updated through 2026-10-22 (tested exploit results, corrected findings, repaired Suricata
@@ -199,6 +199,16 @@ The zip's own hash cannot be embedded inside itself, so it ships as a sidecar
 42. **New detection content for this tool's artefacts:** Suricata rules for `*.p2s.php` URI access and
     the webshell's distinctive body, a YARA rule for the 105-byte webshell, and hunting queries for
     `.p2s.php` / `.p2s_v2.php` / `.htaccess` writes. See dossier §35.
+
+## What changed in the 2026-10-24 18:00 rebuild
+
+43. **Documented the two real upstream bugs behind the "second vulnerability" noise** (verified on the
+    php-src tracker): #24481, an *open* `unserialize()` UAF with no CVE that is **not** a bypass; and
+    #24488, a **regression introduced by 8.4.27 / 8.5.12** that double-frees SimpleXML state and
+    crashes workers. Patch guidance now includes staging the rollout and recognising the crash.
+44. **Added a caveated note on community mitigation:** a third-party native extension
+    (`hp_uploadprogress_guard`) that protects unpatched PHP — useful where patching is impossible,
+    but a native extension is a supply-chain risk and never a substitute for the official builds.
 
 ## Reading order
 

@@ -183,3 +183,30 @@ apps which never change the serialize handler at runtime can leave upload progre
 **Sources:** php.net release announcements; Ubuntu CVE tracker + USN-8948-1/-2; Debian Security
 Tracker (DSA-6574-1, DLA-4848-1); Docker Hub `library/php`; PHP advisory GHSA-w8hw-w9fx-j79w /
 GHSA-6wmf-4rv5-p3rp.
+
+
+## 10. Known regression introduced by the fixed releases (2026-10-24)
+
+The 21 October security releases changed the garbage collector. **8.4.27 and 8.5.12 introduce a
+double-free in SimpleXML**: when an object converted via `json_encode()`, `(array)` or
+`get_object_vars()` (i.e. the everyday `json_decode(json_encode($xml), true)`) is collected in a
+reference cycle, PHP aborts the worker with `zend_mm_heap corrupted`.
+
+| | |
+|---|---|
+| Upstream issue | [php-src#24488](https://github.com/php/php-src/issues/24488) — closed, `Status: Verified` |
+| Affects | PHP 8.4.27 and 8.5.12 (introduced by the security release); 8.3.36 / 8.2.35 not affected by this change |
+| Impact | Availability only — crashed worker, no memory corruption primitive demonstrated |
+| Fix | Merged upstream, **not in any released build** as of 24 October |
+| What to do | Stage the upgrade; search for the conversion pattern on SimpleXML objects; know the crash signature. **Do not roll back to a vulnerable PHP build.** |
+
+## 11. Community mitigation for hosts that cannot patch (third-party)
+
+`HOSTED-POWER/php_uploadprogress_guard` — a native PHP extension that mirrors the official fix for
+CVE-2026-109618/109619 on unpatched PHP, forces `session.upload_progress.enabled=0` (covering
+CVE-2026-115560), and applies upstream fixes for two unrelated PHP bugs by patching from inside the
+extension. Prebuilt for Linux x86_64/aarch64 and Windows x64, with checksums.
+
+**Caveats:** third-party native extension loaded into the web server — supply-chain and stability
+risk. It is **not** a substitute for the official fixed builds. Recommended only where patching is
+genuinely impossible, after source review, checksum verification and staging tests.

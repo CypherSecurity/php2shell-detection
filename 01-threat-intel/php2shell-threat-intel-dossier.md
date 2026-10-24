@@ -1448,3 +1448,37 @@ fetch returning 404 is expected, not a failure.
 - Suricata: request to any URI ending `.p2s.php`; response body containing the webshell signature.
 - Hunting: access-log search for `.p2s.php`, `.p2s_v2.php`, `.htaccess` writes, and `?c=` execution
   patterns on those paths.
+
+## 36. MATERIAL (patch guidance) — 2026-10-24 — regression in the fixed releases; the real bugs behind the "second vulnerability" noise
+
+### 36.1 Verified upstream issues (not rumours — checked via the php-src tracker)
+| Issue | State | What it is | Relevance |
+|---|---|---|---|
+| [php-src#24481](https://github.com/php/php-src/issues/24481) | **open**, `Status: Needs Triage` | Use-after-free in `var_destroy()` during `unserialize()` re-entrancy — a `__destruct` calling `unserialize()` again reads freed memory | **This is the bug behind the "8.5.12 patch is incomplete" claims.** Real, unfixed, **no CVE** (PHP does not assign CVEs to `unserialize()` bugs). Reachable only when an application unserializes attacker-controlled data or code already runs on the host — **not a bypass of the php2shell chain**. |
+| [php-src#24488](https://github.com/php/php-src/issues/24488) | **closed**, `Status: Verified`, `Extension: simplexml` | **Regression introduced by 8.4.27 / 8.5.12**: the changed GC double-frees the `SimpleXMLElement` property table when an object converted via `json_encode()`/`(array)`/`get_object_vars()` is collected in a reference cycle → `zend_mm_heap corrupted`, crashed worker | **Affects patched hosts.** Common pattern: `json_decode(json_encode($xml), true)`. Fix merged upstream but **not in any released build yet** as of 24 Oct. |
+
+### 36.2 Why this matters operationally
+- The RCE fixes themselves stand: no bypass exists (see §29 / CLARIFICATION doc). The PHP team's
+  "unrelated issue with minimal impact" statement maps to **#24481**, which is now documented
+  precisely rather than dismissed.
+- **A patched host can still crash workers** on ordinary SimpleXML code. That is an availability
+  regression, not a security hole — but it will show up in rollout as "8.4.27 broke our app". Teams
+  should stage the upgrade, look for `json_decode(json_encode(...))` on SimpleXML objects, and know
+  the crash signature (`zend_mm_heap corrupted`).
+- Do **not** roll back to a vulnerable build to avoid the regression. Workaround options: avoid the
+  conversion-in-cycle pattern, isolate affected endpoints, or wait for the next regular release.
+
+### 36.3 Community mitigation for unpatched hosts (third-party)
+`HOSTED-POWER/php_uploadprogress_guard` (143★, C extension, created 21 Oct, v3.2.5 pushed 24 Oct) is a
+native PHP module that "mirrors the official fix component by component" so an unpatched PHP loses
+each link of the published chain, plus it forces `session.upload_progress.enabled=0` (covering
+CVE-2026-115560) and applies upstream fixes for #24481/#24488 by patching from inside the extension.
+Prebuilt for Linux x86_64/aarch64 (5.4–8.5) and Windows x64, with checksums.
+
+**Assessment:** potentially useful for hosts that genuinely cannot patch (EOL PHP, frozen vendor
+images), but it is a **third-party native extension loaded into the web server** — supply-chain and
+stability risk, and it is not a substitute for the official builds. Recommendation: patch first;
+if that is impossible, review the source, verify checksums, and test on staging before deploying.
+
+### 36.4 No change to detection
+The guard module is defensive; nothing new to detect. The `.p2s.php` artefacts from §35 still stand.
