@@ -202,3 +202,15 @@ alert http any any -> [$HOME_NET,$HTTP_SERVERS] any (msg:"ET LOCAL php2shell exp
 alert http any any -> [$HOME_NET,$HTTP_SERVERS] any (msg:"ET LOCAL php2shell exploit webshell URI access (*.p2s.php)"; flow:established,to_server; http.uri; content:".p2s.php"; nocase; fast_pattern; classtype:web-application-attack; sid:2202610116; rev:1; metadata:created_at 2026_10_24, cve CVE-2026-109618, cve CVE-2026-109619, confidence high, stage post-exploitation, reference url github.com/JoasASantos/php2shell-exploit;)
 
 alert http any any -> [$HOME_NET,$HTTP_SERVERS] any (msg:"ET LOCAL php2shell webshell payload served (system + self-delete handler)"; flow:established,to_client; file.data; content:"system($_GET"; nocase; content:"unlink(__FILE__)"; nocase; distance:0; within:160; classtype:web-application-attack; sid:2202610117; rev:1; metadata:created_at 2026_10_24, cve CVE-2026-109618, cve CVE-2026-109619, confidence high, stage post-exploitation;)
+
+# ---------------------------------------------------------------------------
+# v2.1 additions — 2026-10-25 — Cyfirma campaign IoCs (unit42/cyfirma reports)
+# Provenance: CYFIRMA "Suspected DPRK Campaign Staging PHP2Shell" v3 (24 Oct), section 09 C.
+# These are tool/campaign indicators, not vulnerability signatures: they catch known tooling.
+# ---------------------------------------------------------------------------
+
+alert http any any -> [$HOME_NET,$HTTP_SERVERS] any (msg:"ET LOCAL php2shell known scanner user-agent family (php2shell-scan/verify/poc)"; flow:established,to_server; http.user_agent; content:"php2shell-"; nocase; fast_pattern; classtype:web-application-attack; sid:2202610118; rev:1; metadata:created_at 2026_10_25, cve CVE-2026-109618, cve CVE-2026-109619, confidence medium, tag campaign_scanner;)
+
+alert http any any -> [$HOME_NET,$HTTP_SERVERS] any (msg:"ET LOCAL php2shell blind-RCE canary JACKALPOC returned in response"; flow:established,to_client; file.data; content:"JACKALPOC"; nocase; fast_pattern; classtype:attempted-admin; sid:2202610119; rev:1; metadata:created_at 2026_10_25, cve CVE-2026-109618, cve CVE-2026-109619, confidence high, stage post-exploitation, note canary-in-response-means-execution;)
+
+alert http $HOME_NET any -> any any (msg:"ET LOCAL php2shell CYFIRMA dropper staging host contact (92.118.112.100/nfs)"; flow:established,to_server; http.host; content:"92.118.112.100"; http.uri; content:"/nfs"; classtype:trojan-activity; sid:2202610120; rev:1; metadata:created_at 2026_10_25, cve CVE-2026-109618, cve CVE-2026-109619, confidence high, source cyfirma_v3_ioc, note mirai-loader-egress;)

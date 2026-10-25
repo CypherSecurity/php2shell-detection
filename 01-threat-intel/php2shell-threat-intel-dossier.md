@@ -1514,7 +1514,7 @@ Content-Type: multipart/form-data, boundary=X   → $_POST parsed   (bypass conf
 PHP trims the content-type at `;`, `,` and space, so the comma form is accepted identically. Any WAF
 signature anchored on `multipart/form-data;` — a very common anchoring — **will not see it**.
 
-**Our rules are unaffected.** Checked all 18 Suricata rules and the ModSecurity config: they match the
+**Our rules are unaffected.** Checked all Suricata rules (18 at the time, 21 now) and the ModSecurity config: they match the
 substring `Content-Type: multipart/form-data` (or `^multipart/form-data` for ModSecurity), with **no
 semicolon requirement**, so the comma variant still fires. This should be stated explicitly in SOC
 guidance — it is a concrete differentiator versus rules copied from elsewhere.
@@ -1634,3 +1634,24 @@ one vendor — report it as such, not as established attribution.
 - **CVE-2026-115560 stays as documented:** THN's 25 Oct piece confirms the narrow preconditions, that
   PHP treats it as unlikely, that no emergency fix is coming, and that **no exploitation has been
   reported** — matching our record; it is not part of this intrusion reporting.
+
+### 39.5 CYFIRMA IoC set ingested (2026-10-25)
+CYFIRMA publishes a substantial IoC set with the campaign (Section 09 of their advisory), and it is now
+in the package (`04-hunting/cyfirma-iocs-2026-10-25.md`), defanged with provenance:
+
+| Set | Count | Handling |
+|---|---|---|
+| Staging / target-list hosting / launch IPv4 | 15 (+1 possible typo variant) | MONITOR & HUNT |
+| Suspected source IPs (web-shell tooling, upload-progress poisoning) | 17 | BLOCK or close-monitor |
+| Dropper staging host + URL | `92.118.112[.]100`, `hxxp://…/nfs` | **BLOCK egress** |
+| Scanner user-agents | `php2shell-scan/109618`, `php2shell-verify/1.0`, `php2shell-109618`, `Mozilla/5.0 (php2shell-poc)` | DETECT |
+| Multipart boundary prefix | `--p2s…` / `--p2shell` | DETECT |
+| Blind-RCE canary | `JACKALPOC` in a response = execution | DETECT |
+| Malware | SHA-256 `0c5486f0…` (179,632-byte ELF x86-64), MD5 `b61a098f…` | EDR / YARA |
+| Behavioural | multipart to non-upload endpoints, PHP worker spawning shells, new `.php` in web roots, `.user_agent`/`.htaccess` prepend, I2P egress | HIGHEST VALUE |
+
+**Three new Suricata rules derived from it** (validated, exit 0): SID 2202610118 (scanner UA family),
+**2202610119 (`JACKALPOC` canary in response — means execution succeeded)**, 2202610120 (loader egress
+to the dropper host). Rationale: the UA family and the canary survive infrastructure rotation; the IPs
+are ephemeral, shared/anonymising, and per CYFIRMA's own guidance should be used for hunting, not as a
+blind blocklist. Attribution stays **moderate confidence / suspected**.

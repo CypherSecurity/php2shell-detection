@@ -95,8 +95,23 @@ is processed as a normal multipart upload. Any WAF signature anchored on the com
 
 **Verified by us** on `php:8.4.26-apache`: the body parsed identically under both forms.
 
-**Our rules are not affected** — all 18 Suricata rules match the substring
+**Our rules are not affected** — all Suricata rules match the substring
 `Content-Type: multipart/form-data` without requiring the semicolon, and the ModSecurity rule uses
 `@rx (?i)^multipart/form-data`. If you copy signatures from elsewhere, check the anchoring.
 
 Source: `dinosn/php-cve-2026-10961x-lab-poc` research write-up (claim independently reproduced here).
+
+### 2026-10-25 — Campaign IoCs from CYFIRMA (3 new Suricata rules, 18 → 21)
+
+Provenance: CYFIRMA advisory v3 (24 Oct), section 09. Full IoC set with caveats in
+`04-hunting/cyfirma-iocs-2026-10-25.md`.
+
+| SID | Rule | Why it survives IOC rotation |
+|---|---|---|
+| 2202610118 | Request `User-Agent` contains `php2shell-` (scanner family) | tool naming, not infrastructure |
+| 2202610119 | Response body contains `JACKALPOC` | blind-RCE canary — **hit means code executed** |
+| 2202610120 | Egress to `92.118.112.100` URI `/nfs` (Mirai-style loader) | payload delivery path |
+
+Validated: Suricata 8.0.7 `-T` exits 0. The IP lists in the hunting doc are ephemeral and partly
+shared/anonymising infrastructure — hunt and pivot with them, do not treat them as a security control.
+A `php2shell-` user-agent can also be a researcher's scanner; correlate with request shape.

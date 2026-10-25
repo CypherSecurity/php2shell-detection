@@ -232,6 +232,19 @@ The zip's own hash cannot be embedded inside itself, so it ships as a sidecar
     intensity, but the remediation is unchanged — patch, disable upload progress, restrict PAN-OS
     management exposure, and treat oversized-`PHPSESSID` observations as likely hostile.
 
+## What changed in the 2026-10-25 20:00 rebuild — CYFIRMA campaign IoCs
+
+50. **Ingested CYFIRMA's IoC set** (advisory v3): 15 staging + 1 variant, 17 suspected source IPs,
+    dropper host/URL, 4 scanner user-agents, boundary prefix, `JACKALPOC` canary, SHA-256 + MD5 of the
+    179,632-byte ELF second stage, plus behavioural indicators. Defanged, with provenance and the
+    vendor's own "investigate before blocking" caveat — see `04-hunting/cyfirma-iocs-2026-10-25.md`.
+51. **Three new Suricata rules** derived from it (SIDs 2202610118/119/120), validated with
+    Suricata 8.0.7 `-T` (exit 0). Rule count 18 → 21. The canary rule is the valuable one: a
+    `JACKALPOC` string in a response means blind-RCE validation succeeded.
+52. Attribution reminder: CYFIRMA assesses **moderate confidence** for the suspected DPRK/Lazarus link.
+    Report it as *suspected*, and remember some quoted scanner user-agents also belong to defensive
+    scanning (Amazon/VulnCheck) — correlate with request shape.
+
 ## Reading order
 
 | File | Why |
