@@ -1,6 +1,6 @@
 # BUILD INFO — php2shell detection & response package
 
-**Build timestamp:** 2026-10-25 05:57 UTC
+**Build timestamp:** 2026-10-25 14:57 UTC
 **Package name:** `php2shell-detection-package-2026-10-24`
 **Why the name changed:** the package was first assembled on 2026-10-21 and then materially
 updated through 2026-10-22 (tested exploit results, corrected findings, repaired Suricata
@@ -221,6 +221,16 @@ The zip's own hash cannot be embedded inside itself, so it ships as a sidecar
     rules into being bypassable.
 47. PAN-OS advisory revised 25 Oct: FAQ updates plus additional Prisma product rows (all unaffected);
     Threat Prevention IDs unchanged at 25; fixes still pending, ETAs 27–30 Oct.
+
+## What changed in the 2026-10-25 15:00 rebuild — EPSS ESCALATION
+
+48. **EPSS jumped to near-certain exploitation.** FIRST's 25 Oct daily update: CVE-2026-109618
+    **0.99981**, CVE-2026-109619 **0.99997** (from 11.8% / 6.2%). Verified against the official
+    daily datasets across 23–25 Oct: same model version, control CVEs unchanged → a real
+    exploitation-evidence surge, not a re-scoring artefact. KEV still NO (1,756).
+49. Interpretation and caveats in `INCIDENT-STATUS.md` and dossier §38: very high exploitation
+    intensity, but the remediation is unchanged — patch, disable upload progress, restrict PAN-OS
+    management exposure, and treat oversized-`PHPSESSID` observations as likely hostile.
 
 ## Reading order
 

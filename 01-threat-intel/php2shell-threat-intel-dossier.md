@@ -1524,3 +1524,46 @@ Palo Alto re-published CVE-2026-109618: **FAQ section updated**, and additional 
 added (Prisma SD-WAN Controller / ION / On-Prem Controller — all **unaffected**). Threat Prevention ID
 list **unchanged at 25**; fixes still pending with ETAs **27–30 October**. Nothing material for our
 guidance.
+
+## 38. 🚨 ESCALATION (exploitation intensity) — 2026-10-25 — EPSS jumps from ~12% to ~99.98% in one day
+
+### 38.1 The signal
+The 2026-10-25 EPSS daily update moved both CVEs from low-teens to near-certain:
+
+| CVE | 23 Oct | 24 Oct | **25 Oct** | Percentile |
+|---|---|---|---|---|
+| CVE-2026-109618 | 0.11620 | 0.11841 | **0.99981** | 99.98 |
+| CVE-2026-109619 | 0.05991 | 0.06217 | **0.99997** | 99.99 |
+
+### 38.2 Verification — this is not a feed error and not a model rebase
+Checked against FIRST's **official daily datasets**, not just the API:
+
+| Evidence | Result |
+|---|---|
+| Same `model_version` all three days | `v2026.06.15` — unchanged |
+| `score_date` of the 25 Oct file | `2026-10-25T12:03:13Z` (current) |
+| Control CVE-2021-44228 (log4j) | **0.99999 on all three days** — did not move |
+| Control CVE-2024-3400 (PAN-OS) | **0.99999 on all three days** — did not move |
+| Control CVE-2017-0143 (EternalBlue) | 0.93307 — plausible mid-high, not pinned |
+| Control CVE-2026-22777 (obscure) | 0.00342 — plausible low, not pinned |
+
+Because the controls are stable and the model version is identical, the jump is a **real change in
+the exploitation evidence feeding the model**, not a re-scoring artefact. An EPSS of ~0.9998 means the
+model estimates exploitation in the next 30 days as effectively certain.
+
+### 38.3 What it means — and what it does not
+- **Corroborates the "broadly exploited" reporting** (MadPot pre-disclosure attempts, Cloudflare's
+  millions of attempts) with an independent, quantitative source.
+- It is **not** evidence of a specific victim, nor of a new capability change. KEV remains **NO**
+  (catalog 1,756) — CISA has not listed either CVE as of this check.
+- Treat as a **mass-exploitation-intensity** signal: expect opportunistic scanning against any
+  unpatched estate to be heavy, and treat any oversized-`PHPSESSID` observation as likely hostile
+  rather than noise.
+- Action for defenders is unchanged — the intensity raises the *likelihood*, not the *remediation*:
+  patch + restart, `session.upload_progress.enabled=0`, restrict PAN-OS management planes, hunt from
+  17 Oct.
+
+### 38.4 Caveat to state honestly
+EPSS is an algorithmic estimate driven by observed exploitation telemetry; a jump this large in one
+day can reflect a burst of automated scanning being ingested, and the model's absolute values are not
+a probability of *your* compromise. Use it as direction and urgency, never as a per-host verdict.

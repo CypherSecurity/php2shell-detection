@@ -92,6 +92,13 @@ Attempts are failing **publicly**, but the exploit capability behind them is imp
   Detection: the tool plants `/.p2s.php` (also `/assets/.p2s.php`, `/tmp/.p2s.php`) and v2 uses
   `/tmp/.p2s_v2.php` + `.htaccess`.
 
+- **Update 25 Oct — EPSS moved to near-certain.** FIRST's 25 October daily update put
+  CVE-2026-109618 at **0.99981** and CVE-2026-109619 at **0.99997** (from 11.8% / 6.2% the day
+  before). Verified against the official daily datasets: same model version, and control CVEs
+  (log4j, PAN-OS CVE-2024-3400) unchanged — so this is a **real exploitation-evidence surge**, not a
+  re-scoring artefact. KEV remains NO. Interpretation: exploitation intensity is now very high, the
+  remediation is unchanged.
+
 **So the public story is "attempts fail"; the private story is "capability exists".** Today's
 absence of a confirmed victim is therefore a statement about *exploit availability and intent*, not
 about *inherent difficulty*. That gap is exactly what closes when a working public exploit appears.
