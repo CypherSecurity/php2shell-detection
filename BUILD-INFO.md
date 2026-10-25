@@ -245,6 +245,21 @@ The zip's own hash cannot be embedded inside itself, so it ships as a sidecar
     Report it as *suspected*, and remember some quoted scanner user-agents also belong to defensive
     scanning (Amazon/VulnCheck) — correlate with request shape.
 
+## What changed in the 2026-10-25 23:59 rebuild — THN update triaged
+
+53. **THN article updated but NOT corrected.** The flagged article changed by two section headings; the
+    Unit 42 paragraph it is built on was **retracted by Unit 42 on 25 Oct** and the article carries no
+    correction notice. Our documents carry the corrected position (dossier §39.6).
+54. **New artefact: `p2s-rider`.** Defused Cyber reports PHP2Shell probes against **PAN-OS GlobalProtect
+    honeypots** from `204.76.203[.]7`, carrying a `PHP_SESSION_UPLOAD_PROGRESS` marker `p2s-rider` and a
+    dummy file upload. Added Suricata **SID 2202610121** (rule count 21 → 22) and recorded it in
+    `04-hunting/cyfirma-iocs-2026-10-25.md` (Addendum). First artefact specifically indicating
+    **appliance** targeting rather than generic PHP estate scanning.
+55. **ReliaQuest detection sequence** added to hunting doc: POST → 500 → PHP memory-exhaustion/heap-corruption
+    → Apache worker crash. Corroborates our reproduction signature.
+56. Scale caveat recorded: Xpanse 22.6M **potentially vulnerable** vs Bitsight ~37M **PHP systems overall** —
+    different denominators, do not conflate.
+
 ## Reading order
 
 | File | Why |

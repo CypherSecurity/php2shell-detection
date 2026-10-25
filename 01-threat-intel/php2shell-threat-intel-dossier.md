@@ -1695,3 +1695,34 @@ unverified pending corroboration** — victim claims need either victim confirma
 sources before the word "confirmed" is used. We did catch the retraction within one hourly cycle, because
 we now track the page's own "Updated <date>" string (it has no `dateModified`); that is the one part that
 worked as intended.
+
+## 40. THN update triaged (25 Oct, 23:55 UTC) — article updated NOT corrected; three new artefacts captured
+
+### 40.1 What changed on the THN page
+The tracked article (`writeup.thn_govern`, 10,940 → 11,191 bytes) changed by **two section headings**
+("Suspected N. Korea Campaign Targets PHP2Shell", "Other Exploit Efforts and Mitigations") — a
+restructure, **not a correction**. Verified by paragraph diff against our 18:50 copy:
+
+- **Retracted Unit 42 paragraph still present** ("multi-factor authentication secrets…"): yes.
+- **Retraction/correction notice added:** no.
+
+So the article the user was shown still presents a claim its own source withdrew. Our page and package
+carry the corrected position (§39.6). Worth repeating to anyone citing it.
+
+### 40.2 New reporting in that article worth keeping
+1. **Probes aimed at PAN-OS GlobalProtect honeypots** — Defused Cyber (25 Oct) reports PHP2Shell probes
+   against GlobalProtect honeypots from `204.76.203[.]7` ("known mass-exploit IP"), carrying a
+   **`PHP_SESSION_UPLOAD_PROGRESS` marker `p2s-rider`** and a dummy file upload with no payload. Their read
+   is target-list building against Palo Alto devices. This matters for our PAN-OS section: it is the
+   first artefact specifically indicating **appliance targeting** rather than generic PHP-estate scanning.
+2. **ReliaQuest reproduction — detection sequence** (22 Oct): POST → HTTP 500; PHP error log shows memory
+   exhaustion + heap corruption; Apache error log shows the worker handling the request crashing. This
+   corroborates our own reproduction signature and is now stated as a log-level detection heuristic.
+3. **Scale figures:** Bitsight internet-wide scans report **~37 million** internet-facing PHP/PHP-related
+   systems (vs Cortex Xpanse's 22.6M *potentially vulnerable* estimate — different denominators, do not
+   conflate). Xint released a scanner (`phpguard.io`); Trend Micro published KA-0024789.
+
+### 40.3 Action taken
+- Added the `p2s-rider` upload-progress marker as a new detection (SID **2202610121**).
+- Hunting doc updated with the GlobalProtect-probe artefact, source IP and ReliaQuest log sequence.
+- **No change to victim status** (§39.6 stands): the article's headline claim remains retracted by Unit 42.

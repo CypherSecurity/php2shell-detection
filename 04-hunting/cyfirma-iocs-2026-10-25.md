@@ -96,3 +96,34 @@ CYFIRMA's attribution is moderate confidence and its own guidance is to investig
 Two of their quoted scanner user-agents overlap with *defensive* scanning reported by Amazon/VulnCheck —
 so a UA hit can be a researcher as easily as an attacker. Correlate with request shape (multipart to
 non-upload endpoint, upload-progress field) before escalating.
+
+---
+
+# Addendum — artefacts from 25 Oct reporting (THN / Defused Cyber / ReliaQuest)
+
+## A. PAN-OS GlobalProtect targeted probing (Defused Cyber, 25 Oct 2026)
+- **Source IP:** `204.76.203[.]7` (described as a known mass-exploit address)
+- **Request artefacts:** `PHP_SESSION_UPLOAD_PROGRESS` field with marker **`p2s-rider`**; a **dummy file
+  upload with no payload**
+- **Reading:** target-list building against Palo Alto devices rather than random PHPestate scanning. This
+  is the first artefact specifically pointing at **appliance** targeting; see `PAN-OS-EXPOSURE.md`.
+- **Detection:** Suricata SID **2202610121** matches `p2s-rider` in request body.
+
+## B. Detection sequence from lab reproduction (ReliaQuest, 22 Oct)
+Corroborates our own reproduction signature. Across four log sources, look for this **order**:
+1. POST request returns **HTTP 500**
+2. **PHP error log:** memory exhaustion / heap corruption
+3. **Apache error log:** worker handling the request **crashes**
+4. Subsequent requests may succeed (worker replaced) — the crash is the signal
+
+## C. Scale figures (do not conflate)
+| Source | Figure | Meaning |
+|---|---|---|
+| Cortex Xpanse (Unit 42) | **22.6 million** | exposed instances **potentially vulnerable** |
+| Bitsight | **~37 million** | internet-facing systems running **PHP or PHP-related software** (denominator, not vulnerable count) |
+
+## D. Caveat
+These artefacts are **vendor-reported request markers**, not proof of successful exploitation. The
+`p2s-rider` marker and the GlobalProtect targeting claim come from a single vendor's honeypots; hunt with
+them, and correlate with the multipart request shape and oversized `PHPSESSID` behaviour before
+escalating.
