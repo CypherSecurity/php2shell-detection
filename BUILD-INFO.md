@@ -232,7 +232,7 @@ The zip's own hash cannot be embedded inside itself, so it ships as a sidecar
     intensity, but the remediation is unchanged — patch, disable upload progress, restrict PAN-OS
     management exposure, and treat oversized-`PHPSESSID` observations as likely hostile.
 
-## What changed in the 2026-10-25 20:00 rebuild — CYFIRMA campaign IoCs
+## What changed in the 2026-10-25 18:55 rebuild — CYFIRMA campaign IoCs
 
 50. **Ingested CYFIRMA's IoC set** (advisory v3): 15 staging + 1 variant, 17 suspected source IPs,
     dropper host/URL, 4 scanner user-agents, boundary prefix, `JACKALPOC` canary, SHA-256 + MD5 of the
