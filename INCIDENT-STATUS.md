@@ -121,40 +121,37 @@ Four reasons to hold both ideas at once:
 not succeeded publicly*. It is **not** evidence that targeted, quiet compromise has not occurred.
 Treat your own 17–23 October window as potentially exposed and hunt accordingly.
 
-## 5b. ⚠️ UPDATE 2026-10-25 — a confirmed intrusion now exists (unnamed European government)
+## 5b. ⚠️ CLAIM → RETRACTION (25 Oct): Unit 42's "European government intrusion" was withdrawn
 
-**This supersedes every "no confirmed victim" statement in this document.** Palo Alto Networks Unit 42
-published a threat brief on **23 October** (updated 12:30 p.m. PT) describing a successful intrusion:
+**Status: retracted.** Timeline, kept as a record because it is instructive:
 
-> "In one case, the attackers targeted a government entity in Europe and within two hours of the
-> initial exploitation they had successfully accessed password hashes and multi-factor authentication
-> secrets. They also established an NT LAN Manager (NTLM)-relay tunnel into Active Directory and
-> attempted Domain Admin privilege escalation."
+1. **23 Oct (12:30 PT)** — Unit 42 updated its threat brief describing an intrusion at a European
+   government entity: password hashes and MFA secrets within two hours, NTLM relay into AD, Domain Admin
+   attempt, plus agentic-AI command patterns (`==SHELLUSER==`, `==PASSWD==`).
+2. **25 Oct (~18:50 UTC)** — we ingested that report, corrected this document from "no confirmed victim"
+   to "one confirmed intrusion", and published it.
+3. **25 Oct (14:15 PT / ~21:15 UTC)** — Unit 42 **retracted the update**: *"We are unable to confirm that
+   initial access is associated with the specific PHP2Shell CVEs. We have retracted our previous update
+   from October 23."*
+4. **25 Oct (~21:55 UTC)** — we verified the retraction and reversed the correction here and on the page.
 
-- **Under two hours** from exploitation to credential/MFA-secret access; NTLM relay into AD; Domain
-  Admin escalation attempted.
-- **Likely agentic-AI post-exploitation** — command batches wrapped in machine-readable delimiters
-  (`==SHELLUSER==`, `==PASSWD==`), short serially-spaced tasks, fast pivots after failures.
-- Unit 42 estimates **22.6 million** exposed instances potentially vulnerable (vendor telemetry).
-- The victim is **unnamed**; no government has publicly confirmed compromise.
-- **We missed this report when it was published** because Unit 42 was not in our monitored source list.
-  That is corrected now — it is monitored going forward. This was a coverage gap, not a re-assessment
-  of the exploit difficulty.
+**What survives:** a real attack against a European government agency **in the context of a vulnerable
+PHP application** took place, but initial access is **not confirmed** to be CVE-2026-109618/109619. The
+22.6 million exposed-instance estimate and the patching guidance are unchanged.
 
-Separately, **CYFIRMA** describes a suspected **DPRK/Lazarus-ecosystem** campaign (moderate confidence)
-probing a **216-host** target set low-and-slow from **21 compromised nodes**, prioritising government,
-finance, logistics and aviation across the US, Asia, the Gulf and the EU. Treat as suspected
-state-linked staging, not established attribution.
+**Net position: no publicly confirmed victim tied to these two CVEs.** The earlier §30 conclusion was
+right; our correction was premature — single-vendor, unconfirmed victim claims should be labelled
+"vendor-reported, unverified", not "confirmed". See dossier §39.6.
 
-**Remediation unchanged.** What changes is the hunting priority: NTLM relay to AD, anonymous LDAP
-queries from web servers, credential access from PHP worker context, and shell batches with the
-`==SHELLUSER==` / `==PASSWD==` delimiters.
+**Separate:** the CYFIRMA **suspected DPRK/Lazarus-ecosystem** staging campaign (216-host target set,
+21 compromised nodes, moderate confidence) is unaffected by this retraction — it is a staging/scanning
+assessment, not a victim claim.
 
 ## 6. What would change the picture (watch items)
 
-- ~~First **confirmed** compromise with technical detail~~ — **PARTIALLY MET 23 Oct**: Unit 42 reports an
-  unnamed European government intrusion with credential/MFA theft, NTLM relay and Domain Admin attempt
-  (see §5b). Still open: a *named* victim, or a public post-incident report with webshell/skimming detail.
+- First **confirmed** compromise with technical detail (webshell, skimming script, credential theft).
+  *Unit 42's 23 Oct claim was retracted on 25 Oct; the European government intrusion it described is real
+  but its initial access is not confirmed as php2shell. Still open.*
 - A **public ASLR-bypassing exploit** for x86-64 — would immediately change mass-exploitation odds.
 - **KEV addition** — CISA's confirmation of in-the-wild exploitation.
 - Hosting provider reporting successful intrusion rather than blocked attempts.
@@ -162,15 +159,14 @@ queries from web servers, credential access from PHP worker context, and shell b
 
 ## 7. What to say if asked "has anyone been hacked?"
 
-> "Yes — one confirmed intrusion has been reported, and it is serious. Palo Alto Networks Unit 42
-> documented an unnamed European government entity where an attacker got from initial exploitation to
-> password hashes and MFA secrets in under two hours, relayed NTLM into Active Directory and tried for
-> Domain Admin; the command patterns look agentic-AI driven. Separately, CYFIRMA reports a suspected
-> DPRK-linked staging campaign probing 216 hosts slowly from 21 compromised nodes. What we still do not
-> have is a named victim or a public post-incident report, and mass opportunistic scanning remains
-> mostly unsuccessful. The remediation is unchanged: patch and restart, disable session upload progress,
-> restrict PAN-OS management access, and hunt from 17 October."
+> "No organisation has publicly confirmed compromise **from these two CVEs**. One claim came close:
+> Palo Alto Networks Unit 42 described a European government agency intrusion, but **retracted it on 25
+> October**, saying it could not confirm initial access came from php2shell — the attack was real and the
+> application was a vulnerable PHP app, but the CVE attribution is unconfirmed. The one widely reported
+> victim, Sophos, retracted its own claim. With millions of exploitation attempts, a memory-disclosure
+> path that leaves no obvious trace, and an attempt four days before disclosure, absence of confirmed
+> victims is not evidence of safety — hunt from 17 October."
 
-**Do not repeat our earlier line** ("no confirmed victim anywhere") — it was wrong from 23 October and is
-corrected here and on the public page.
+**Do not say "no one was hacked"** either. Say: no confirmed CVE-attributed victim; one unconfirmed
+government intrusion; heavy attempted exploitation.
 

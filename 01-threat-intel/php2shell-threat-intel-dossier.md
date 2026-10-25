@@ -1574,9 +1574,14 @@ EPSS is an algorithmic estimate driven by observed exploitation telemetry; a jum
 day can reflect a burst of automated scanning being ingested, and the model's absolute values are not
 a probability of *your* compromise. Use it as direction and urgency, never as a per-host verdict.
 
-## 39. ⚠️ CORRECTION (incident status) — 2026-10-25 — FIRST CONFIRMED INTRUSION (unnamed European government); agentic-AI post-exploitation; suspected DPRK staging
+## 39. ⚠️ CLAIM RAISED AND RETRACTED — 2026-10-25 — Unit 42's "confirmed intrusion" update (withdrawn same day); suspected DPRK staging stands
 
-### 39.1 What we got wrong, and why it matters
+> **STATUS: RETRACTED BY UNIT 42 (25 Oct, 2:15 p.m. PT).** Sections 39.1–39.2 record a claim we accepted
+> and then had to reverse — see **§39.6** for the retraction and the lesson. The suspected DPRK staging
+> campaign in §39.3 (CYFIRMA) is separate and still stands. Net position: **no publicly confirmed victim
+> tied to these two CVEs**, with one unresolved nuance described in §39.6.
+
+### 39.1 (RETRACTED) What we initially got wrong, and why it matters
 §30 (dated 2026-10-23 20:00 UTC) said "no publicly confirmed victim". **That was wrong by the time it
 was written.** Palo Alto Networks **Unit 42** published a threat brief on **23 October** (updated the
 same day, 12:30 p.m. PT) that describes a successful intrusion. We missed it because Unit 42 was not in
@@ -1584,7 +1589,7 @@ our monitored source list; it is now. The mistake was a **coverage gap, not an a
 an incident-status page it is exactly the sentence a customer would quote back at us, so it is corrected
 here, in `INCIDENT-STATUS.md` §5b/§7, and on the public page.
 
-### 39.2 The confirmed case (Unit 42, 23 Oct)
+### 39.2 (RETRACTED) The claimed case (Unit 42, 23 Oct — withdrawn 25 Oct)
 > "In one case, the attackers targeted a government entity in Europe and within two hours of the initial
 > exploitation they had successfully accessed password hashes and multi-factor authentication secrets.
 > They also established an NT LAN Manager (NTLM)-relay tunnel into Active Directory and attempted Domain
@@ -1655,3 +1660,38 @@ in the package (`04-hunting/cyfirma-iocs-2026-10-25.md`), defanged with provenan
 to the dropper host). Rationale: the UA family and the canary survive infrastructure rotation; the IPs
 are ephemeral, shared/anonymising, and per CYFIRMA's own guidance should be used for hunting, not as a
 blind blocklist. Attribution stays **moderate confidence / suspected**.
+
+### 39.6 RETRACTION — Unit 42 withdrew the 23 October update (verified 25 Oct 21:55 UTC)
+The Unit 42 brief now reads:
+
+> "Unit 42 reported earlier that we had observed post-compromise activity that we initially thought was
+> related to the PHP2Shell vulnerabilities. What researchers saw was an attack against a European
+> government agency executed in the context of a vulnerable PHP application. This led us to believe that
+> it was exploitation of those vulnerabilities. **We are unable to confirm that initial access is
+> associated with the specific PHP2Shell CVEs. We have retracted our previous update from October 23.**"
+
+Revision history on the page: *"Updated October 25, 2026, at 2:15 p.m. PT to retract our October 23
+update."* Removed in the retraction: the European-government intrusion paragraph (<2h to hashes/MFA,
+NTLM relay, Domain Admin attempt), the agentic-AI post-exploitation details and the `==SHELLUSER==` /
+`==PASSWD==` delimiters. **Still standing:** the 22.6 million exposed-instance estimate (Cortex Xpanse
+telemetry), the CVE descriptions and the patching guidance.
+
+**What the retraction does and does not say.** It confirms:
+- there **was** a real attack against a **European government agency**, in the context of a **vulnerable
+  PHP application**;
+- Unit 42 **cannot confirm** initial access came from CVE-2026-109618/109619.
+
+So the honest position is *not* "nothing happened", and *not* "a php2shell victim exists" either. It is:
+a government intrusion exists whose initial-access vector is **not attributable to these CVEs on current
+evidence**.
+
+**Corrected position (restores §30):** no publicly confirmed victim **tied to these two CVEs**. KEV is
+still NO. GUIDANCE: unchanged.
+
+**The lesson — ours, not theirs.** We accepted a single-vendor claim within ~2 hours, promoted it to
+"confirmed victim" in the dossier, `INCIDENT-STATUS.md`, the public page and the monitoring prompt. It was
+retracted seven hours later. Correct handling would have been to publish it as **vendor-reported and
+unverified pending corroboration** — victim claims need either victim confirmation or two independent
+sources before the word "confirmed" is used. We did catch the retraction within one hourly cycle, because
+we now track the page's own "Updated <date>" string (it has no `dateModified`); that is the one part that
+worked as intended.
