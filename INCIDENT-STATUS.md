@@ -103,7 +103,7 @@ Attempts are failing **publicly**, but the exploit capability behind them is imp
 absence of a confirmed victim is therefore a statement about *exploit availability and intent*, not
 about *inherent difficulty*. That gap is exactly what closes when a working public exploit appears.
 
-## 5. Why "no confirmed victims" is not "nobody was hit"
+## 5. Why the absence of *mass* confirmed victims was not "nobody was hit"
 
 Four reasons to hold both ideas at once:
 
@@ -121,9 +121,40 @@ Four reasons to hold both ideas at once:
 not succeeded publicly*. It is **not** evidence that targeted, quiet compromise has not occurred.
 Treat your own 17–23 October window as potentially exposed and hunt accordingly.
 
+## 5b. ⚠️ UPDATE 2026-10-25 — a confirmed intrusion now exists (unnamed European government)
+
+**This supersedes every "no confirmed victim" statement in this document.** Palo Alto Networks Unit 42
+published a threat brief on **23 October** (updated 12:30 p.m. PT) describing a successful intrusion:
+
+> "In one case, the attackers targeted a government entity in Europe and within two hours of the
+> initial exploitation they had successfully accessed password hashes and multi-factor authentication
+> secrets. They also established an NT LAN Manager (NTLM)-relay tunnel into Active Directory and
+> attempted Domain Admin privilege escalation."
+
+- **Under two hours** from exploitation to credential/MFA-secret access; NTLM relay into AD; Domain
+  Admin escalation attempted.
+- **Likely agentic-AI post-exploitation** — command batches wrapped in machine-readable delimiters
+  (`==SHELLUSER==`, `==PASSWD==`), short serially-spaced tasks, fast pivots after failures.
+- Unit 42 estimates **22.6 million** exposed instances potentially vulnerable (vendor telemetry).
+- The victim is **unnamed**; no government has publicly confirmed compromise.
+- **We missed this report when it was published** because Unit 42 was not in our monitored source list.
+  That is corrected now — it is monitored going forward. This was a coverage gap, not a re-assessment
+  of the exploit difficulty.
+
+Separately, **CYFIRMA** describes a suspected **DPRK/Lazarus-ecosystem** campaign (moderate confidence)
+probing a **216-host** target set low-and-slow from **21 compromised nodes**, prioritising government,
+finance, logistics and aviation across the US, Asia, the Gulf and the EU. Treat as suspected
+state-linked staging, not established attribution.
+
+**Remediation unchanged.** What changes is the hunting priority: NTLM relay to AD, anonymous LDAP
+queries from web servers, credential access from PHP worker context, and shell batches with the
+`==SHELLUSER==` / `==PASSWD==` delimiters.
+
 ## 6. What would change the picture (watch items)
 
-- First **confirmed** compromise with technical detail (webshell, skimming script, credential theft).
+- ~~First **confirmed** compromise with technical detail~~ — **PARTIALLY MET 23 Oct**: Unit 42 reports an
+  unnamed European government intrusion with credential/MFA theft, NTLM relay and Domain Admin attempt
+  (see §5b). Still open: a *named* victim, or a public post-incident report with webshell/skimming detail.
 - A **public ASLR-bypassing exploit** for x86-64 — would immediately change mass-exploitation odds.
 - **KEV addition** — CISA's confirmation of in-the-wild exploitation.
 - Hosting provider reporting successful intrusion rather than blocked attempts.
@@ -131,14 +162,15 @@ Treat your own 17–23 October window as potentially exposed and hunt accordingl
 
 ## 7. What to say if asked "has anyone been hacked?"
 
-> "No organisation has publicly confirmed compromise from these CVEs. The one reported victim —
-> Sophos — was retracted by Sophos themselves after analysis showed failed attempts. There are
-> millions of attempts, a French government outage that was precautionary, and no confirmed shell.
-> That said, the memory-disclosure path is silent by design, one attempt predates disclosure by four
-> days, and breach disclosure lags — so absence of reports is not evidence of safety. Hunt from
-> 17 October."
+> "Yes — one confirmed intrusion has been reported, and it is serious. Palo Alto Networks Unit 42
+> documented an unnamed European government entity where an attacker got from initial exploitation to
+> password hashes and MFA secrets in under two hours, relayed NTLM into Active Directory and tried for
+> Domain Admin; the command patterns look agentic-AI driven. Separately, CYFIRMA reports a suspected
+> DPRK-linked staging campaign probing 216 hosts slowly from 21 compromised nodes. What we still do not
+> have is a named victim or a public post-incident report, and mass opportunistic scanning remains
+> mostly unsuccessful. The remediation is unchanged: patch and restart, disable session upload progress,
+> restrict PAN-OS management access, and hunt from 17 October."
 
-**Sources:** Sophos advisory (updated 22/23 Oct) · Wordfence blog (22 Oct) · Hunt.io research
-(Oct 2026) · AWS Security Blog MadPot post (21 Oct) · Flawfence summary (23 Oct) · CERT-FR
-CERTFR-2026-ALE-014 · CISA KEV (checked 23 Oct) · Palo Alto advisory (updated 23 Oct) · hosting
-provider status pages.
+**Do not repeat our earlier line** ("no confirmed victim anywhere") — it was wrong from 23 October and is
+corrected here and on the public page.
+

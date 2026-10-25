@@ -1148,7 +1148,13 @@ interface is exactly the sort of target that gets scanned immediately once a PoC
   so the multipart/`PHPSESSID` anomalies in this package stand out more clearly there than on busy
   application servers.
 
-## 30. INCIDENT STATUS — 2026-10-23 20:00 UTC — no publicly confirmed victim
+## 30. INCIDENT STATUS — 2026-10-23 20:00 UTC — no publicly confirmed victim  ⚠️ SUPERSEDED BY §39
+
+> **⚠️ SUPERSEDED (2026-10-25):** the "no confirmed victim" conclusion below was wrong at the time of
+> writing — Unit 42 had published a confirmed European-government intrusion on 23 Oct and we had not yet
+> ingested it. See **§39**. Everything else in this section (exploit difficulty, disclosure lag, hunting
+> window) still holds.
+
 
 ### 30.1 The position
 **No organisation has publicly confirmed a successful compromise from CVE-2026-109618 / 109619.**
@@ -1567,3 +1573,64 @@ model estimates exploitation in the next 30 days as effectively certain.
 EPSS is an algorithmic estimate driven by observed exploitation telemetry; a jump this large in one
 day can reflect a burst of automated scanning being ingested, and the model's absolute values are not
 a probability of *your* compromise. Use it as direction and urgency, never as a per-host verdict.
+
+## 39. ⚠️ CORRECTION (incident status) — 2026-10-25 — FIRST CONFIRMED INTRUSION (unnamed European government); agentic-AI post-exploitation; suspected DPRK staging
+
+### 39.1 What we got wrong, and why it matters
+§30 (dated 2026-10-23 20:00 UTC) said "no publicly confirmed victim". **That was wrong by the time it
+was written.** Palo Alto Networks **Unit 42** published a threat brief on **23 October** (updated the
+same day, 12:30 p.m. PT) that describes a successful intrusion. We missed it because Unit 42 was not in
+our monitored source list; it is now. The mistake was a **coverage gap, not an analytical one** — but on
+an incident-status page it is exactly the sentence a customer would quote back at us, so it is corrected
+here, in `INCIDENT-STATUS.md` §5b/§7, and on the public page.
+
+### 39.2 The confirmed case (Unit 42, 23 Oct)
+> "In one case, the attackers targeted a government entity in Europe and within two hours of the initial
+> exploitation they had successfully accessed password hashes and multi-factor authentication secrets.
+> They also established an NT LAN Manager (NTLM)-relay tunnel into Active Directory and attempted Domain
+> Admin privilege escalation." — [Unit 42, CVE-2026-109618/CVE-2026-109619 threat brief](https://unit42.paloaltonetworks.com/cve-2026-109618-cve-2026-109619/)
+
+Supporting detail:
+- **Time-to-impact: under two hours** from initial exploitation to credential and MFA-secret access.
+- **Lateral movement:** NTLM-relay tunnel into Active Directory, attempted Domain Admin escalation —
+  i.e. the web server was a route into the identity system.
+- **Likely agentic-AI driven:** commands batched inside machine-readable delimiters (`==SHELLUSER==`,
+  `==PASSWD==`), short serially-spaced tasks, rapid pivots after failures. Unit 42 reads this as strong
+  evidence of an agentic attacker rather than a human operator.
+- **Scale context:** Unit 42 estimates **22.6 million** internet-exposed instances were potentially
+  vulnerable based on Cortex Xpanse telemetry (vendor telemetry, not a victim count).
+- Unit 42 also notes **at least one European government took its website offline as a precaution** —
+  distinct from the intrusion above.
+
+**What remains true:** the victim is **unnamed**, no government has publicly confirmed compromise, and
+mass exploitation of opportunistic scanners is still largely unsuccessful. **What is no longer true:**
+"no confirmed victim anywhere". One confirmed intrusion exists, reported by the vendor's threat-intel
+team.
+
+### 39.3 Suspected DPRK-linked staging campaign (CYFIRMA, moderate confidence)
+- **216-host** filtered target set, probed **low-and-slow** from **21 compromised nodes** ("nodes are
+  rotated and abandoned at the first sign of blocking or rate-limiting, so threshold-based alerting is
+  unlikely to catch it" — Kumar Ritesh, CYFIRMA CEO).
+- Targets span **government, financial institutions, logistics, airports/aviation, manufacturing and
+  online transaction platforms**, across the U.S., Japan, South Korea, Thailand, Indonesia, Australia,
+  Taiwan, India, Singapore, the UAE, Saudi Arabia and the EU.
+- Attribution is **moderate confidence** to a Korean-speaking operator in the **Lazarus ecosystem**;
+  coordination via a closed I2P channel; Munhwaŏ vocabulary cited; prior Lazarus behaviour of
+  compromising PHP/WordPress for C2 and web shells (SyncHole).
+- CYFIRMA: exploitation is "the next step"; operators planned to shortlist targets and adapt public
+  exploits.
+
+**Handling:** this is a *suspected* state-linked staging campaign, attributed at moderate confidence by
+one vendor — report it as such, not as established attribution.
+
+### 39.4 Effect on our guidance and detection
+- **Nothing in the remediation changes** — patch + restart, `session.upload_progress.enabled=0`,
+  restrict PAN-OS management planes, hunt back to 17 Oct.
+- **Detection priorities rise:** NTLM relay to AD, anonymous LDAP queries from web servers, LSASS/SAM
+  access from PHP worker context, and webshell command batches with `==SHELLUSER==`/`==PASSWD==`
+  delimiters. The last is a **new hunting artefact** worth adding to query sets.
+- **EPSS context:** the 25 Oct jump to ~0.9998 (§38) is consistent with a confirmed intrusion plus
+  state-linked staging — the two signals corroborate each other.
+- **CVE-2026-115560 stays as documented:** THN's 25 Oct piece confirms the narrow preconditions, that
+  PHP treats it as unlikely, that no emergency fix is coming, and that **no exploitation has been
+  reported** — matching our record; it is not part of this intrusion reporting.
