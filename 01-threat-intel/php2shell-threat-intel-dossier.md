@@ -1482,3 +1482,45 @@ if that is impossible, review the source, verify checksums, and test on staging 
 
 ### 36.4 No change to detection
 The guard module is defensive; nothing new to detect. The `.p2s.php` artefacts from §35 still stand.
+
+## 37. MATERIAL (detection) — 2026-10-25 — new public research repo; WAF bypass claim VERIFIED, our rules unaffected
+
+### 37.1 What appeared
+`dinosn/php-cve-2026-10961x-lab-poc` (**110★ / 24 forks**, created 20 Oct, pushed 25 Oct 05:44) — a
+vulnerability-research package making broader claims than prior public work:
+
+| Claim | Status |
+|---|---|
+| Self-contained RCE on stock **PHP 8.5.11**, four plain HTTP requests, in-band address leak via `PS(id)`→cookie disclosure, 12/12 fires over 8 ASLR generations | their claim — not reproduced by us; consistent in shape with our confirmed reproduction (§35) |
+| **52× memory amplification** via duplicate 6-byte multipart headers, defeating `post_max_size` (2.57 MB body OOMs a 128M limit), PHP 7.4–8.5.11 | their claim — plausible, matches the OOM primitive we know |
+| **"Three paths survive the 8.5.12 patch"** | **consistent with §36**: they are the separate unfixed issues — `var_destroy` re-entry UAF ([php-src#24481](https://github.com/php/php-src/issues/24481)), serialize-handler mismatch (CVE-2026-115560 territory) and upload-progress injection. **Not a bypass of the two CVEs** — the wording must be kept precise. |
+| FPM stale `BG(unserialize)`: session-decode OOM leaves state consumed by the next request; heap-shaped consumption SIGSEGVs the worker | proven as **mechanism + DoS** in their write-up; RCE there is not claimed as proven |
+| **WAF signature bypass** via `Content-Type: multipart/form-data, boundary=X` (comma instead of semicolon) | **VERIFIED BY US — see 37.2** |
+
+### 37.2 WAF bypass — verified against a real PHP runtime
+Tested on `php:8.4.26-apache` with a normal multipart body:
+
+```
+Content-Type: multipart/form-data; boundary=X   → $_POST parsed   (normal)
+Content-Type: multipart/form-data, boundary=X   → $_POST parsed   (bypass confirmed)
+```
+
+PHP trims the content-type at `;`, `,` and space, so the comma form is accepted identically. Any WAF
+signature anchored on `multipart/form-data;` — a very common anchoring — **will not see it**.
+
+**Our rules are unaffected.** Checked all 18 Suricata rules and the ModSecurity config: they match the
+substring `Content-Type: multipart/form-data` (or `^multipart/form-data` for ModSecurity), with **no
+semicolon requirement**, so the comma variant still fires. This should be stated explicitly in SOC
+guidance — it is a concrete differentiator versus rules copied from elsewhere.
+
+### 37.3 Action taken
+- Detection docs updated with the content-type bypass and the correct anchoring guidance.
+- No rule changes needed (existing rules already match the bypass form).
+- Their amplification and FPM claims are recorded as unverified-but-credible; no deliverable change
+  derived from them yet.
+
+### 37.4 PAN advisory revision (25 Oct)
+Palo Alto re-published CVE-2026-109618: **FAQ section updated**, and additional Prisma product rows
+added (Prisma SD-WAN Controller / ION / On-Prem Controller — all **unaffected**). Threat Prevention ID
+list **unchanged at 25**; fixes still pending with ETAs **27–30 October**. Nothing material for our
+guidance.

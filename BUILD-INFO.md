@@ -1,6 +1,6 @@
 # BUILD INFO — php2shell detection & response package
 
-**Build timestamp:** 2026-10-24 17:56 UTC
+**Build timestamp:** 2026-10-25 05:57 UTC
 **Package name:** `php2shell-detection-package-2026-10-24`
 **Why the name changed:** the package was first assembled on 2026-10-21 and then materially
 updated through 2026-10-22 (tested exploit results, corrected findings, repaired Suricata
@@ -209,6 +209,18 @@ The zip's own hash cannot be embedded inside itself, so it ships as a sidecar
 44. **Added a caveated note on community mitigation:** a third-party native extension
     (`hp_uploadprogress_guard`) that protects unpatched PHP — useful where patching is impossible,
     but a native extension is a supply-chain risk and never a substitute for the official builds.
+
+## What changed in the 2026-10-25 06:00 rebuild
+
+45. **Verified a WAF content-type bypass** (from `dinosn/php-cve-2026-10961x-lab-poc` research):
+    PHP accepts `Content-Type: multipart/form-data, boundary=X` (comma instead of semicolon) and
+    parses the multipart body normally. Reproduced on `php:8.4.26-apache`. Signatures anchored on
+    `multipart/form-data;` miss it.
+46. **Our rules already survive it** — they match the substring without requiring the semicolon; the
+    ModSecurity rule anchors on `^multipart/form-data`. Documented so SOC teams do not "harden" the
+    rules into being bypassable.
+47. PAN-OS advisory revised 25 Oct: FAQ updates plus additional Prisma product rows (all unaffected);
+    Threat Prevention IDs unchanged at 25; fixes still pending, ETAs 27–30 Oct.
 
 ## Reading order
 

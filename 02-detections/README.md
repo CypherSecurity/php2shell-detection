@@ -81,3 +81,22 @@ A public exploit framework (`JoasASantos/php2shell-exploit`) was reproduced by u
 
 The `*.p2s.php` URI rule is high-fidelity and low-noise; the response-body rule catches the shell
 being served; the YARA rule catches the file on disk even if renamed (3-of-4 string condition).
+
+### 2026-10-25 — Content-Type bypass for WAF signatures (verified)
+
+PHP trims the `Content-Type` value at `;`, `,` **and space**, so a request with
+
+```
+Content-Type: multipart/form-data, boundary=X
+```
+
+is processed as a normal multipart upload. Any WAF signature anchored on the common
+`multipart/form-data;` form therefore misses it.
+
+**Verified by us** on `php:8.4.26-apache`: the body parsed identically under both forms.
+
+**Our rules are not affected** — all 18 Suricata rules match the substring
+`Content-Type: multipart/form-data` without requiring the semicolon, and the ModSecurity rule uses
+`@rx (?i)^multipart/form-data`. If you copy signatures from elsewhere, check the anchoring.
+
+Source: `dinosn/php-cve-2026-10961x-lab-poc` research write-up (claim independently reproduced here).
