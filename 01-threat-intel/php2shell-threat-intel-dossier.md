@@ -1782,3 +1782,25 @@ was never parsed. The 26 Oct drop was nearly misfiled as a parse artefact. Fix:
   inbound cert, decrypt inbound, enable Threat Prevention; Threat IDs 543004 + 97622–97678).
 - **Panorama / WF-500** → no fix; keep management access tightly restricted.
 - Do not assume web-server patching covers the appliance; PAN-OS ships its own embedded PHP.
+
+## 43. Defensive ecosystem: exposure-discovery resources (2026-10-26)
+
+**`cseelhoff-ms/php2shell-hunting-pack`** — Microsoft-authored hunting pack (Defender / Sentinel / Azure
+tooling), created 21 Oct, updated 26 Oct. Fills a gap none of our artefacts cover: **asset discovery**
+("top 10 ways to find vulnerable PHP assets" via Defender Vulnerability Management, Defender for Cloud,
+EASM, Azure Resource Graph), rather than log-based exploitation hunting.
+
+Two things worth borrowing:
+- **"An empty CVE/TVM result does not mean not vulnerable"** — version detection misses embedded PHP and
+  distro backports. This matches our `START-HERE.md` inventory guidance and is a good line for customer
+  conversations.
+- Pairing **exposure discovery** (their pack) with **exploitation detection** (our Suricata/YARA/Sigma) —
+  different jobs; estates need both.
+
+Referenced (unverified by us, no exploit code) in `04-hunting/hunting-queries-v2.md` alongside the
+NCSC-NL vendor-status list.
+
+### 43.1 Monitoring note — NVD 503
+This cycle's NVD fetches failed (`nvd.*.parse=FAIL`); direct retest returned **HTTP 503** from
+services.nvd.nist.gov. Source-side throttling/outage, not a monitor defect — the sweep and per-CVE records
+will be re-checked next cycle. Single occurrence only; escalate if it persists 2+ runs.

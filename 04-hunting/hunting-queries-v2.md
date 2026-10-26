@@ -573,3 +573,27 @@ find /tmp /var/lib/php/sessions -maxdepth 1 -type f -size +2M -printf '%p %s %TY
 ```
 
 Hunt window: from **2026-10-17** (pre-disclosure attempts) onward.
+
+---
+
+## Complementary resources (not authored by us — verify before adopting)
+
+### Microsoft PHP2Shell Hunting Pack (`cseelhoff-ms/php2shell-hunting-pack`)
+- URL: https://github.com/cseelhoff-ms/php2shell-hunting-pack — Microsoft-authored (Defender / Sentinel /
+  Azure tooling), created 21 Oct, actively updated.
+- **What it adds that we do not cover:** *asset discovery* rather than log hunting — "top 10 ways to find
+  vulnerable PHP assets" for Microsoft estates (Defender Vulnerability Management, Defender for Cloud,
+  EASM, Azure Resource Graph, etc.), each with a copy-paste query or runbook.
+- **Useful framing to keep:** their warning that an empty CVE/TVM result does **not** mean "not
+  vulnerable" — version detection is unreliable for embedded PHP and distro backports. This matches our
+  own guidance (`START-HERE.md`: inventory is the first step; version strings alone are unreliable).
+- **Caveat:** third-party content, not validated by us; no exploit code. Treat its queries as
+  starting points and test against your own telemetry before alerting.
+
+### NCSC-NL (`NCSC-NL/php2shell`)
+- Vendor/product status list (TLP:CLEAR) for "is product X affected?" — referenced in
+  `../PATCH-AVAILABILITY.md`. Also carries `detection_mitigation/`, `tools/` and `tests/`.
+
+### Suricata / YARA in this package
+Our own network and file detections remain the primary **exploitation** signal; the resources above are
+for **exposure discovery** and **estate inventory** — different jobs, use both.

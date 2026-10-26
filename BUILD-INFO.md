@@ -1,6 +1,6 @@
 # BUILD INFO — php2shell detection & response package
 
-**Build timestamp:** 2026-10-26 00:56 UTC
+**Build timestamp:** 2026-10-26 11:56 UTC
 **Package name:** `php2shell-detection-package-2026-10-24`
 **Why the name changed:** the package was first assembled on 2026-10-21 and then materially
 updated through 2026-10-22 (tested exploit results, corrected findings, repaired Suricata
@@ -280,6 +280,15 @@ The zip's own hash cannot be embedded inside itself, so it ships as a sidecar
     per-letter files plus a changelog; includes Palo Alto Networks PAN-OS/Panorama listed **Vulnerable,
     fixed releases not yet announced** — independently consistent with our PAN-OS assessment.
 62. Monitor now tracks the NCSC-NL README (vendor-status activity signal).
+
+## What changed in the 2026-10-26 12:00 rebuild — exposure-discovery references
+
+63. **Added a "Complementary resources" section** to `04-hunting/hunting-queries-v2.md`: the
+    Microsoft-authored PHP2Shell Hunting Pack (`cseelhoff-ms/php2shell-hunting-pack`) for **asset
+    discovery** (Defender TVM / Cloud / EASM / Azure Resource Graph — a job our log-side queries do not
+    cover), plus the NCSC-NL vendor-status list. Third-party content is labelled as unverified.
+64. Kept their key framing: an empty CVE/TVM result does **not** mean "not vulnerable" — version
+    detection is unreliable for embedded PHP and distro backports.
 
 ## Reading order
 
