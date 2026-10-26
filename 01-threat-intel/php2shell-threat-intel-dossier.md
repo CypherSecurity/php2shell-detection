@@ -1721,3 +1721,23 @@ These are present in the article as first published; we had simply not extracted
 - Added the `p2s-rider` upload-progress marker as a new detection (SID **2202610121**).
 - Hunting doc updated with the GlobalProtect-probe artefact, source IP and ReliaQuest log sequence.
 - **No change to victim status** (§39.6 stands): the article's headline claim remains retracted by Unit 42.
+
+## 41. Independent government vendor-status resource (NCSC-NL) — 2026-10-26
+
+Found during the 02:55 UTC cycle: **`NCSC-NL/php2shell`** (Dutch government CERT), **~298★ / 101 forks**,
+created 21 Oct, updated **hourly** (pushed 02:46 UTC at time of triage), **TLP:CLEAR**.
+
+| Aspect | Detail |
+|---|---|
+| Layout | `software/software_list_<letter>.md` (31 files), `software/changelog_software_list.md` (~530 KB), `detection_mitigation/`, `tools/`, `tests/` |
+| Granularity | supplier · product · versions · **status per CVE** (`Vulnerable` / `Fix` / `Not vuln`) · vendor-advisory links |
+| Value | covers **embedded PHP in commercial products** — the gap our distro patch matrix cannot fill |
+| Caveat | entries are *investigation leads* until backed by the vendor advisory (repo states this) |
+
+**PAN-OS cross-check:** NCSC-NL lists PAN-OS 12.2/12.1/11.2/11.1/10.2 and Panorama as **Vulnerable,
+fixed releases not yet announced** — **independent confirmation** of our `PAN-OS-EXPOSURE.md` position
+(fixes pending, ETAs 27–30 Oct). It adds no claim of appliance-specific RCE.
+
+**Action:** referenced in `PATCH-AVAILABILITY.md`; monitoring now tracks the repo README so vendor-status
+activity is visible. We do not copy the list (it is large and hourly-changing) — we cite it and use it as
+the lookup layer for customer "is product X affected?" questions.

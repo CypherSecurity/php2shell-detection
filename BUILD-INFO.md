@@ -273,6 +273,14 @@ The zip's own hash cannot be embedded inside itself, so it ships as a sidecar
 60. **Kept:** the `p2s-rider` artefact and its detection (SID 2202610121) — it was in the article from
     first publication; we simply extracted it later.
 
+## What changed in the 2026-10-26 03:00 rebuild — NCSC-NL vendor status
+
+61. **Added NCSC-NL's government-maintained vendor/product status list** as the authoritative reference
+    for embedded-PHP products (`PATCH-AVAILABILITY.md`, new section). TLP:CLEAR, updated hourly, 31
+    per-letter files plus a changelog; includes Palo Alto Networks PAN-OS/Panorama listed **Vulnerable,
+    fixed releases not yet announced** — independently consistent with our PAN-OS assessment.
+62. Monitor now tracks the NCSC-NL README (vendor-status activity signal).
+
 ## Reading order
 
 | File | Why |

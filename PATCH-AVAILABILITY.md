@@ -210,3 +210,26 @@ extension. Prebuilt for Linux x86_64/aarch64 and Windows x64, with checksums.
 **Caveats:** third-party native extension loaded into the web server — supply-chain and stability
 risk. It is **not** a substitute for the official fixed builds. Recommended only where patching is
 genuinely impossible, after source review, checksum verification and staging tests.
+
+## Government-maintained vendor/product status — NCSC-NL (TLP:CLEAR)
+
+An independent, continuously updated **vendor-by-vendor** status list is maintained by the Dutch
+government CERT:
+
+- Repo: https://github.com/NCSC-NL/php2shell — **298★ / 101 forks**, created 21 Oct, updated hourly
+- Machine-readable layout: `software/software_list_<letter>.md` (31 files), plus
+  `software/changelog_software_list.md` (changes), `detection_mitigation/`, `tools/`, `tests/`
+- Per product: supplier, product, versions, **status for CVE-2026-109618 / CVE-2026-109619**
+  (`Vulnerable` / `Fix` / `Not vuln` / …), and links to the vendor's own advisory
+- TLP:CLEAR — safe to redistribute
+
+**Why it matters for us:** it closes the gap our patch matrix cannot cover — **embedded PHP in
+commercial appliances**. Every "can't patch this product" question now has an authoritative place to
+start. Entries are investigation leads unless backed by a vendor advisory (the repo says so itself).
+
+**Cross-check on PAN-OS:** NCSC-NL lists PAN-OS 12.2/12.1/11.2/11.1/10.2 and Panorama as
+**Vulnerable, fixed releases not yet announced** — independently consistent with our
+`PAN-OS-EXPOSURE.md` assessment (fixes pending, ETAs 27–30 Oct).
+
+**Usage:** filter by your product inventory; for each hit follow the vendor link for the fix version.
+Do not treat "Not vuln" as a permanent state — the list is updated daily and vendors revise.
