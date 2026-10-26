@@ -48,6 +48,13 @@ Suricata 8.0.3 (16 rules, clean `-T`), Zeek 9.0.0, YARA 4.5.5 and an Apache mod_
 - Patching an application does not help — the PHP runtime must be updated.
 - A package upgrade without a PHP worker restart leaves the host exploitable.
 
+## Built and maintained by
+
+**f4n6** — independent security research. Detection engineering and threat-intel work for teams that
+need it now: <https://f4n6.co.uk>. This package is produced from a live monitoring pipeline; corrections
+and sourced additions are welcome via issues or the advisory page at
+<https://f4n6.co.uk/php2shell/>.
+
 ## Licence / use
 
 Provided for defensive use. Attribution appreciated. No warranty.
