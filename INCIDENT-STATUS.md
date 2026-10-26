@@ -81,8 +81,8 @@ Attempts are failing **publicly**, but the exploit capability behind them is imp
 - **Update 24 Oct — PUBLIC WORKING EXPLOIT CONFIRMED (conditional).** The framework
   `JoasASantos/php2shell-exploit` was run against its own lab (PHP 8.4.26, stock
   `php.ini-production`, **`display_errors=Off`**, upload progress On). Result: **pre-auth RCE
-  reproduced** on **both x86_64 and arm64** — but **only when Apache prefork runs a single worker**.
-  Multi-worker pools failed at the memory-leak stage on both architectures. Proof was taken
+  reproduced** on **both x86_64 and arm64** — at the time, **only when Apache prefork ran a single
+  worker** (multi-worker failed at the leak stage; **superseded 26 Oct — see below**). Proof was taken
   independently of the tool's own output: the command wrote a file inside the target container
   (`uid=33(www-data)`), read back with `docker exec`.
   **What changed:** a public exploit now covers the `display_errors=Off` case that previously
@@ -91,6 +91,17 @@ Attempts are failing **publicly**, but the exploit capability behind them is imp
   Mitigation is unchanged and still effective: patch, and/or `session.upload_progress.enabled=0`.
   Detection: the tool plants `/.p2s.php` (also `/assets/.p2s.php`, `/tmp/.p2s.php`) and v2 uses
   `/tmp/.p2s_v2.php` + `.htaccess`.
+
+- **Update 26 Oct — MULTI-WORKER BARRIER REMOVED (public exploit).** The upstream tool shipped an
+  "Exploit Stability Enhancement" (PR #3: worker-count estimation fix, dedicated reverse shell, keep-alive
+  recon). We re-tested against a **default multi-worker Apache prefork pool** (StartServers 5, 75
+  processes observed) on stock PHP 8.4.26 with `php.ini-production`/`display_errors=Off`:
+  **RCE succeeded in 2 of 3 attempts** (`uid=33(www-data)` and marker echoed back; one attempt exhausted
+  retries). Previously multi-worker pools failed at the leak stage on both architectures.
+  **What changed:** "single worker" is no longer a meaningful mitigation, and the exploit is now usable
+  against default Apache prefork deployments. **What did not:** reliability is still imperfect (~2/3 in a
+  small sample), mod_php+prefork remains the target shape, and `session.upload_progress.enabled=0` still
+  breaks the path. Remediation unchanged: patch + restart every worker.
 
 - **Update 25 Oct — EPSS moved to near-certain.** FIRST's 25 October daily update put
   CVE-2026-109618 at **0.99981** and CVE-2026-109619 at **0.99997** (from 11.8% / 6.2% the day

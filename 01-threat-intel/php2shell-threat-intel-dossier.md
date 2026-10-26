@@ -1804,3 +1804,45 @@ NCSC-NL vendor-status list.
 This cycle's NVD fetches failed (`nvd.*.parse=FAIL`); direct retest returned **HTTP 503** from
 services.nvd.nist.gov. Source-side throttling/outage, not a monitor defect — the sweep and per-CVE records
 will be re-checked next cycle. Single occurrence only; escalate if it persists 2+ runs.
+
+## 44. 🚨 CAPABILITY UPDATE (2026-10-26) — public exploit now clears MULTI-WORKER pools
+
+### 44.1 What prompted it
+The repo tracker showed `JoasASantos/php2shell-exploit` pushed at **2026-10-26 12:50** (first code change
+since 24 Oct). Changelog: *"Merge pull request #3 from MNTMDEV/main"* — PR titled **"Exploit Stability
+Enhancement"**: *"use dedicated nc reverse shell to prevent thread hold, **fix worker count estimate
+bug**, support keep-alive recon"*, touching `exploit.py`, `lib/worker_pin.py`, `recon.py`.
+
+### 44.2 Our re-test (independent of the tool's own claims)
+Lab: `php:8.4.26-apache`, stock `php.ini-production` (**display_errors=Off**), upload progress On,
+**default Apache prefork pool** (StartServers 5; 75 apache2 processes observed during the run — no worker
+pinning of any kind applied to the server).
+
+| Attempt | Result |
+|---|---|
+| 1 | ✅ **RCE** — `uid=33(www-data)`, marker echoed |
+| 2 | ✅ **RCE** — marker echoed |
+| 3 | ❌ exhausted retries |
+
+**2 of 3 (small sample).** Earlier (24 Oct) the same tool failed at the leak stage on **every**
+multi-worker attempt on both architectures; single-worker was the documented workaround.
+
+### 44.3 Effect on our assessments
+- **Supersedes the "single worker required" caveat** in §35 and in `INCIDENT-STATUS.md` §4b / `START-HERE.md`.
+- **"Worker count is a security control" is now definitively false.** Default Apache prefork
+  deployments are in scope for the public tool.
+- Reliability is imperfect (~2/3 in n=3) and target shape is still mod_php + prefork; FPM is not covered
+  by this tool. `session.upload_progress.enabled=0` still breaks the path; patching remains the fix.
+- The *silent memory-disclosure* mode is unchanged and independent of worker count.
+
+### 44.4 Monitoring gap closed
+This update was nearly missed: the repo tracker only surfaced stars, and we noticed the commit because a
+star count moved. `check.sh` now tracks **`pushed_at` for key repos** (Joas exploit, xuehuolll PoC,
+HOSTED-POWER guard, NCSC-NL) as `repo.<name>.pushed=…`, so new code is a first-class signal rather than
+a lucky observation.
+
+### 44.5 Note on a second repo
+`xuehuolll/php2shell-CVE-2026-109618-109619` (47★, v2.1 released 26 Oct) claims "a working remote chain
+on stock php.ini-production, four more exploit paths, and post-patch evidence". Its own analysis commit
+states an "8M chain also fails on 8.4.20/8.5.11". **We have not tested it**; treat as unverified. Our
+verified capability statement rests on the Joas tool (§35, §44.2).

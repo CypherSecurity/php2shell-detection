@@ -16,11 +16,12 @@ Any `.php` URL can be attacked **before your application code runs**:
 - **CVE-2026-109619** — internal state from one request survives its memory being freed;
   the **next request on the same worker** trusts it → **RCE, or silent heap theft**
 
-**On `display_errors=Off`:** two research teams have privately demonstrated full RCE in that
-production configuration (VulnCheck on x86-64, CovertSwarm on AArch64) — **so do not rely on
-`display_errors=Off` as protection.** No *reliable public* exploit for that config has been verified
-(we tested the loudest claim 14 times and it failed), but the barrier is exploit maturity, not
-hardening.
+**On `display_errors=Off`:** **a public exploit now clears it.** We reproduced `JoasASantos/php2shell-exploit`
+on stock PHP 8.4.26 with `php.ini-production` (`display_errors=Off`) on x86-64 and arm64 — and, as of the
+**2026-10-26 update**, it also succeeds against a **default multi-worker Apache prefork pool** (2 of 3
+attempts; previously it required a single worker). Private exploits also exist (VulnCheck x86-64,
+CovertSwarm AArch64). **Do not rely on `display_errors=Off`, and do not rely on worker count as a
+control.**
 
 **The silent mode is the part most people miss:** an attacker can steal process memory
 (passwords, session tokens, API keys, certificates belonging to *other users'* requests)
@@ -132,14 +133,15 @@ We executed the public PoCs against their own labs. Results:
 | Karasawa `final-zero` | `display_errors=On` | ✅ **RCE CONFIRMED** — `uid=33(www-data)` in **4 HTTP requests**, no auth, no PHP written to target |
 | Karasawa `nzd-u8` | `display_errors=Off` | ❌ **NOT reproduced** — fails on its own lab (repo contradicts itself; unverified) |
 | 9bie `exploit.py` | `display_errors=On` | ❌ **NOT reproduced** — leak fires (4 KB `PHPSESSID` cookie, `zend_mm_heap corrupted`) but chain fails; calibrated for an older image |
+| **Joas `exploit.py`** | **`display_errors=Off`**, `php.ini-production` | ✅ **RCE CONFIRMED** — x86-64 + arm64 (24 Oct); **multi-worker prefork SUCCESS 2/3 (26 Oct)** — `uid=33(www-data)`, independent file-write proof |
 
 **What this means for you:**
 
 1. **Public working RCE is real for `display_errors=On`.** Treat that as fact: patch +
    restart workers.
-2. **`display_errors=Off` end-to-end RCE is UNVERIFIED.** Do not assume either way. The heap
-   *disclosure* path against `Off` is publicly documented and our lab did observe the
-   oversized `PHPSESSID` cookie that it relies on.
+2. **`display_errors=Off` end-to-end RCE is CONFIRMED (public tool, 24 Oct; multi-worker 26 Oct).**
+   Treat production config as exploitable. The heap *disclosure* path (silent memory theft via a
+   `PHPSESSID` cookie) is also public.
 3. **Public exploit reliability is lower than star counts suggest.** Both failed on
    slightly different environments — they are image/calibration-specific. That reduces the
    predicted rate of mass opportunistic attacks, **not** the risk to a host an attacker has

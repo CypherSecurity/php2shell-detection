@@ -1,6 +1,6 @@
 # BUILD INFO — php2shell detection & response package
 
-**Build timestamp:** 2026-10-26 11:56 UTC
+**Build timestamp:** 2026-10-26 13:00 UTC
 **Package name:** `php2shell-detection-package-2026-10-24`
 **Why the name changed:** the package was first assembled on 2026-10-21 and then materially
 updated through 2026-10-22 (tested exploit results, corrected findings, repaired Suricata
@@ -289,6 +289,19 @@ The zip's own hash cannot be embedded inside itself, so it ships as a sidecar
     cover), plus the NCSC-NL vendor-status list. Third-party content is labelled as unverified.
 64. Kept their key framing: an empty CVE/TVM result does **not** mean "not vulnerable" — version
     detection is unreliable for embedded PHP and distro backports.
+
+## What changed in the 2026-10-26 13:00 rebuild — CAPABILITY: multi-worker RCE confirmed
+
+65. **Public exploit now works against default multi-worker Apache prefork pools.** The Joas framework
+    shipped an "Exploit Stability Enhancement" (PR #3, worker-count estimate fix). We re-tested against
+    `php:8.4.26-apache` with stock `php.ini-production` (`display_errors=Off`) and a default prefork pool
+    (StartServers 5, 75 processes observed, no pinning): **RCE in 2 of 3 attempts**, `uid=33(www-data)`.
+    Previously multi-worker failed at the leak stage on both arches.
+66. **"Single worker" is no longer a mitigation.** Worker count is definitively not a control. Target shape
+    is still mod_php + prefork (this tool does not cover FPM); `session.upload_progress.enabled=0` still
+    breaks the path; patching remains the fix.
+67. `START-HERE.md` and `INCIDENT-STATUS.md` capability statements updated (superseded caveats marked);
+    dossier §44. Monitoring now tracks `pushed_at` for key repos so new exploit code is a signal.
 
 ## Reading order
 
