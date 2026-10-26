@@ -1818,21 +1818,16 @@ Lab: `php:8.4.26-apache`, stock `php.ini-production` (**display_errors=Off**), u
 **default Apache prefork pool** (StartServers 5; 75 apache2 processes observed during the run — no worker
 pinning of any kind applied to the server).
 
-| Attempt | Result |
-|---|---|
-| 1 | ✅ **RCE** — `uid=33(www-data)`, marker echoed |
-| 2 | ✅ **RCE** — marker echoed |
-| 3 | ❌ exhausted retries |
-
-**2 of 3 (small sample).** Earlier (24 Oct) the same tool failed at the leak stage on **every**
-multi-worker attempt on both architectures; single-worker was the documented workaround.
+Initial spot check: 3 attempts, 2 successes. **A proper benchmark (n=28 total) shows that was
+optimistic luck** — see §44.6 for the corrected numbers.
 
 ### 44.3 Effect on our assessments
 - **Supersedes the "single worker required" caveat** in §35 and in `INCIDENT-STATUS.md` §4b / `START-HERE.md`.
-- **"Worker count is a security control" is now definitively false.** Default Apache prefork
-  deployments are in scope for the public tool.
-- Reliability is imperfect (~2/3 in n=3) and target shape is still mod_php + prefork; FPM is not covered
-  by this tool. `session.upload_progress.enabled=0` still breaks the path; patching remains the fix.
+- **Default Apache prefork deployments are in scope for the public tool** — but **multi-worker
+  reliability is poor** (§44.6: **2/13**). Worker count is not a *control*, yet it remains a **strong
+  reliability factor**: single-worker 15/15 vs multi-worker 2/13.
+- Target shape is still mod_php + prefork; FPM is not covered by this tool.
+  `session.upload_progress.enabled=0` still breaks the path; patching remains the fix.
 - The *silent memory-disclosure* mode is unchanged and independent of worker count.
 
 ### 44.4 Monitoring gap closed
@@ -1846,3 +1841,24 @@ a lucky observation.
 on stock php.ini-production, four more exploit paths, and post-patch evidence". Its own analysis commit
 states an "8M chain also fails on 8.4.20/8.5.11". **We have not tested it**; treat as unverified. Our
 verified capability statement rests on the Joas tool (§35, §44.2).
+
+### 44.6 Reliability benchmark (2026-10-26, n=28, absolute measurements)
+Same exploit build, same target (`php:8.4.26-apache`, stock `php.ini-production`, `display_errors=Off`,
+`session.upload_progress=On`), private loopback lab; per-attempt budget `--timeout 45`; success =
+`BENCH_MARKER` echoed back through the exploit's command execution.
+
+| Arm | Pool | Success | Median attempt |
+|---|---|---|---|
+| **Single-worker** | `MaxRequestWorkers=1`, StartServers 1 (2 procs) | **15/15 (100%)** | ~5 s |
+| **Multi-worker** | default: StartServers 5, MaxRequestWorkers 150 (6 idle procs, more under load) | **2/13 (15%)** | ~62 s (failures burn retries) |
+
+**Interpretation (supersedes the 2/3 spot check):**
+- The 26 Oct upstream fix does **not** make multi-worker reliable. It makes multi-worker *sometimes
+  reachable* — a capability change, but a marginal one.
+- **Single-worker remains the reliable configuration (100%)**, so the earlier "single worker" note was
+  about *reliability*, not a security control. Reporting nuance: "worker count does not protect you, but
+  it does reduce an attacker's success probability to roughly one attempt in seven in our lab".
+- Failures on multi-worker were consistent: the leak stage rarely lands on a worker that is reused in
+  the attacker's favour; a single worker guarantees reuse.
+- These are **lab figures** — production results vary with memory_limit, request pacing, traffic and the
+  application's session behaviour.

@@ -1,6 +1,6 @@
 # BUILD INFO — php2shell detection & response package
 
-**Build timestamp:** 2026-10-26 13:00 UTC
+**Build timestamp:** 2026-10-26 13:40 UTC
 **Package name:** `php2shell-detection-package-2026-10-24`
 **Why the name changed:** the package was first assembled on 2026-10-21 and then materially
 updated through 2026-10-22 (tested exploit results, corrected findings, repaired Suricata
@@ -302,6 +302,15 @@ The zip's own hash cannot be embedded inside itself, so it ships as a sidecar
     breaks the path; patching remains the fix.
 67. `START-HERE.md` and `INCIDENT-STATUS.md` capability statements updated (superseded caveats marked);
     dossier §44. Monitoring now tracks `pushed_at` for key repos so new exploit code is a signal.
+
+## What changed in the 2026-10-26 14:00 rebuild — reliability benchmark (correction)
+
+68. **Benchmarked the public exploit (n=28) and corrected our own claim.** Same build, stock PHP 8.4.26,
+    `php.ini-production`, `display_errors=Off`: **single-worker 15/15 (100%)**, **multi-worker 2/13 (15%)**.
+    The earlier "2 of 3" multi-worker spot check was small-sample luck.
+69. Corrected wording everywhere: multi-worker is no longer a hard barrier, but it is **unreliable**
+    there. Worker count is not a security control, yet remains a strong **reliability** factor.
+    `START-HERE.md`, `INCIDENT-STATUS.md` and dossier §44 updated.
 
 ## Reading order
 

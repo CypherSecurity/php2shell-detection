@@ -18,10 +18,10 @@ Any `.php` URL can be attacked **before your application code runs**:
 
 **On `display_errors=Off`:** **a public exploit now clears it.** We reproduced `JoasASantos/php2shell-exploit`
 on stock PHP 8.4.26 with `php.ini-production` (`display_errors=Off`) on x86-64 and arm64 — and, as of the
-**2026-10-26 update**, it also succeeds against a **default multi-worker Apache prefork pool** (2 of 3
-attempts; previously it required a single worker). Private exploits also exist (VulnCheck x86-64,
-CovertSwarm AArch64). **Do not rely on `display_errors=Off`, and do not rely on worker count as a
-control.**
+**2026-10-26 update**, it also reaches a **default multi-worker Apache prefork pool** — though **unreliably**: benchmark
+single-worker **15/15**, multi-worker **2/13**. Worker count is not a control, but it is a strong
+reliability factor. Private exploits also exist (VulnCheck x86-64, CovertSwarm AArch64). **Do not rely
+on `display_errors=Off`.**
 
 **The silent mode is the part most people miss:** an attacker can steal process memory
 (passwords, session tokens, API keys, certificates belonging to *other users'* requests)
@@ -133,7 +133,7 @@ We executed the public PoCs against their own labs. Results:
 | Karasawa `final-zero` | `display_errors=On` | ✅ **RCE CONFIRMED** — `uid=33(www-data)` in **4 HTTP requests**, no auth, no PHP written to target |
 | Karasawa `nzd-u8` | `display_errors=Off` | ❌ **NOT reproduced** — fails on its own lab (repo contradicts itself; unverified) |
 | 9bie `exploit.py` | `display_errors=On` | ❌ **NOT reproduced** — leak fires (4 KB `PHPSESSID` cookie, `zend_mm_heap corrupted`) but chain fails; calibrated for an older image |
-| **Joas `exploit.py`** | **`display_errors=Off`**, `php.ini-production` | ✅ **RCE CONFIRMED** — x86-64 + arm64 (24 Oct); **multi-worker prefork SUCCESS 2/3 (26 Oct)** — `uid=33(www-data)`, independent file-write proof |
+| **Joas `exploit.py`** | **`display_errors=Off`**, `php.ini-production` | ✅ **RCE CONFIRMED** — x86-64 + arm64 (24 Oct); single-worker **15/15**, multi-worker **2/13** (26 Oct benchmark) — `uid=33(www-data)`, independent proof |
 
 **What this means for you:**
 

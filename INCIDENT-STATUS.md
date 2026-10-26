@@ -95,13 +95,14 @@ Attempts are failing **publicly**, but the exploit capability behind them is imp
 - **Update 26 Oct — MULTI-WORKER BARRIER REMOVED (public exploit).** The upstream tool shipped an
   "Exploit Stability Enhancement" (PR #3: worker-count estimation fix, dedicated reverse shell, keep-alive
   recon). We re-tested against a **default multi-worker Apache prefork pool** (StartServers 5, 75
-  processes observed) on stock PHP 8.4.26 with `php.ini-production`/`display_errors=Off`:
-  **RCE succeeded in 2 of 3 attempts** (`uid=33(www-data)` and marker echoed back; one attempt exhausted
-  retries). Previously multi-worker pools failed at the leak stage on both architectures.
-  **What changed:** "single worker" is no longer a meaningful mitigation, and the exploit is now usable
-  against default Apache prefork deployments. **What did not:** reliability is still imperfect (~2/3 in a
-  small sample), mod_php+prefork remains the target shape, and `session.upload_progress.enabled=0` still
-  breaks the path. Remediation unchanged: patch + restart every worker.
+  processes observed) on stock PHP 8.4.26 with `php.ini-production`/`display_errors=Off`.
+  **Benchmark (n=28): single-worker 15/15 (100%); multi-worker 2/13 (15%)** — an initial 2/3 spot check
+  was small-sample luck. Previously multi-worker failed at the leak stage on both architectures.
+  **What changed:** multi-worker is no longer a hard barrier — the exploit occasionally lands there.
+  **What did not:** it is *not reliable* there (**15% vs 100% single-worker**); worker count is therefore
+  not a security control but remains a strong reliability factor. Target shape is still mod_php+prefork,
+  and `session.upload_progress.enabled=0` still breaks the path. Remediation unchanged: patch + restart
+  every worker.
 
 - **Update 25 Oct — EPSS moved to near-certain.** FIRST's 25 October daily update put
   CVE-2026-109618 at **0.99981** and CVE-2026-109619 at **0.99997** (from 11.8% / 6.2% the day
