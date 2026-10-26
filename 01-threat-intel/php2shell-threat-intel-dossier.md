@@ -1741,3 +1741,44 @@ fixed releases not yet announced** — **independent confirmation** of our `PAN-
 **Action:** referenced in `PATCH-AVAILABILITY.md`; monitoring now tracks the repo README so vendor-status
 activity is visible. We do not copy the list (it is large and hourly-changing) — we cite it and use it as
 the lookup layer for customer "is product X affected?" questions.
+
+## 42. 🚨 TOP ESCALATION (2026-10-26) — PAN-OS hotfixes have started shipping
+
+### 42.1 What changed and how it was caught
+The 05:55 UTC cycle flagged a **PAN advisory revision** (`pending_fix_rows` 17 → 13,
+`advisory_updated 2026-10-25 → 2026-10-26`). Initial ambiguity — the Solution text still says "will be
+fixed in upcoming releases" — was resolved by reading the advisory's **own Timeline section**:
+
+> "2026-10-26 Removed the ETAs for 11.1.4-h38, 11.1.6-h40, 11.1.10-h36 and 11.1.13-h16 **as these
+> versions are released**."
+> "2026-10-25 Updated the Frequently Asked question (FAQ) section. Also, removed the ETA for
+> 10.2.18-h13, 11.1.16-h4 and 11.2.10-h16 **as these versions are released**."
+
+Corroborated by PAN-OS release notes: e.g. *"The PAN-OS 11.1.13-h16 release includes a fix to address
+CVE-2026-109618"* and the equivalent for 10.2.18-h13.
+
+### 42.2 Fix status by branch (2026-10-26)
+| Status | Builds |
+|---|---|
+| **Released 25 Oct** | `10.2.18-h13` · `11.1.16-h4` · `11.2.10-h16` |
+| **Released 26 Oct** | `11.1.4-h38` · `11.1.6-h40` · `11.1.10-h36` · `11.1.13-h16` |
+| Pending (ETA) | `11.1.7-h12` 10/30 · `11.2.4-h23` 10/30 · `11.2.7-h23` 10/29 · `11.2.13-h4` 10/27 · `11.2.16-h1` 10/28 · `10.2.7-h39` 10/30 · `10.2.10-h42` 10/29 · `10.2.13-h27` 10/27 · `10.2.16-h12` 10/28 · `12.1.4-h13` 10/29 · `12.1.7-h11` 10/28 · `12.1.10-h3` 10/30 · `12.2.4-h1` 10/28 |
+
+**No fix date:** Panorama, WildFire WF-500/WF-500-B. 25 Threat Prevention IDs unchanged.
+
+### 42.3 Monitoring gap this exposed (and the fix)
+Our monitor treated only `(ETA: …)` rows as pending and had **no notion of "released"** — the 25 Oct
+releases were missed because the advisory update was attributed to an FAQ revision, and the timeline text
+was never parsed. The 26 Oct drop was nearly misfiled as a parse artefact. Fix:
+- Parse the advisory **Timeline** for `removed the ETA for … as these versions are released` →
+  emit `pan.released_builds=…` and `pan.release_timeline=…`.
+- Keep the three-state pending logic; released builds are now positively reported, not inferred from
+  missing ETAs.
+- **Lesson:** "no ETA" is not evidence either way — read the vendor's release timeline.
+
+### 42.4 Customer action
+- Branch has a released build → **upgrade now**, then re-verify management-interface exposure.
+- Branch still pending → interim controls (restrict MGT access, route MGT through a DP port, replace
+  inbound cert, decrypt inbound, enable Threat Prevention; Threat IDs 543004 + 97622–97678).
+- **Panorama / WF-500** → no fix; keep management access tightly restricted.
+- Do not assume web-server patching covers the appliance; PAN-OS ships its own embedded PHP.

@@ -105,7 +105,7 @@ dpkg -l | grep -E '^ii\s+php' | awk '{print $2, $3}'
 #    then compare against the tables above
 ```
 
-## 7b. ⚠️ Palo Alto Networks PAN-OS / Panorama — affected, fixes PENDING
+## 7b. ⚠️ Palo Alto Networks PAN-OS / Panorama — affected; **fixes now shipping (since 25 Oct)**
 
 PAN-OS and Panorama are **affected** by both CVEs, with **no special configuration required**.
 **Fixed versions are not released yet** — ETAs **26–30 Oct 2026**. PAN rates its own product impact
@@ -119,7 +119,25 @@ PAN-OS and Panorama are **affected** by both CVEs, with **no special configurati
 | 11.1 | `11.1.16-h4` … `11.1.7-h12` | 10/26 – 10/30 |
 | 10.2 | `10.2.13-h27` / `10.2.16-h12` / `10.2.10-h42` / `10.2.7-h39` | 10/27 – 10/30 |
 
-**Interim mitigations (until PAN-OS fixes ship):**
+
+**UPDATE 2026-10-26 — hotfixes have begun to ship.** Palo Alto's advisory carries its own timeline:
+*"2026-10-26 Removed the ETAs for 11.1.4-h38, 11.1.6-h40, 11.1.10-h36 and 11.1.13-h16 as these versions
+are released"* and *"2026-10-25 … removed the ETA for 10.2.18-h13, 11.1.16-h4 and 11.2.10-h16 as these
+versions are released"*. PAN-OS release notes confirm each build "includes a fix to address
+CVE-2026-109618".
+
+| Status | Builds |
+|---|---|
+| **Released 25 Oct** | `10.2.18-h13` · `11.1.16-h4` · `11.2.10-h16` |
+| **Released 26 Oct** | `11.1.4-h38` · `11.1.6-h40` · `11.1.10-h36` · `11.1.13-h16` |
+| Still pending (ETA) | `11.1.7-h12` (10/30) · `11.2.4-h23` (10/30) · `11.2.7-h23` (10/29) · `11.2.13-h4` (10/27) · `11.2.16-h1` (10/28) · `10.2.7-h39` (10/30) · `10.2.10-h42` (10/29) · `10.2.13-h27` (10/27) · `10.2.16-h12` (10/28) · `12.1.4-h13` (10/29) · `12.1.7-h11` (10/28) · `12.1.10-h3` (10/30) · `12.2.4-h1` (10/28) |
+
+**Action:** if your branch has a released build, upgrade now (maintenance window, then verify the
+management interface is reachable only from trusted sources). Branches still pending keep the interim
+controls below. **Panorama and WF-500** still have no announced fix date. Confirm build existence on the
+advisory page before scheduling — PAN revises ETAs.
+
+**Interim mitigations (for branches without a released fix):**
 1. **Restrict management-plane access** — never expose the MGT interface to the internet.
 2. Enable the **full current** Threat Prevention ID list — **543004, 97622–97625, and the wider set added 24 Oct (`97643`, `97647`, `97649`, `97652`, `97653`, `97656`–`97659`, `97662`–`97664`, `97670`–`97674`, `97676`–`97678`) — content **9162+, 9163, 9164+****. ⚠️ **Updated 24 Oct:** the list
    grew from 5 to 25 signatures; enabling only the original five leaves you under-covered. Verify the

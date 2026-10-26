@@ -1,10 +1,18 @@
-# PAN-OS exposure, exploitability and the patch window (26–30 Oct)
+# PAN-OS exposure, exploitability and the patch window (25–30 Oct) — **patches now shipping**
 
 **Prepared 2026-10-23.** For network/security teams who own Palo Alto estates. This answers three
 questions: *how many are exposed*, *would an exploit actually work*, and *what do we do before the
 fixes land*.
 
 ---
+
+## 0. UPDATE 2026-10-26 — hotfixes have started shipping
+
+Palo Alto's advisory timeline records releases: **25 Oct** — `10.2.18-h13`, `11.1.16-h4`, `11.2.10-h16`;
+**26 Oct** — `11.1.4-h38`, `11.1.6-h40`, `11.1.10-h36`, `11.1.13-h16`. Release notes for those builds
+state they "include a fix to address CVE-2026-109618". Thirteen further builds remain on ETA 27–30 Oct
+(12.2 / 12.1 / most of 11.2 / 11.1.7 / most of 10.2). **Panorama and WF-500/WF-500-B still have no fix
+date.** Treat internet-reachable management interfaces as exposed until the relevant build is installed.
 
 ## 1. How many PAN-OS management interfaces are on the internet?
 
