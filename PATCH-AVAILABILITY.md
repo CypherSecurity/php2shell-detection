@@ -253,3 +253,17 @@ start. Entries are investigation leads unless backed by a vendor advisory (the r
 
 **Usage:** filter by your product inventory; for each hit follow the vendor link for the fix version.
 Do not treat "Not vuln" as a permanent state — the list is updated daily and vendors revise.
+
+### ⚠️ 10.2 branch documentation ahead of the advisory (checked 2026-10-26 23:59 UTC)
+
+The per-release **"Addressed Issues" pages for `10.2.13-h27` and `10.2.16-h12` are published** and both
+state: *"The PAN-OS 10.2.13-h27 / 10.2.16-h12 release includes a fix to address CVE-2026-109618."*
+The **advisory had not yet flipped them to released**: it still showed `ETA: 10/27` and `ETA: 10/28`.
+
+Read this the right way:
+- **Documentation is not a download.** Check the support portal / software updates page for availability
+  in your account before scheduling.
+- **Do not treat the advisory ETA as "unavailable"** if your portal offers the build. Palo Alto's
+  release notes normally go live with the release; the advisory update can lag by hours.
+- The monitor now HEAD-checks every pending build's release-notes page
+  (`pan.rn_pending_documented`), so documentation publication is detected as its own signal.

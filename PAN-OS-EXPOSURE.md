@@ -171,3 +171,10 @@ take the management plane off the internet.
 **Sources:** PAN advisory CVE-2026-109618 (updated 2026-10-23) · Unit 42 threat brief (21 Oct) ·
 VulnCheck analysis via Censys / Help Net Security (22 Oct) · Shadowserver figures via BleepingComputer,
 SecurityWeek, TechTarget (2024–2026) · Wiz (May 2026) · heise/Censys (23 Oct) · OX Security (22 Oct).
+
+## Release-notes ahead of advisory (2026-10-26)
+
+`10.2.13-h27` and `10.2.16-h12` both have published "Addressed Issues" pages stating they include the fix
+for CVE-2026-109618, while the advisory still showed ETAs of 10/27 and 10/28 at 23:59 UTC. These are the
+**only** two pending builds with documentation live. Check the support portal for actual availability;
+the advisory can lag the release. The monitor now tracks this via `pan.rn_pending_documented`.

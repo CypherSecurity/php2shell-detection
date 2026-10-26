@@ -1898,3 +1898,15 @@ is detected rather than inherited.
 Walking back a claim is worse than never making it, but silently editing it is worse still. The error
 came from trusting an earlier revision and never re-reading the table; the fix is a parser signal, not a
 promise to be more careful.
+
+
+## 46. 10.2 branch release notes published ahead of the advisory (2026-10-26 23:59 UTC)
+
+Palo Alto's per-release documentation for **`10.2.13-h27`** and **`10.2.16-h12`** is live, and both pages
+state the release "includes a fix to address CVE-2026-109618". The advisory still listed `ETA: 10/27` and
+`ETA: 10/28` at the same moment. These are the **only** two of the thirteen pending builds with
+documentation published: `11.1.7-h12` (the other `h12`) returns 404, so it is not out.
+
+Interpretation: documentation publication is a leading indicator that a build is available or imminent,
+while the advisory update lags. Neither signal alone is sufficient, so `check.sh` now tracks both:
+`pan.released_builds` (advisory timeline) and `pan.rn_pending_documented` (docs pages, HEAD-checked).

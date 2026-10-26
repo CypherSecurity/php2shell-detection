@@ -47,6 +47,9 @@ so the two cannot drift. Safe to share with customers; it contains no exploit co
 **PAN-OS / Panorama are affected by both CVEs, no special configuration required.** Fixes are now
 **shipping**: 7 hotfix builds released on 25–26 Oct (`10.2.18-h13`, `11.1.4-h38`, `11.1.6-h40`,
 `11.1.10-h36`, `11.1.13-h16`, `11.1.16-h4`, `11.2.10-h16`); 13 more on ETA 27–30 Oct. Panorama and
+**Docs ahead of advisory (26 Oct):** `10.2.13-h27` and `10.2.16-h12` release notes already state the fix;
+the advisory still shows ETA 10/27 and 10/28. Check your support portal for availability.
+
 One correction matters here: **WF-500 / WF-500-B are not affected** (vendor corrected its 23 Oct
 listing); **Panorama remains affected with no fix date**. PAN rates its product impact **8.7 HIGH**.
 
