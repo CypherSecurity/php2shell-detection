@@ -47,8 +47,8 @@ so the two cannot drift. Safe to share with customers; it contains no exploit co
 **PAN-OS / Panorama are affected by both CVEs, no special configuration required.** Fixes are now
 **shipping**: 7 hotfix builds released on 25–26 Oct (`10.2.18-h13`, `11.1.4-h38`, `11.1.6-h40`,
 `11.1.10-h36`, `11.1.13-h16`, `11.1.16-h4`, `11.2.10-h16`); 13 more on ETA 27–30 Oct. Panorama and
-WF-500 matters: **wind forward** — WF-500/WF-500-B are **not affected**; **Panorama remains affected with
-no fix date**. PAN rates its product impact **8.7 HIGH**.
+One correction matters here: **WF-500 / WF-500-B are not affected** (vendor corrected its 23 Oct
+listing); **Panorama remains affected with no fix date**. PAN rates its product impact **8.7 HIGH**.
 
 - **Do now:** restrict management-interface access (never internet-exposed), and enable the **full
   current Threat Prevention ID list** — **543004, 97622–97625, and the wider set added 24 Oct (`97643`, `97647`, `97649`, `97652`, `97653`, `97656`–`97659`, `97662`–`97664`, `97670`–`97674`, `97676`–`97678`) — content **9162+, 9163, 9164+****. The list grew ~5× on 24 Oct; if you enabled only the
