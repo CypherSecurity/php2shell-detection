@@ -1,6 +1,6 @@
 # BUILD INFO — php2shell detection & response package
 
-**Build timestamp:** 2026-10-25 14:57 UTC
+**Build timestamp:** 2026-10-26 00:56 UTC
 **Package name:** `php2shell-detection-package-2026-10-24`
 **Why the name changed:** the package was first assembled on 2026-10-21 and then materially
 updated through 2026-10-22 (tested exploit results, corrected findings, repaired Suricata
@@ -259,6 +259,19 @@ The zip's own hash cannot be embedded inside itself, so it ships as a sidecar
     → Apache worker crash. Corroborates our reproduction signature.
 56. Scale caveat recorded: Xpanse 22.6M **potentially vulnerable** vs Bitsight ~37M **PHP systems overall** —
     different denominators, do not conflate.
+
+## What changed in the 2026-10-26 01:00 rebuild — false-positive correction
+
+57. **Corrected a false positive in our own reporting.** The tracked THN article was reported as "updated
+    but not corrected" at 25 Oct 23:55 UTC. Re-verified with a **normalised text diff** across three
+    captures (18:50, 23:55, 00:55): **byte-identical** — the article never changed; the byte delta came
+    from the reader proxy used to reach the Cloudflare-protected page. Dossier §40 rewritten.
+58. **Method fix:** for reader-proxied pages, strip links/images/URLs and compare normalised text; never
+    trust raw sizes or hashes for that source. Note added to the monitor config.
+59. **Position unchanged:** that article still carries the Unit 42 claim Unit 42 retracted on 25 Oct, with
+    no correction notice. Victim status remains "no publicly confirmed victim tied to these two CVEs".
+60. **Kept:** the `p2s-rider` artefact and its detection (SID 2202610121) — it was in the article from
+    first publication; we simply extracted it later.
 
 ## Reading order
 
