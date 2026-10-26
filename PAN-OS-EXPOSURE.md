@@ -11,7 +11,7 @@ fixes land*.
 Palo Alto's advisory timeline records releases: **25 Oct** — `10.2.18-h13`, `11.1.16-h4`, `11.2.10-h16`;
 **26 Oct** — `11.1.4-h38`, `11.1.6-h40`, `11.1.10-h36`, `11.1.13-h16`. Release notes for those builds
 state they "include a fix to address CVE-2026-109618". Thirteen further builds remain on ETA 27–30 Oct
-(12.2 / 12.1 / most of 11.2 / 11.1.7 / most of 10.2). **Panorama and WF-500/WF-500-B still have no fix
+(12.2 / 12.1 / most of 11.2 / 11.1.7 / most of 10.2). **Panorama still has no fix
 date.** Treat internet-reachable management interfaces as exposed until the relevant build is installed.
 
 ## 1. How many PAN-OS management interfaces are on the internet?
@@ -90,7 +90,8 @@ defensive priority is the same either way: **get the management plane off the in
 
 Per Palo Alto's advisory (revised 23 Oct):
 - **Affected:** PAN-OS 10.2 / 11.1 / 11.2 / 12.1 / 12.2 (all builds), **Panorama** (all versions),
-  and — added in the 23 Oct revision — **WildFire appliances WF-500 / WF-500-B** (all versions)
+  and **WildFire appliances WF-500 / WF-500-B**, which were briefly listed as affected in the 23 Oct
+  revision and then **corrected to not affected** (vendor table: `None` affected / `All` unaffected)
 - **In scope on the device:** the **management web interface** = the **HTTPS web UI *and* the XML API
   service**, plus **any dataplane interface that has a management profile attached**
 - **Not in scope:** GlobalProtect portal and gateway, the captive portal
@@ -99,7 +100,7 @@ Per Palo Alto's advisory (revised 23 Oct):
 - **Already remediated:** Cortex XCORE (21 Oct), WildFire Cloud (22 Oct)
 
 **Timeline:** first hotfixes **26 Oct** (`10.2.18-h13`, `11.1.16-h4`, `11.2.10-h16`), rest by
-**30 Oct**. ⚠️ **Panorama and WF-500/WF-500-B have no published date** — plan to run restricted
+**30 Oct**. ⚠️ **Panorama has no published date** — plan to run restricted
 indefinitely for those.
 
 ---
@@ -133,7 +134,7 @@ done
 # management interface, silently exposing it on those ports during the Lunar Peak campaign.
 ```
 
-**Also check Panorama and WF-500 appliances** — they are in scope and have no fix date.
+**Also check Panorama** — in scope, no fix date. **WF-500 / WF-500-B are not affected** (vendor correction).
 
 ---
 
@@ -151,7 +152,7 @@ done
 4. **Hunt for crash/reboot events** that correlate with inbound management requests — with PAN's
    availability-only assessment, an unexplained firewall restart is a more likely sign of an attempt
    than a compromised configuration.
-5. **Patch on release:** 26–30 Oct per branch; Panorama/WF-500 pending vendor dates.
+5. **Patch on release:** 26–30 Oct per branch; Panorama pending a vendor date. WF-500 not affected.
 
 ---
 

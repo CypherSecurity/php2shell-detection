@@ -1287,7 +1287,8 @@ updated"*. **No fixes have shipped** — 20 `ETA:` markers remain, still 26–30
   variation, which matches AWS/Cloudflare reports of payload mutation.
 
 ### 32.3 Status unchanged otherwise
-No fixed versions; ETAs 26–30 Oct intact; Panorama and WF-500/WF-500-B still undated; PAN continues to
+No fixed versions; ETAs 26–30 Oct intact; Panorama still undated (WF-500/WF-500-B later corrected to NOT
+affected — see §45); PAN continues to
 say it is unaware of exploitation against its products; impact still assessed as availability-only
 (`VC:N/VI:N/VA:H`).
 
@@ -1764,7 +1765,8 @@ CVE-2026-109618"* and the equivalent for 10.2.18-h13.
 | **Released 26 Oct** | `11.1.4-h38` · `11.1.6-h40` · `11.1.10-h36` · `11.1.13-h16` |
 | Pending (ETA) | `11.1.7-h12` 10/30 · `11.2.4-h23` 10/30 · `11.2.7-h23` 10/29 · `11.2.13-h4` 10/27 · `11.2.16-h1` 10/28 · `10.2.7-h39` 10/30 · `10.2.10-h42` 10/29 · `10.2.13-h27` 10/27 · `10.2.16-h12` 10/28 · `12.1.4-h13` 10/29 · `12.1.7-h11` 10/28 · `12.1.10-h3` 10/30 · `12.2.4-h1` 10/28 |
 
-**No fix date:** Panorama, WildFire WF-500/WF-500-B. 25 Threat Prevention IDs unchanged.
+**No fix date:** Panorama. **WildFire WF-500/WF-500-B: NOT affected** (vendor correction, 23 Oct — see §45).
+25 Threat Prevention IDs unchanged.
 
 ### 42.3 Monitoring gap this exposed (and the fix)
 Our monitor treated only `(ETA: …)` rows as pending and had **no notion of "released"** — the 25 Oct
@@ -1780,7 +1782,7 @@ was never parsed. The 26 Oct drop was nearly misfiled as a parse artefact. Fix:
 - Branch has a released build → **upgrade now**, then re-verify management-interface exposure.
 - Branch still pending → interim controls (restrict MGT access, route MGT through a DP port, replace
   inbound cert, decrypt inbound, enable Threat Prevention; Threat IDs 543004 + 97622–97678).
-- **Panorama / WF-500** → no fix; keep management access tightly restricted.
+- **Panorama** → no fix; keep management access tightly restricted. **WF-500/WF-500-B** → not affected.
 - Do not assume web-server patching covers the appliance; PAN-OS ships its own embedded PHP.
 
 ## 43. Defensive ecosystem: exposure-discovery resources (2026-10-26)
@@ -1862,3 +1864,37 @@ Same exploit build, same target (`php:8.4.26-apache`, stock `php.ini-production`
   the attacker's favour; a single worker guarantees reuse.
 - These are **lab figures** — production results vary with memory_limit, request pacing, traffic and the
   application's session behaviour.
+
+
+## 45. CORRECTION (2026-10-26) — WildFire WF-500 / WF-500-B are NOT affected
+
+### 45.1 What we had wrong
+Our PAN-OS material carried, since 23 Oct, the line "Panorama and WF-500/WF-500-B have no fix date". That
+was based on a 23 Oct advisory revision that briefly listed the WildFire appliances as in scope.
+
+### 45.2 What the primary source says now
+Palo Alto's advisory product table lists **WildFire Appliance WF-500 and WF-500-B: affected = None,
+unaffected = All**. Its timeline records the fix: *"2026-10-23 … made the correction to the status of
+WildFire Appliance WF-500 and WF-500-B impact."* So the appliances were **briefly mis-listed and corrected
+the same day**; the correction predates our statement, which means we kept a stale line for three days.
+
+**Panorama remains affected.** The advisory note is explicit: *"This issue is applicable to PAN-OS software
+on PA-Series and VM-Series firewalls and on Panorama (virtual and M-Series)."* No fixed version or date is
+listed for Panorama.
+
+### 45.3 Impact
+- Customers with WF-500 appliances were told to treat them as exposed and wait for a non-existent fix.
+  That is unnecessary work and a credibility cost. Corrected across `PAN-OS-EXPOSURE.md`,
+  `PATCH-AVAILABILITY.md`, `START-HERE.md` and this dossier.
+- Panorama guidance is unchanged: affected, no fix date, keep management access restricted.
+
+### 45.4 Monitoring gap and fix
+The monitor parsed released builds and pending ETAs, but **not product status rows**, so a vendor
+correction to affected/unaffected could not surface. `check.sh` now emits
+`pan.wf500_status=…` (and the WildFire Cloud row) from the advisory product table, so the next correction
+is detected rather than inherited.
+
+### 45.5 Why this is recorded rather than quietly fixed
+Walking back a claim is worse than never making it, but silently editing it is worse still. The error
+came from trusting an earlier revision and never re-reading the table; the fix is a parser signal, not a
+promise to be more careful.
