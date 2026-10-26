@@ -576,6 +576,57 @@ Hunt window: from **2026-10-17** (pre-disclosure attempts) onward.
 
 ---
 
+## H2. Boundary-first hunting (added 2026-10-26) — the highest-precision php2shell signal
+
+Per **Fastly** (21 Oct 2026): *"there's no payload string to match. The exploit is a condition"*, and the
+most reliable discriminator is the **fixed/patterned multipart boundary** in the `Content-Type` header.
+Kits hardcode their boundary; UA, IP lists and body sizes are unreliable.
+
+**Known-good boundary constants:** public `JoasASantos` tool → `CCCCCCCCCC`; most widespread mass-scan kit
+→ `B7kQpoc618` (UA `php2shell-109618`, POST `/index.php` or `/`, raw-IP targets). Look-alike: WordPress
+`wp2shell` kit uses `----wp2shell` — **different bug, exclude it.**
+
+**Splunk SPL — fixed/patterned boundaries:**
+```spl
+index=web sourcetype=access_combined
+| where match(_raw, "(?i)boundary=(?-i:([A-Za-z0-9]))\1{9,}") OR match(_raw, "boundary=B7kQpoc618") OR match(_raw, "boundary=----wp2shell")
+| eval kit=case(match(_raw,"B7kQpoc618"),"php2shell-massscan", match(_raw,"----wp2shell"),"wp2shell-LOOKALIKE", true(),"repeated-char-other")
+| stats count min(_time) as first_seen max(_time) as last_seen by kit, clientip, uri
+| sort -count
+```
+
+**Elastic KQL / Lucene:**
+```text
+http.request.headers: ("boundary=B7kQpoc618" or "boundary=----wp2shell")
+```
+For patterned boundaries use a runtime field or ingest pipeline regex `boundary=(?-i:([A-Za-z0-9])){9,}`.
+
+**Defender XDR KQL:**
+```kql
+DeviceNetworkEvents
+| where RemotePort in (80, 443, 8080, 8443)
+| where AdditionalFields has_any ("B7kQpoc618", "----wp2shell")
+   or AdditionalFields matches regex @"boundary=(?-i:([A-Za-z0-9])){9,}"
+```
+
+**React2Shell exclusion (critical):** Fastly measured chunked multipart with no `Content-Length` as
+**98.6% React2Shell (CVE-2025-55182)**, and long runs of `A` padding as **99.9%**. Exclude requests
+carrying the **`Next-Action`** header (Next.js Server Actions; PHP never sends it) before attributing any
+"chunked multipart" alert to php2shell.
+
+**Origin-side confirmation (a successful and a failed attempt look identical at the edge):**
+```bash
+# Apache worker crashes / OOM
+zgrep -E "AH00051|child pid .* exit signal|Allowed memory size.*exhausted" /var/log/apache2/error.log*
+# PHP-FPM
+zgrep -E "zend_mm_heap corrupted|Out of memory|segfault" /var/log/php*-fpm.log* 2>/dev/null
+# connect-back egress from web workers
+ss -tnp state established '( sport = :php )' 2>/dev/null || ss -tnp | grep -E "php|apache"
+```
+
+**Do not lead with:** UA strings (a third of PHP2shell-named traffic is defensive scanning), IP blocklists
+(polluted with VPN/Tor exits), or body-size thresholds (kit-dependent).
+
 ## Complementary resources (not authored by us — verify before adopting)
 
 ### Microsoft PHP2Shell Hunting Pack (`cseelhoff-ms/php2shell-hunting-pack`)

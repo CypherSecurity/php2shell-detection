@@ -54,14 +54,14 @@
 # Content-Length at all, which is what defeats the post_max_size pre-check.
 # NOTE: HTTP/1.1 forbids sending both; clients that send both are malformed and are
 # caught by the absence test failing — pair with 2202610006 for that case.
-alert http any any -> [$HOME_NET,$HTTP_SERVERS] any (msg:"ET LOCAL php2shell CVE-2026-109618 OOM shape 1 - chunked multipart POST with no Content-Length (post_max_size bypass)"; flow:established,to_server; http.method; content:"POST"; http.request_header; content:"Content-Type|3a 20|multipart/form-data"; nocase; http.request_header; content:"Transfer-Encoding|3a 20|chunked"; nocase; http.request_header; pcre:"/^(?![\s\S]*Content-Length\x3a)/i"; classtype:attempted-dos; sid:2202610100; rev:1; metadata:created_at 2026_10_21, cve CVE-2026-109618, cve CVE-2026-109619, confidence high, oom_shape 1;)
+alert http any any -> [$HOME_NET,$HTTP_SERVERS] any (msg:"ET LOCAL php2shell CVE-2026-109618 OOM shape 1 - chunked multipart POST with no Content-Length (post_max_size bypass)"; flow:established,to_server; http.method; content:"POST"; http.request_header; content:"Content-Type|3a 20|multipart/form-data"; nocase; http.request_header; content:"Transfer-Encoding|3a 20|chunked"; nocase; http.request_header; pcre:"/^(?![\s\S]*Content-Length\x3a)/i"; http.request_header; pcre:"/^[\s\S]*(?!Next-Action\x3a)/i"; classtype:attempted-dos; sid:2202610100; rev:2; metadata:created_at 2026_10_21, updated_at 2026_10_26, cve CVE-2026-109618, cve CVE-2026-109619, confidence medium, oom_shape 1, note fastly_2026_10_21_chunked_no_cl_is_98pct_react2shell_refine_before_alerting;)
 
 # --- Shape 1 variant: close-delimited multipart POST (neither CL nor TE) ------------
 # Same post_max_size bypass achieved without chunking: HTTP/1.0-style
 # connection-close-delimited body. Rare with modern browsers; normal for a handful
 # of embedded/legacy upload clients. Kept separate from 0100 so you can disable it
 # per-vhost if you own such clients, without losing the chunked coverage.
-alert http any any -> [$HOME_NET,$HTTP_SERVERS] any (msg:"ET LOCAL php2shell CVE-2026-109618 OOM shape 1 variant - close-delimited multipart POST (no Content-Length, no Transfer-Encoding)"; flow:established,to_server; http.method; content:"POST"; http.request_header; content:"Content-Type|3a 20|multipart/form-data"; nocase; http.request_header; pcre:"/^(?![\s\S]*(?:Content-Length|Transfer-Encoding)\x3a)/i"; classtype:attempted-dos; sid:2202610101; rev:1; metadata:created_at 2026_10_21, cve CVE-2026-109618, cve CVE-2026-109619, confidence medium, oom_shape 1;)
+alert http any any -> [$HOME_NET,$HTTP_SERVERS] any (msg:"ET LOCAL php2shell CVE-2026-109618 OOM shape 1 variant - close-delimited multipart POST (no Content-Length, no Transfer-Encoding)"; flow:established,to_server; http.method; content:"POST"; http.request_header; content:"Content-Type|3a 20|multipart/form-data"; nocase; http.request_header; pcre:"/^(?![\s\S]*(?:Content-Length|Transfer-Encoding)\x3a)/i"; http.request_header; pcre:"/^[\s\S]*(?!Next-Action\x3a)/i"; classtype:attempted-dos; sid:2202610101; rev:2; metadata:created_at 2026_10_21, updated_at 2026_10_26, cve CVE-2026-109618, cve CVE-2026-109619, confidence medium, oom_shape 1, note fastly_lookalike_react2shell_check_next_action;)
 
 # --- Shape 2 (official OOM #2): part-header flood WITHOUT Content-Disposition -------
 # Advisory: part headers are amplified in memory far beyond their wire size, so a
@@ -216,3 +216,16 @@ alert http any any -> [$HOME_NET,$HTTP_SERVERS] any (msg:"ET LOCAL php2shell bli
 alert http $HOME_NET any -> any any (msg:"ET LOCAL php2shell CYFIRMA dropper staging host contact (92.118.112.100/nfs)"; flow:established,to_server; http.host; content:"92.118.112.100"; http.uri; content:"/nfs"; classtype:trojan-activity; sid:2202610120; rev:1; metadata:created_at 2026_10_25, cve CVE-2026-109618, cve CVE-2026-109619, confidence high, source cyfirma_v3_ioc, note mirai-loader-egress;)
 
 alert http any any -> [$HOME_NET,$HTTP_SERVERS] any (msg:"ET LOCAL php2shell probe marker p2s-rider (upload-progress target list building)"; flow:established,to_server; file.data; content:"p2s-rider"; nocase; fast_pattern; classtype:web-application-attack; sid:2202610121; rev:1; metadata:created_at 2026_10_25, cve CVE-2026-109618, cve CVE-2026-109619, confidence medium, source thn_defusedcyber_2026_10_25, note globalprotect-targeting;)
+
+# ---------------------------------------------------------------------------
+# v2.2 additions — 2026-10-26 — BOUNDARY-FIRST detection (Fastly Security Research, 21 Oct)
+# Fastly: "there's no payload string to match. The exploit is a condition" — and the most
+# reliable discriminator across 250k observed requests was the fixed/patterned multipart
+# boundary per exploit kit. Body sizes, UA and IP lists are explicitly unreliable.
+# ---------------------------------------------------------------------------
+
+alert http any any -> [$HOME_NET,$HTTP_SERVERS] any (msg:"ET LOCAL php2shell most-widespread kit boundary B7kQpoc618"; flow:established,to_server; http.request_header; content:"boundary=B7kQpoc618"; fast_pattern; classtype:web-application-attack; sid:2202610122; rev:1; metadata:created_at 2026_10_26, cve CVE-2026-109618, cve CVE-2026-109619, confidence high, source fastly_2026_10_21, reference url www.fastly.com/blog/how-fastly-detected-and-built-a-coordinated-response-to-php2shell;)
+
+alert http any any -> [$HOME_NET,$HTTP_SERVERS] any (msg:"ET LOCAL php2shell fixed single-character multipart boundary (e.g. CCCCCCCCCC public tool)"; flow:established,to_server; http.request_header; content:"multipart/form-data"; nocase; http.request_header; pcre:"/boundary=(?-i:([A-Za-z0-9]))\1{9,}/R"; classtype:web-application-attack; sid:2202610123; rev:1; metadata:created_at 2026_10_26, cve CVE-2026-109618, cve CVE-2026-109619, confidence medium, note joas_public_tool_uses_CCCCCCCCCC;)
+
+alert http any any -> [$HOME_NET,$HTTP_SERVERS] any (msg:"ET LOCAL LOOK-ALIKE wp2shell kit boundary (NOT php2shell - do not misattribute)"; flow:established,to_server; http.request_header; content:"boundary=----wp2shell"; fast_pattern; classtype:web-application-attack; sid:2202610124; rev:1; metadata:created_at 2026_10_26, cve CVE-2026-000000, confidence high, look_alike wp2shell_july_2026, note exclude_from_php2shell_counts;)

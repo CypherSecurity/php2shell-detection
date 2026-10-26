@@ -46,6 +46,45 @@ Legend: ✅ covered · ◐ partial · ✗ not covered
 5. **YARA** — scan session dirs and web roots for weaponised `sess_*` and dropped tooling.
 6. **Hunting §5** — build the unpatched-host inventory; that drives your patch queue.
 
+## v2.2 — boundary-first detection, and three red herrings to stop chasing (added 2026-10-26)
+
+Source: **Fastly Security Research**, *PHP2Shell: Finding the Needles in a 250,000 Request Haystack*
+(21 Oct 2026) — <https://www.fastly.com/blog/how-fastly-detected-and-built-a-coordinated-response-to-php2shell>
+plus **F5 Labs**, *PHP2Shell Exploitation Attempts Observed* (21 Oct 2026) —
+<https://www.f5.com/labs/articles/php2shell-exploitation-attempts-observed>.
+
+**There is no payload string to match.** The exploit is a *condition*: make the request fail at the wrong
+moment. Fastly's telemetry (~250,000 requests / ~3,200 public IPs through 22 Oct) found the most reliable
+discriminator is the **fixed or patterned multipart boundary** in `Content-Type` — each exploit kit uses
+its own constant boundary, while body sizes vary widely between kits.
+
+**New rules in v2.2 (`sid:2202610122`–`124`):**
+
+| SID | Signal | Confidence |
+|---|---|---|
+| 2202610122 | `boundary=B7kQpoc618` — most widespread kit (UA `php2shell-109618`, POST `/index.php` or `/`, raw-IP targets, 1–2 requests/host) | high |
+| 2202610123 | fixed **single-character** boundary repeated ≥10× — the public `JoasASantos` tool uses `boundary=CCCCCCCCCC`; generic for kits that hardcode a repeated-char boundary | medium |
+| 2202610124 | `boundary=----wp2shell` — **look-alike, NOT php2shell**; WordPress wp2shell (July 2026) kit. Use to *exclude*, never to count | high (as exclusion) |
+
+**Red herrings — do not lead with these:**
+
+1. **User-Agent** (`php2shell-109618`, `php2shell-scan/…`): trivially changed, and a third of observed
+   PHP2shell-named traffic self-identifies as defensive scanning. Keep as corroboration only.
+2. **IP blocklists**: circulating lists are polluted with VPN/Tor exits and scanner infrastructure.
+   Blocking them has poor ROI and high collateral.
+3. **Body-size thresholds**: sizes vary widely kit-to-kit. Our OOM-shape rules use shape *and* size, not
+   size alone.
+4. **Chunked multipart with no Content-Length**: this signature is **98.6% React2Shell (CVE-2025-55182)**
+   in Fastly's measurement; the `A`-padding signature was **99.9%** React2Shell. v2.2 therefore adds a
+   **`Next-Action` header exclusion** to SIDs `…100`/`…101` (Next.js Server Actions use it; PHP never
+   does). Keep those rules at *medium* confidence.
+5. **Boundaries starting `----wp2shell`**: different bug, active before php2shell — counting it creates a
+   false "pre-disclosure exploitation" narrative.
+
+**Confirmation lives on the origin, not the edge.** A successful attempt and a failed one look identical
+at the proxy. Confirm on-host: PHP-FPM error logs, Apache error log worker crashes (e.g. `AH00051` "child
+pid … exit signal"), and **unexpected outbound connections from PHP workers** (connect-back shell egress).
+
 ## Notes and caveats
 
 - Every quoted log string in the Sigma/hunting files was captured **verbatim in the

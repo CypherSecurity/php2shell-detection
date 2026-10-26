@@ -60,3 +60,14 @@ sensor keeps running and simply produces zero alerts for this threat. Always run
 
 Both target a detail published with the public exploit: it sets `PHPSESSID=\x00` to force
 PHP to mint a new session id while leaving session state dirty.
+
+## v2.2 deploy note — boundary-first rules (2026-10-26)
+
+SIDs **2202610122–124** are new. `…122` (kit boundary `B7kQpoc618`) is the highest-precision network
+signal we have — it needs no payload inspection and no body-size tuning. `…123` catches fixed
+single-character boundaries (the public tool uses `CCCCCCCCCC`). `…124` exists to **exclude** the
+WordPress `wp2shell` look-alike, not to count it.
+
+SIDs `…100`/`…101` were revised to add a **`Next-Action` header exclusion** after Fastly measured the
+chunked-multipart-no-Content-Length signature as **98.6% React2Shell (CVE-2025-55182)**. Treat those two
+as *medium* confidence context, not the primary signal.

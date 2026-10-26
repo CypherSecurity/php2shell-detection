@@ -312,6 +312,20 @@ The zip's own hash cannot be embedded inside itself, so it ships as a sidecar
     there. Worker count is not a security control, yet remains a strong **reliability** factor.
     `START-HERE.md`, `INCIDENT-STATUS.md` and dossier §44 updated.
 
+## What changed in the 2026-10-26 23:45 rebuild — detection alignment with Fastly/F5 findings
+
+70. **Boundary-first detection added** (SIDs 2202610122–124): kit boundary `B7kQpoc618` (highest precision),
+    generic fixed single-character boundary (`CCCCCCCCCC` = public tool), and a `----wp2shell` **look-alike
+    exclusion** rule.
+71. **React2Shell correction**: chunked multipart with no Content-Length is **98.6% React2Shell**
+    (CVE-2025-55182), `A`-padding **99.9%** — SIDs …100/…101 now exclude `Next-Action` header traffic and
+    are marked medium confidence.
+72. **Red herrings documented** (UA, IP blocklists, body-size thresholds) and **origin-side confirmation**
+    guidance added (PHP-FPM logs, Apache `AH00051` worker crashes, connect-back egress) — edge telemetry
+    cannot distinguish success from failure.
+73. Hunting queries: new **H2 boundary-first hunting** section (Splunk/Elastic/Defender) with look-alike and
+    React2Shell exclusions.
+
 ## Reading order
 
 | File | Why |
