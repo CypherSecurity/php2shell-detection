@@ -1696,33 +1696,28 @@ sources before the word "confirmed" is used. We did catch the retraction within 
 we now track the page's own "Updated <date>" string (it has no `dateModified`); that is the one part that
 worked as intended.
 
-## 40. THN update triaged (25 Oct, 23:55 UTC) — article updated NOT corrected; three new artefacts captured
+## 40. ⚠️ FALSE POSITIVE, CORRECTED (26 Oct 00:55 UTC) — the THN article was never updated; reader-proxy variance
 
-### 40.1 What changed on the THN page
-The tracked article (`writeup.thn_govern`, 10,940 → 11,191 bytes) changed by **two section headings**
-("Suspected N. Korea Campaign Targets PHP2Shell", "Other Exploit Efforts and Mitigations") — a
-restructure, **not a correction**. Verified by paragraph diff against our 18:50 copy:
+> **Correction of an earlier §40.** At 23:55 UTC I recorded that the tracked THN article had been
+> "updated but not corrected" (+251 bytes, two new headings). **That was wrong.** Re-checking at 00:55 UTC,
+> the page measured 10,940 bytes again — and a **normalised text comparison** across all three captures
+> (18:50, 23:55, 00:55) is **byte-identical**. The article never changed.
 
-- **Retracted Unit 42 paragraph still present** ("multi-factor authentication secrets…"): yes.
-- **Retraction/correction notice added:** no.
+### 40.1 What actually happened
+- THN blocks direct fetches (Cloudflare 403), so it is tracked through a reader proxy (`r.jina.ai`).
+- That proxy's markdown output includes **anchor-link suffixes on headings** and other variable
+  decorations; its byte size therefore fluctuates by a few hundred bytes between requests.
+- My 23:55 diff filtered out lines shorter than 70 characters, which **hid headings in the old copy** but
+  not in the new one (where anchor links made them longer) — producing two phantom "added headings".
+- **Lesson recorded:** for reader-proxied pages, strip images/links/URLs and markdown decoration and
+  compare **normalised text**, not byte sizes. Size/hash are still fine for direct-fetch pages.
 
-So the article the user was shown still presents a claim its own source withdrew. Our page and package
-carry the corrected position (§39.6). Worth repeating to anyone citing it.
+### 40.2 Position on the article (unchanged)
+The THN article is **not** corrected and still carries the Unit 42 paragraph that Unit 42 retracted on
+25 Oct. That statement was, and remains, accurate — it simply was not the result of an update.
 
-### 40.2 New reporting in that article worth keeping
-1. **Probes aimed at PAN-OS GlobalProtect honeypots** — Defused Cyber (25 Oct) reports PHP2Shell probes
-   against GlobalProtect honeypots from `204.76.203[.]7` ("known mass-exploit IP"), carrying a
-   **`PHP_SESSION_UPLOAD_PROGRESS` marker `p2s-rider`** and a dummy file upload with no payload. Their read
-   is target-list building against Palo Alto devices. This matters for our PAN-OS section: it is the
-   first artefact specifically indicating **appliance targeting** rather than generic PHP-estate scanning.
-2. **ReliaQuest reproduction — detection sequence** (22 Oct): POST → HTTP 500; PHP error log shows memory
-   exhaustion + heap corruption; Apache error log shows the worker handling the request crashing. This
-   corroborates our own reproduction signature and is now stated as a log-level detection heuristic.
-3. **Scale figures:** Bitsight internet-wide scans report **~37 million** internet-facing PHP/PHP-related
-   systems (vs Cortex Xpanse's 22.6M *potentially vulnerable* estimate — different denominators, do not
-   conflate). Xint released a scanner (`phpguard.io`); Trend Micro published KA-0024789.
-
-### 40.3 Action taken
+### 40.3 Artefacts extracted from the article (not evidence of an update)
+These are present in the article as first published; we had simply not extracted them until now:
 - Added the `p2s-rider` upload-progress marker as a new detection (SID **2202610121**).
 - Hunting doc updated with the GlobalProtect-probe artefact, source IP and ReliaQuest log sequence.
 - **No change to victim status** (§39.6 stands): the article's headline claim remains retracted by Unit 42.
