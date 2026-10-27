@@ -9,6 +9,7 @@ fixes land*.
 ## 0. UPDATE 2026-10-26 — hotfixes have started shipping
 
 Palo Alto's advisory timeline records releases: **25 Oct** — `10.2.18-h13`, `11.1.16-h4`, `11.2.10-h16`;
+**27 Oct** — `10.2.13-h27`, `10.2.16-h12`;
 **26 Oct** — `11.1.4-h38`, `11.1.6-h40`, `11.1.10-h36`, `11.1.13-h16`. Release notes for those builds
 state they "include a fix to address CVE-2026-109618". Thirteen further builds remain on ETA 27–30 Oct
 (12.2 / 12.1 / most of 11.2 / 11.1.7 / most of 10.2). **Panorama still has no fix
@@ -99,7 +100,8 @@ Per Palo Alto's advisory (revised 23 Oct):
   Bridgecrew, Strata Cloud Manager, Idira, Cortex XDR Broker VM
 - **Already remediated:** Cortex XCORE (21 Oct), WildFire Cloud (22 Oct)
 
-**Timeline:** first hotfixes **26 Oct** (`10.2.18-h13`, `11.1.16-h4`, `11.2.10-h16`), rest by
+**Timeline:** first hotfixes **26 Oct** (`10.2.18-h13`, `11.1.16-h4`, `11.2.10-h16`); `10.2.13-h27` and
+`10.2.16-h12` released **27 Oct**; rest by
 **30 Oct**. ⚠️ **Panorama has no published date** — plan to run restricted
 indefinitely for those.
 
@@ -174,7 +176,8 @@ SecurityWeek, TechTarget (2024–2026) · Wiz (May 2026) · heise/Censys (23 Oct
 
 ## Release-notes ahead of advisory (2026-10-26)
 
-`10.2.13-h27` and `10.2.16-h12` both have published "Addressed Issues" pages stating they include the fix
+**Resolved 27 Oct:** the advisory now lists `10.2.13-h27` and `10.2.16-h12` as released. The note below is
+kept as the record of the docs-first window. Both have "Addressed Issues" pages stating they include the fix
 for CVE-2026-109618, while the advisory still showed ETAs of 10/27 and 10/28 at 23:59 UTC. These are the
 **only** two pending builds with documentation live. Check the support portal for actual availability;
 the advisory can lag the release. The monitor now tracks this via `pan.rn_pending_documented`.

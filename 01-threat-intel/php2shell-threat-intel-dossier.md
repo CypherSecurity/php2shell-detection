@@ -1910,3 +1910,35 @@ documentation published: `11.1.7-h12` (the other `h12`) returns 404, so it is no
 Interpretation: documentation publication is a leading indicator that a build is available or imminent,
 while the advisory update lags. Neither signal alone is sufficient, so `check.sh` now tracks both:
 `pan.released_builds` (advisory timeline) and `pan.rn_pending_documented` (docs pages, HEAD-checked).
+
+## 47. 🚨 ESCALATION (2026-10-27 01:55 UTC) — PAN-OS 10.2 builds now officially released: 10.2.13-h27, 10.2.16-h12
+
+### 47.1 What changed
+The PAN advisory was updated on **27 October** (`Updated 2026-10-27`) and the **ETAs for `10.2.13-h27` and
+`10.2.16-h12` were removed**, which is the advisory's way of saying they are released. The product table now
+reads `>= 10.2.13-h27` and `>= 10.2.16-h12` with no ETA. Monitor signals:
+
+| Signal | Before | After |
+|---|---|---|
+| `pan.released_builds` | 7 builds (25–26 Oct) | **9 builds** (adds `10.2.13-h27`, `10.2.16-h12`) |
+| `pan.timeline_latest` | 2026-10-26 | **2026-10-27** |
+| `pan.pending_fix_rows` | 13 | **11** |
+| `pan.advisory_updated` | 2026-10-26 | **2026-10-27** |
+
+This closes the docs-first window documented in §46: the release-notes pages existed before the advisory
+flipped, and the monitor now confirms both states independently.
+
+### 47.2 What it means for customers on PAN-OS 10.2
+- **10.2.13 branch:** upgrade to `10.2.13-h27` or later. PAN's own guidance for 10.2.11 through 10.2.13-h*
+  names `10.2.13-h27` or `10.2.18-h13`.
+- **10.2.16 branch:** upgrade to `10.2.16-h12` or later. For 10.2.14 through 10.2.16-h*, `10.2.16-h12` or
+  `10.2.18-h13` is the fixed path.
+- After upgrading, re-verify management-plane exposure and review whether anything reached it.
+- Branches without a release yet: 11.1.7-h12 (10/30), 11.2.4-h23 (10/30), 11.2.7-h23 (10/29),
+  11.2.13-h4 (10/27), 11.2.16-h1 (10/28), 10.2.7-h39 (10/30), 10.2.10-h42 (10/29), 12.1.4-h13 (10/29),
+  12.1.7-h11 (10/28), 12.1.10-h3 (10/30), 12.2.4-h1 (10/28). **Panorama still has no fix date.**
+
+### 47.3 Verification note
+The release-notes pages were already live on 26 Oct (see §46), so this was a confirmation rather than a
+surprise. The monitor caught the transition in the first cycle after it happened, through the timeline
+parser, without requiring a docs re-check.

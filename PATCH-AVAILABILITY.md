@@ -117,7 +117,7 @@ PAN-OS and Panorama are **affected** by both CVEs, with **no special configurati
 | 12.1 | `12.1.7-h11` / `12.1.4-h13` / `12.1.10-h3` | 10/28 – 10/30 |
 | 11.2 | `11.2.10-h16` / `11.2.13-h4` / `11.2.16-h1` / `11.2.7-h23` / `11.2.4-h23` | 10/26 – 10/30 |
 | 11.1 | `11.1.16-h4` … `11.1.7-h12` | 10/26 – 10/30 |
-| 10.2 | `10.2.13-h27` / `10.2.16-h12` / `10.2.10-h42` / `10.2.7-h39` | 10/27 – 10/30 |
+| 10.2 | `10.2.13-h27` / `10.2.16-h12` (**released 27 Oct**) / `10.2.10-h42` / `10.2.7-h39` | 10/29 – 10/30 for the rest |
 
 
 **UPDATE 2026-10-26 — hotfixes have begun to ship.** Palo Alto's advisory carries its own timeline:
@@ -129,8 +129,9 @@ CVE-2026-109618".
 | Status | Builds |
 |---|---|
 | **Released 25 Oct** | `10.2.18-h13` · `11.1.16-h4` · `11.2.10-h16` |
+| **Released 27 Oct** | `10.2.13-h27` · `10.2.16-h12` |
 | **Released 26 Oct** | `11.1.4-h38` · `11.1.6-h40` · `11.1.10-h36` · `11.1.13-h16` |
-| Still pending (ETA) | `11.1.7-h12` (10/30) · `11.2.4-h23` (10/30) · `11.2.7-h23` (10/29) · `11.2.13-h4` (10/27) · `11.2.16-h1` (10/28) · `10.2.7-h39` (10/30) · `10.2.10-h42` (10/29) · `10.2.13-h27` (10/27) · `10.2.16-h12` (10/28) · `12.1.4-h13` (10/29) · `12.1.7-h11` (10/28) · `12.1.10-h3` (10/30) · `12.2.4-h1` (10/28) |
+| Still pending (ETA) | `11.1.7-h12` (10/30) · `11.2.4-h23` (10/30) · `11.2.7-h23` (10/29) · `11.2.13-h4` (10/27) · `11.2.16-h1` (10/28) · `10.2.7-h39` (10/30) · `10.2.10-h42` (10/29) · `12.1.4-h13` (10/29) · `12.1.7-h11` (10/28) · `12.1.10-h3` (10/30) · `12.2.4-h1` (10/28) |
 
 **Action:** if your branch has a released build, upgrade now (maintenance window, then verify the
 management interface is reachable only from trusted sources). Branches still pending keep the interim
@@ -254,7 +255,10 @@ start. Entries are investigation leads unless backed by a vendor advisory (the r
 **Usage:** filter by your product inventory; for each hit follow the vendor link for the fix version.
 Do not treat "Not vuln" as a permanent state — the list is updated daily and vendors revise.
 
-### ⚠️ 10.2 branch documentation ahead of the advisory (checked 2026-10-26 23:59 UTC)
+### ✅ RESOLVED 2026-10-27 — 10.2 branch documentation confirmed by advisory
+
+The advisory was updated on **27 Oct** and now lists `10.2.13-h27` and `10.2.16-h12` as released (their
+ETAs were removed). The earlier note below records what the docs-first state looked like; it is history now.
 
 The per-release **"Addressed Issues" pages for `10.2.13-h27` and `10.2.16-h12` are published** and both
 state: *"The PAN-OS 10.2.13-h27 / 10.2.16-h12 release includes a fix to address CVE-2026-109618."*
