@@ -2031,3 +2031,18 @@ The monitor caught the KEV change at its first cycle (snapshot 2026-10-26T23:39Z
 listing: KEV listing, PAN-OS released-build changes, and PAN product-scope changes. The KEV signal also
 emits the playbook-compatible `kev.php2shell_in_kev=YES` again (it had drifted to `IN_KEV=` lines only).
 Reporting rule: read the ALERTS block and the KEV signal every cycle, never the prompt's cached facts.
+
+
+## 51. EPSS at ceiling (2026-10-27) — both CVEs 0.99999, verified against the official dataset
+
+First's 27 October daily dataset (checked against `epss_scores-2026-10-27.csv.gz`, not just the API) shows
+**both CVEs at 0.99999**:
+
+| CVE | 25 Oct | 27 Oct | Percentile |
+|---|---|---|---|
+| CVE-2026-109618 | 0.99981 | **0.99999** | 0.99998 |
+| CVE-2026-109619 | 0.99997 | **0.99999** | 0.99999 |
+
+The move is the expected model response to a KEV listing plus confirmed exploitation, not a new
+vulnerability development. EPSS states the probability of exploitation activity in the next 30 days across
+the internet; it is not a per-host verdict. The 25 October values remain correct as history (see §38).

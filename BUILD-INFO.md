@@ -326,6 +326,17 @@ The zip's own hash cannot be embedded inside itself, so it ships as a sidecar
 73. Hunting queries: new **H2 boundary-first hunting** section (Splunk/Elastic/Defender) with look-alike and
     React2Shell exclusions.
 
+## What changed in the 2026-10-27 KEV rebuild
+
+74. **CISA KEV escalation.** Both CVEs listed 26 Oct (catalog 2026.10.26), remediation due **29 Oct**.
+    `START-HERE.md` opens with the KEV block; `PATCH-AVAILABILITY.md` §0 sets the urgency; `INCIDENT-STATUS.md`
+    §5c records confirmed exploitation (35 shells on honeypots, 24 Oct) while keeping "no named victim".
+75. **EPSS at ceiling.** Both 0.99999 in First's 27 Oct official dataset (verified against the daily file).
+    Historical 25 Oct values retained where they are stated as history.
+76. **Monitor fix:** ALERTS block at the top of every check run (KEV, PAN released builds, PAN scope rows);
+    KEV signal emits `kev.php2shell_in_kev=YES` again. The KEV flip was caught but reporting missed it for
+    ~14 hours; see dossier §50.3.
+
 ## Reading order
 
 | File | Why |

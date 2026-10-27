@@ -147,6 +147,10 @@ Treat your own 17–23 October window as potentially exposed and hunt accordingl
 - **Reading:** exploitation is real and working; victim attribution is still absent. Patch urgency is now
   set by the KEV due date, not by whether a victim has been named.
 
+- **EPSS (27 Oct):** both CVEs are now **0.99999** in First's official daily dataset, up from 0.99981 and
+  0.99997 on 25 Oct. Expected model response to KEV plus confirmed exploitation; still a direction
+  statement, not a per-host verdict.
+
 ## 5b. ⚠️ CLAIM → RETRACTION (25 Oct): Unit 42's "European government intrusion" was withdrawn
 
 **Status: retracted.** Timeline, kept as a record because it is instructive:
