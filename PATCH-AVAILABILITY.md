@@ -169,6 +169,54 @@ Siemens support; no self-service fix.
 
 **Note:** you cannot patch the appliance's embedded PHP — only PAN-OS maintenance releases apply.
 
+
+## 8c. Appliance and platform vendors beyond PAN-OS (added 2026-10-27)
+
+Several appliance vendors embed PHP. These are the ones with published php2shell positions. Check the
+vendor advisory before acting, because fixed "releases" are sometimes future plans rather than downloads.
+
+### Citrix NetScaler ADC / NetScaler Gateway — IMPACTED, fixes published 27 Oct
+
+Advisory: **CTX697263**, *"Citrix Security Advisory for CVE-2026-109618 and CVE-2026-109619"*, severity
+critical, created 22 Oct, **updated 27 Oct** (remediation versions updated). NetScaler ADC and NetScaler
+Gateway are impacted.
+
+| Product | Fixed versions |
+|---|---|
+| NetScaler ADC / Gateway 14.1 | **14.1-73.49** and later |
+| NetScaler ADC / Gateway 13.1 | **13.1-64.32** and later 13.1 releases |
+| NetScaler ADC 14.1-FIPS | **14.1-73.49 FIPS** and later |
+| NetScaler ADC 13.1-FIPS / 13.1-NDcPP | **13.1.37.286** and later |
+
+Not impacted (vendor list): NetScaler Console, Citrix Analytics, Endpoint Analysis, Endpoint Management,
+Observability, Secure Access, Secure Private Access, Session Remote Start, Virtual Apps and Desktops,
+Workspace App, StoreFront, Provisioning, eLux Scout, XenServer. Citrix-managed cloud services were
+remediated before publication, so cloud customers need no action.
+
+Citrix's mitigation guidance is again about **management access**: restrict the management interface to
+trusted networks until the fixed build is installed. Treat a NetScaler management interface the same way
+you would treat PAN-OS MGT.
+
+### Cisco — PARTLY AFFECTED, mostly fixes not yet available
+
+Advisory: *"Vulnerabilities in PHP Affecting Cisco Products: October 2026"*
+(cisco-sa-php-october26-Jj384Daq), last updated 26 Oct. Cisco's rule: a product not listed is not affected.
+
+| Cisco product | Bug | Fixed release |
+|---|---|---|
+| Expressway Series / Expressway Select Series | CSCwx37062 | **15.5.21**, availability date TBD |
+| Ultra-Reliable Wireless Backhaul (URWB) | CSCwx37073 | **27.1.1**, planned Feb 2027. Requires administrator authentication, CVSS 6.6, workaround available |
+| Duo Access Gateway | — | **3.2.0** (released) |
+
+Cisco lists workarounds in the relevant bug IDs. Planned release versions are not downloads: confirm in the
+Cisco download channel before scheduling.
+
+### Other vendor positions worth checking (not tracked in detail here)
+Red Hat, Ubuntu, Debian, cPanel, Plesk, Sophos and Veeam have published positions; the distributions are
+covered in sections 3 to 5 above. Broadcom has a portfolio response with isolated affected products
+(Symantec Endpoint Protection Manager, Carbon Black App Control Server, CloudSOC SpanVA). If your estate
+includes an appliance not listed here, the vendor advisory is the only reliable source.
+
 ## 8b. CVE-2026-115560 — no patch yet; mitigate by configuration
 
 PHP published an **informational advisory** on 2026-10-23 (session upload progress) assigning

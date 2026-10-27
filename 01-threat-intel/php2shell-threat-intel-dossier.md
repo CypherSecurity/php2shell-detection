@@ -1964,3 +1964,32 @@ Monitor signals: `pan.released_builds` 9 → **11**; `pan.pending_fix_rows` 11 �
   broader 12.1 branch still waits for `12.1.4-h13` and `12.1.10-h3`.
 - 12.2 administrators can close this out now with `12.2.4-h1`.
 - Nine builds remain pending, with `11.2.13-h4` still the next expected release.
+
+
+## 49. Appliance-vendor gap filled (2026-10-27) — Citrix NetScaler and Cisco
+
+### 49.1 Why this matters
+Our appliance coverage was PAN-OS-only. A 20-star community checker that surfaced in the repo tracker
+pointed at **Citrix advisory CTX697263**, which we had missed. The same class of product (network appliance
+with an internet-reachable management plane and an embedded PHP runtime) is the part of the exposure
+picture most likely to be omitted from "patch your web servers" messaging.
+
+### 49.2 Citrix NetScaler ADC / Gateway — impacted, fixes published 27 Oct
+Advisory CTX697263 (created 22 Oct, updated 27 Oct; severity critical). Affected: NetScaler ADC and
+NetScaler Gateway. Fixed: **14.1-73.49**, **13.1-64.32**, plus FIPS lines **14.1-73.49 FIPS** and
+**13.1.37.286** (13.1-FIPS / 13.1-NDcPP). Not affected: Console, Analytics, Endpoint Management,
+Observability, StoreFront, Workspace App, XenServer and others. Citrix cloud services were remediated
+before publication. Citrix's interim guidance is management-access restriction, the same control we
+recommend for PAN-OS.
+
+### 49.3 Cisco — partly affected, fixes mostly pending
+Cisco advisory cisco-sa-php-october26-Jj384Daq (updated 26 Oct). Affected: **Expressway Series / Select**
+(CSCwx37062, fix **15.5.21**, date TBD), **URWB** (CSCwx37073, **27.1.1** planned Feb 2027; requires admin
+auth, CVSS 6.6, workaround available), **Duo Access Gateway** (fixed in **3.2.0**). Other products remain
+under investigation; unlisted products are treated as not affected by Cisco's own rule.
+
+### 49.4 Process lesson
+The monitor watches PAN because PAN is where the vendor advisory was found early. It had no watch for
+other appliance vendors, so a community project surfaced Citrix before we did. Added to
+`PATCH-AVAILABILITY.md` §8c with a standing instruction: if an appliance has a PHP runtime and a public
+management interface, check the vendor advisory rather than assuming it is covered by distro patching.
