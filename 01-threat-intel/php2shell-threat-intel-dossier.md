@@ -2100,3 +2100,43 @@ The RCE window recorded **52 disclosure cookies and 35 shells** (~67% leak-to-sh
 B2 may reuse a leak). The attempt window itself had 4,227 access records, 30 OOM triggers and 11 worker
 crashes with **zero shells**. A request-level success rate cannot be computed: capture selection, incomplete
 streams and body reuse all break the denominator. Treat any "one in N requests" figure as unsupported.
+
+
+## 53. UNVERIFIED CLAIM (2026-10-27) — FPM-only "full RCE" PoC appeared; could not reproduce
+
+### 53.1 What was published
+`VABISMO/php2shell-nginx-fpm-full-rce` (public, ~427 KB, Python client plus a user-prefix nginx + PHP-FPM
+lab). Claims a full **nginx + PHP-FPM** chain for CVE-2026-109619 via the `BG(unserialize)` stale-state path,
+with profiles for PHP 8.0 through 8.4.26 and a session-file plant for 5.4-7.x. README claims verified output
+on 8.4.26 with a proof file and describes a "default-installation mode" (one pool, one port,
+`memory_limit=128M`, `pm=dynamic`, `post_max_size=8M`).
+
+### 53.2 What a real target still needs (author's own checklist)
+This is **not** a generic FPM exploit. It requires:
+1. vulnerable 8.x FPM build (8.0-8.4.26, 8.5.0-8.5.11);
+2. an application operation calling `session_start()`;
+3. a session that stores a **reference** (`R:N`);
+4. a **reflection** of a session value (leak channel), or supplied bases;
+5. an operation that decodes attacker-controlled session data (`session_decode`) or appends attacker data to
+   the session;
+6. bodies of ~5 MB accepted by the front (stock nginx `client_max_body_size` is 1m and fails; Apache has no
+   such cap).
+
+Conditions 3 to 5 are application behaviours, not PHP defaults. Most frameworks call `session_start()`, but
+few expose a `session_decode`/append surface and a reflected session value together.
+
+### 53.3 Verification attempts
+- **Upstream CI:** `ci.yml` runs lint, unit tests and profile schema validation only. `live-fpm.yml` (the
+  workflow that would build PHP and run the RCE integration tests) is `workflow_dispatch` only and has
+  **0 runs**. The "Live FPM lab" badge in the README is decorative, not evidence.
+- **Our lab:** assembled nginx + official `php:8.4.26-fpm` image, served the repo's own `app.php`, `ref.php`,
+  `grow.php`; the client's `probe` passed every precondition and the amplified `session_decode` arm was
+  reached. Three `leak` attempts and one `no-oracle` attempt then failed with
+  `HTTP leak failed (all reads short or invalid)`. Our stack is not the author's (official Docker build, our
+  own pool config), so this is **not disproof**. It is also **not confirmation**.
+
+### 53.4 Position
+**Unverified, prerequisites heavy, and not a reason to change the exposure shape yet.** Our stated shape
+(mod_php + prefork confirmed; FPM unconfirmed) stands. Watch item: whether independent researchers reproduce
+it, whether the author's live-lab workflow runs, or whether a variant drops the application prerequisites.
+If an independent reproduction appears, the shape statement changes immediately.

@@ -349,6 +349,16 @@ The zip's own hash cannot be embedded inside itself, so it ships as a sidecar
     above that revision's filter, so a modified or different build was used. Consistent with our lab
     failure on that exact revision; capability statement unchanged.
 
+## What changed in the 2026-10-27 FPM-claim entry
+
+80. **FPM claim assessed and marked UNVERIFIED.** `VABISMO/php2shell-nginx-fpm-full-rce` claims an nginx +
+    PHP-FPM RCE chain with a "default-installation" mode. Assessment: prerequisites are application-specific
+    (session reference, reflected session value, attacker-controlled `session_decode`/append surface, ~5 MB
+    bodies past nginx's 1m default). Upstream `live-fpm` workflow has **0 runs** (`workflow_dispatch` only);
+    `ci.yml` does not execute the exploit. Our Docker reproduction (official php:8.4.26-fpm + repo webroot)
+    passed probe and reached the arm, then failed the ASLR leak. Not confirmation, not disproof. Shape
+    statement unchanged: mod_php + prefork confirmed, FPM unconfirmed. Dossier §53.
+
 ## Reading order
 
 | File | Why |
