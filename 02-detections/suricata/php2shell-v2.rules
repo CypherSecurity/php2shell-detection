@@ -229,3 +229,14 @@ alert http any any -> [$HOME_NET,$HTTP_SERVERS] any (msg:"ET LOCAL php2shell mos
 alert http any any -> [$HOME_NET,$HTTP_SERVERS] any (msg:"ET LOCAL php2shell fixed single-character multipart boundary (e.g. CCCCCCCCCC public tool)"; flow:established,to_server; http.request_header; content:"multipart/form-data"; nocase; http.request_header; pcre:"/boundary=(?-i:([A-Za-z0-9]))\1{9,}/R"; classtype:web-application-attack; sid:2202610123; rev:1; metadata:created_at 2026_10_26, cve CVE-2026-109618, cve CVE-2026-109619, confidence medium, note joas_public_tool_uses_CCCCCCCCCC;)
 
 alert http any any -> [$HOME_NET,$HTTP_SERVERS] any (msg:"ET LOCAL LOOK-ALIKE wp2shell kit boundary (NOT php2shell - do not misattribute)"; flow:established,to_server; http.request_header; content:"boundary=----wp2shell"; fast_pattern; classtype:web-application-attack; sid:2202610124; rev:1; metadata:created_at 2026_10_26, cve CVE-2026-000000, confidence high, look_alike wp2shell_july_2026, note exclude_from_php2shell_counts;)
+
+# ---------------------------------------------------------------------------
+# v2.3 additions — 2026-10-27 — from the 0x4D31 honeypot dataset (35 confirmed in-the-wild shells,
+# 24 Oct): https://github.com/0x4D31/honeypot-data/tree/main/reports/php2shell
+# Confirmed chains used multipart POSTs with NO User-Agent and a ten-character "C" boundary
+# (CCCCCCCCCC). SID 2202610123 already keys that boundary; it is now validated in the wild.
+# ---------------------------------------------------------------------------
+
+alert http any any -> [$HOME_NET,$HTTP_SERVERS] any (msg:"ET LOCAL php2shell multipart to PHP with NO User-Agent and PHP_SESSION_UPLOAD_PROGRESS (honeypot-confirmed fingerprint)"; flow:established,to_server; http.method; content:"POST"; http.request_header; content:"multipart/form-data"; nocase; http.request_body; content:"PHP_SESSION_UPLOAD_PROGRESS"; pkt_data; pcre:"/(?![\s\S]*User-Agent\x3a)/iH"; classtype:web-application-attack; sid:2202610125; rev:3; metadata:created_at 2026_10_27, cve CVE-2026-109618, confidence high, source honeypot_0x4d31_2026_10_24, note absent_ua_observed_on_all_35_confirmed_chains;)
+
+alert http any any -> [$HOME_NET,$HTTP_SERVERS] any (msg:"ET LOCAL php2shell execution-stage body size 451384 with fixed-length multipart (honeypot-observed B2)"; flow:established,to_server; http.method; content:"POST"; http.request_header; content:"multipart/form-data"; nocase; pkt_data; pcre:"/(?=[\s\S]*Content-Length\x3a\s*451384)/isH"; classtype:web-application-attack; sid:2202610126; rev:3; metadata:created_at 2026_10_27, cve CVE-2026-109618, confidence medium, source honeypot_0x4d31_2026_10_24, note size_specific_kit_variants_vary;)

@@ -337,6 +337,18 @@ The zip's own hash cannot be embedded inside itself, so it ships as a sidecar
     KEV signal emits `kev.php2shell_in_kev=YES` again. The KEV flip was caught but reporting missed it for
     ~14 hours; see dossier §50.3.
 
+## What changed in the 2026-10-27 honeypot-evidence rebuild
+
+77. **Primary honeypot evidence integrated.** `0x4D31/honeypot-data` reports/php2shell: 35 correlated
+    `/bin/sh` starts parented by Apache workers, two source clusters, four-stage fingerprint, fixed
+    decoded-body digests, 14 shell commands. IOC/hunt file: `04-hunting/honeypot-rce-2026-10-24.md`.
+78. **Detection additions (validated):** Suricata `2202610125` (no User-Agent + PHP_SESSION_UPLOAD_PROGRESS)
+    and `2202610126` (B2 size 451,384); Sigma `lnx_apache_worker_shell_spawn`. Rules now 27 Suricata /
+    14 Sigma. **Our boundary rule `2202610123` was validated in the wild**: attackers used `CCCCCCCCCC`.
+79. **Nuance recorded:** in-the-wild traffic matches the 9bie PoC family, but early chains lacked pointers
+    above that revision's filter, so a modified or different build was used. Consistent with our lab
+    failure on that exact revision; capability statement unchanged.
+
 ## Reading order
 
 | File | Why |

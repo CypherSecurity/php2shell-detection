@@ -2046,3 +2046,47 @@ First's 27 October daily dataset (checked against `epss_scores-2026-10-27.csv.gz
 The move is the expected model response to a KEV listing plus confirmed exploitation, not a new
 vulnerability development. EPSS states the probability of exploitation activity in the next 30 days across
 the internet; it is not a per-host verdict. The 25 October values remain correct as history (see §38).
+
+
+## 52. PRIMARY EVIDENCE (2026-10-27) — 0x4D31 honeypot dataset: 35 shells, digests, fingerprint
+
+### 52.1 What arrived
+Adel Karimi (0x4D31) published the underlying dataset behind the "35 shells on honeypots" reporting:
+`github.com/0x4D31/honeypot-data`, `reports/php2shell/` with two reports and a per-case evidence directory
+(HTTP pcaps plus Apache, PHP, Tetragon and signal records for cases `A01`–`A03`, `B01`–`B32`).
+
+Previously our §50 relied on press coverage of this claim. This is the primary record, and it is stronger
+than the coverage suggested.
+
+### 52.2 What it establishes
+- **35 execution-stage POSTs correlated with 35 `/bin/sh` starts parented by Apache workers** (`uid=33`)
+  across three targets. Two source clusters, not two actors: `15.204.59[.]70` (3 shells) and
+  `162.35.99[.]94` (32 shells). `104.28.208[.]84` and `144.48.4[.]242` sent exploit-shaped traffic but
+  produced no shell and no disclosure cookie: attempts, not RCE.
+- **Leak-guided ASLR adjustment per target**: the dominant disclosed pointer differs across targets and
+  B2 tracks the difference. The chain is consistent with **CVE-2026-109618**; the records do **not**
+  establish a distinct CVE-2026-109619 path.
+- **Exact fingerprint**: multipart POST to `/` or `/index.php`, **no User-Agent**, ten-character `C`
+  boundary, fixed header order, four stages of 1,060,211 B (chunked) → 33,128,677 B (chunked) →
+  279,369 B → 451,384 B, with `PHPSESSID` and `PHP_SESSION_UPLOAD_PROGRESS` in every stage and an
+  819,200-byte `PHPSESSID` disclosure cookie.
+- **Fixed decoded-body digests** for A1/B1/A2, and per-case B2 digests (16 distinct). These enable exact
+  matching where body capture exists.
+- **Command patterns**: proof writes (`id>/tmp/x1`, web-root writes), and call-backs via `php -r`, `curl`
+  or `wget` to `162.35.99[.]94` ports 80/8080 with `/pwn-…`, `/PROOF-…`, `/ID-…$(id -un)-$(hostname)`.
+
+### 52.3 What it changes in our analysis
+1. **Our newest Suricata rule was validated in the wild.** SID `2202610123` keys a fixed single-character
+   boundary; the attackers used exactly `CCCCCCCCCC`, the same constant the public tool hardcodes. We also
+   added a no-User-Agent fingerprint rule (SID `…125`) and a B2 size rule (`…126`).
+2. **A new Sigma rule** for the decisive signal: Apache worker → shell (SID-range Sigma, level high).
+3. **Nuance on 9bie**: the traffic "closely matches the public 9bie HTTP-only PoC family", yet early chains
+   contained no pointer above that revision's `0x7f0000000000` filter, so a modified PoC, another revision
+   or a different client was used. Our earlier lab result (9bie revision failed end-to-end) and this
+   in-the-wild success are compatible: same family, different build.
+4. **Reliability context holds**: the honeypots were single-worker mod_php, the profile we benchmarked at
+   15/15. This confirms the favourable case, not the multi-worker average (2/13).
+
+### 52.4 What it does not establish
+No named victim, no CVE-2026-109619 path, no attribution, and no reliability measurement beyond the
+single-worker profile. Customer wording should reflect that.

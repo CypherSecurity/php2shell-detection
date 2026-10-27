@@ -137,10 +137,12 @@ Treat your own 17–23 October window as potentially exposed and hunt accordingl
 
 - **CISA KEV:** both CVEs added on **2026-10-26** (catalog 2026.10.26), due **2026-10-29**. This is CISA
   asserting active exploitation, not a victim report.
-- **Working RCE confirmed in the wild:** Perplexity's Adel Karimi recorded **35 shells across three
-  honeypots** on 24 Oct against **Apache mod_php running PHP 8.4.26** with a single worker, closely
-  matching a public PoC. Marcus Hutchins called it the strongest confirmation to date. No second-stage
-  payload was observed.
+- **Working RCE confirmed in the wild:** the primary dataset is public at
+  `0x4D31/honeypot-data/reports/php2shell` (Adel Karimi, 22–24 Oct): **35 execution-stage POSTs correlated
+  with 35 `/bin/sh` starts parented by Apache workers** across three targets, from two source clusters
+  (`15.204.59[.]70`, 3 shells; `162.35.99[.]94`, 32 shells). Requests carried **no User-Agent** and a
+  ten-character `C` boundary. The chain is consistent with CVE-2026-109618; it does **not** establish a
+  separate CVE-2026-109619 path. No second-stage payload was observed.
 - **Still no named organisation** has publicly confirmed a compromise through these CVEs. The Unit 42
   European-government claim remains **retracted** (§5b below). KEV listing and honeypot compromise are
   not evidence about any specific customer estate.

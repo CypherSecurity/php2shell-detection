@@ -1,0 +1,49 @@
+title: Apache Worker Spawns a Shell (php2shell RCE confirmation)
+id: 3f6c2a9e-71d4-4f2b-9d3e-8a1c5b7e6f02
+status: experimental
+description: |
+  Detects an Apache worker process spawning a shell, the decisive confirmation signal for php2shell
+  (CVE-2026-109618 / CVE-2026-109619) exploitation. Honeypot evidence from 35 confirmed in-the-wild
+  shells shows /bin/sh parented by apache2 workers running as uid 33, often followed by id, php, curl
+  or wget children. An OOM, an oversized PHPSESSID or AH00051 alone is NOT exploitation.
+references:
+  - https://github.com/0x4D31/honeypot-data/tree/main/reports/php2shell
+  - https://f4n6.co.uk/php2shell/
+author: f4n6
+date: 2026-10-27
+tags:
+  - attack.execution
+  - attack.t1059.004
+  - cve.2026-109618
+  - cve.2026-109619
+logsource:
+  category: process_creation
+  product: linux
+detection:
+  parent:
+    ParentImage|endswith:
+      - '/apache2'
+      - '/httpd'
+  child:
+    Image|endswith:
+      - '/sh'
+      - '/bash'
+      - '/dash'
+      - '/curl'
+      - '/wget'
+      - '/php'
+  web_user:
+    User|contains:
+      - 'www-data'
+      - 'apache'
+      - 'httpd'
+  condition: parent and child and web_user
+falsepositives:
+  - CGI or shell-based handlers legitimately launched by Apache (rare on modern estates)
+  - Health checks or admin scripts that invoke curl/wget from a web worker
+level: high
+fields:
+  - Image
+  - ParentImage
+  - CommandLine
+  - User

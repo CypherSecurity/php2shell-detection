@@ -85,6 +85,22 @@ its own constant boundary, while body sizes vary widely between kits.
 at the proxy. Confirm on-host: PHP-FPM error logs, Apache error log worker crashes (e.g. `AH00051` "child
 pid … exit signal"), and **unexpected outbound connections from PHP workers** (connect-back shell egress).
 
+## v2.3 — rules validated against the first public in-the-wild dataset (added 2026-10-27)
+
+Source: **`0x4D31/honeypot-data`**, `reports/php2shell` (35 confirmed shells, 22–24 Oct; packet captures and
+process records per case). Now **27 Suricata rules** and **14 Sigma rules**.
+
+| New rule | Signal | Confidence |
+|---|---|---|
+| Suricata `2202610125` | multipart POST to PHP with **no `User-Agent`** and `PHP_SESSION_UPLOAD_PROGRESS` | high (absent UA observed on all 35 confirmed chains) |
+| Suricata `2202610126` | fixed-length multipart with `Content-Length: 451384` (observed execution-stage B2 size) | medium (size is kit-specific) |
+| Sigma `lnx_apache_worker_shell_spawn` | Apache worker spawns `sh`/`bash`/`curl`/`wget`/`php` as the web user | high (the decisive confirmation signal) |
+
+**Validation note:** our boundary-first rule `2202610123` (fixed single-character boundary) keys exactly
+`CCCCCCCCCC`, the boundary used in all confirmed chains. This is its first in-the-wild validation.
+
+Full IOC set, body digests and command patterns: `04-hunting/honeypot-rce-2026-10-24.md`.
+
 ## Notes and caveats
 
 - Every quoted log string in the Sigma/hunting files was captured **verbatim in the
