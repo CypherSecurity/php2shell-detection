@@ -2140,3 +2140,23 @@ few expose a `session_decode`/append surface and a reflected session value toget
 (mod_php + prefork confirmed; FPM unconfirmed) stands. Watch item: whether independent researchers reproduce
 it, whether the author's live-lab workflow runs, or whether a variant drops the application prerequisites.
 If an independent reproduction appears, the shape statement changes immediately.
+
+
+### 53.5 Retest after the author's leak fix (27 Oct 22:38 UTC commit) — still unverified
+New commit **`213d63a`** *"Leak tiling, 7.4 chain verification, and lab hardening"* explicitly addresses
+**the failure mode we hit**: the leak buffer is now tiled with the read length instead of a single calibrated
+header, so a freed short string landing anywhere inside it carries a sane length. It also claims **PHP 7.4.33
+verified end to end** and raises the coverage to 7.4 plus all 8.x. Upstream `live-fpm` still has **0 runs**;
+`ci.yml` still only lints and unit-tests (24 runs, none executing the exploit).
+
+**Retest with the updated client, same Docker lab (official `php:8.4.26-fpm`):** probe passed every
+precondition and the arm was reached, 22 arm requests, then the same
+`HTTP leak failed (all reads short or invalid)`. Two client versions, same result.
+
+**Most likely explanation:** the shipped profiles are calibrated to the author's Debian-style **user-prefix
+PHP build**, not the official Docker image. The chain depends on heap geometry, so a different build can move
+it outside the calibrated shapes. That is a lab-difference explanation, not a refutation, and it means we
+still cannot call FPM confirmed. A fair reproduction would build PHP the same way the author does, or use the
+lab's own `calibrate` against the Docker build (which the client supports).
+
+**Status: UNVERIFIED.** Affected builds claim now includes 7.4.33. Exposure shape unchanged.
