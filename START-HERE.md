@@ -4,6 +4,20 @@
 Severity: **CVSS v4.0 9.2 each** (vendor) · **NIST v3.1: 9.8 for 109618, 8.1 for 109619** · Patched **2026-10-21 14:00 UTC**
 **Content current as of 2026-10-24 00:00 UTC** · see `BUILD-INFO.md` for what changed and how to verify you have the latest copy
 
+
+> ## ⚠️ CISA KEV — ACTIVELY EXPLOITED (26 Oct)
+> Both CVEs were added to CISA's Known Exploited Vulnerabilities catalog on **2026-10-26**, with a
+> **2026-10-29** remediation due date. Separately, a researcher confirmed **working in-the-wild RCE**
+> against an Apache mod_php PHP 8.4.26 honeypot (35 shells across three sensors, 24 Oct). This is no
+> longer a "not yet exploited" situation.
+>
+> **Still true:** no named organisation has publicly confirmed a compromise through these CVEs. The one
+> reported victim disclosure (Unit 42, 23 Oct) was **retracted by Unit 42 on 25 Oct**. KEV means exploited
+> in the wild, not "confirmed victim in your estate".
+>
+> **Do now:** patch to PHP 8.5.12 / 8.4.27 / 8.3.36 / 8.2.35, restart workers, and check PAN-OS,
+> Citrix NetScaler and Cisco appliances against `PATCH-AVAILABILITY.md`.
+
 ---
 
 ## TL;DR for whoever you're sending this to

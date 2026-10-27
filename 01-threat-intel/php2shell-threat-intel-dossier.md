@@ -1993,3 +1993,41 @@ The monitor watches PAN because PAN is where the vendor advisory was found early
 other appliance vendors, so a community project surfaced Citrix before we did. Added to
 `PATCH-AVAILABILITY.md` §8c with a standing instruction: if an appliance has a PHP runtime and a public
 management interface, check the vendor advisory rather than assuming it is covered by distro patching.
+
+
+## 50. 🚨 TOP ESCALATION (2026-10-27) — CISA KEV listed both CVEs; working RCE confirmed in the wild
+
+### 50.1 What changed
+1. **CISA KEV:** both CVEs are in the catalog version **2026.10.26** (released 2026-10-26T22:24Z), added
+   **2026-10-26**, **remediation due 2026-10-29**. Catalog size 1,756 → 1,758.
+2. **NVD enrichment (27 Oct):** refs 109618 5 → **8**, 109619 14 → **17**. New references: the CISA KEV
+   pages, an Arctic Wolf analysis, and `php2shell.delftintellab.com`. Status remains `Analyzed`.
+3. **Working in-the-wild RCE:** Perplexity detection lead **Adel Karimi** reported **35 shells launched
+   across three honeypots** on **24 Oct**, against **Apache mod_php PHP 8.4.26, single worker**, using a
+   four-stage request chain closely matching the public PoC. Expel's Marcus Hutchins called it the
+   highest-quality confirmation so far. No second-stage payload was observed.
+4. **No named victim:** as of this entry, no organisation has publicly confirmed compromise through these
+   CVEs. The Unit 42 European-government claim remains retracted (§39.6).
+
+### 50.2 What it means
+- **"Not yet exploited" is over.** The vulnerability is in KEV with a 29 Oct due date; patching is now a
+  deadline question, not a judgement call.
+- **The honeypot result matches our capability findings:** single-worker mod_php, PHP 8.4.26,
+  `display_errors=Off`, four-stage chain. That is the same configuration we benchmarked at 15/15 success
+  on single-worker and 2/13 on multi-worker. It also confirms the public PoC was weaponised in the wild,
+  not just published.
+- **Victim attribution remains absent.** KEV and honeypot shells say exploitation is happening; they do
+  not say who was breached. Customer guidance should say exactly that.
+
+### 50.3 Process failure: we were ~14 hours late on KEV
+The monitor caught the KEV change at its first cycle (snapshot 2026-10-26T23:39Z; catalog 1,758,
+`kev.IN_KEV=…`). **Reporting missed it for ~14 hours** because:
+- the run that caught it was filtered to `grep -iE "pan|publish"` while debugging the PAN docs-first
+  state, so the KEV lines never reached the report copy; and
+- subsequent cycles showed no KEV change (baseline already contained it), while the reminder prompt's
+  stale "KEV NO (1,756)" fact was repeated without checking the live signal.
+
+**Fix:** `check.sh` now prints a prominent **ALERTS** block at the **top of every run**, before the diff,
+listing: KEV listing, PAN-OS released-build changes, and PAN product-scope changes. The KEV signal also
+emits the playbook-compatible `kev.php2shell_in_kev=YES` again (it had drifted to `IN_KEV=` lines only).
+Reporting rule: read the ALERTS block and the KEV signal every cycle, never the prompt's cached facts.

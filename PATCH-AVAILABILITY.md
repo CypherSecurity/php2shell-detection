@@ -11,6 +11,17 @@
 
 ---
 
+## 0. URGENCY CHANGE (2026-10-27): CISA KEV listed, exploitation confirmed
+
+CISA added **CVE-2026-109618** and **CVE-2026-109619** to the KEV catalog on **2026-10-26** (catalog
+2026.10.26) with a **2026-10-29** due date. US federal civilian agencies are bound by that date; for
+everyone else it is a strong statement that working exploitation is happening. A researcher also
+confirmed working RCE on an Apache mod_php PHP 8.4.26 honeypot (35 shells across three sensors on 24 Oct,
+matching the single-worker profile we benchmarked). No named victim organisation is confirmed.
+
+Patch priority is now: (1) PHP runtimes, (2) every embedded-PHP appliance with an exposed management
+plane (PAN-OS, Citrix NetScaler, Cisco Expressway), (3) worker restarts everywhere you patched.
+
 ## 1. Upstream PHP — official releases (2026-10-21)
 
 | Branch | Fixed version | Notes |

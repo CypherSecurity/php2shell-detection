@@ -133,6 +133,20 @@ Four reasons to hold both ideas at once:
 not succeeded publicly*. It is **not** evidence that targeted, quiet compromise has not occurred.
 Treat your own 17–23 October window as potentially exposed and hunt accordingly.
 
+## 5c. ✅ CONFIRMED (26–27 Oct): exploitation in the wild, KEV listed, still no named victim
+
+- **CISA KEV:** both CVEs added on **2026-10-26** (catalog 2026.10.26), due **2026-10-29**. This is CISA
+  asserting active exploitation, not a victim report.
+- **Working RCE confirmed in the wild:** Perplexity's Adel Karimi recorded **35 shells across three
+  honeypots** on 24 Oct against **Apache mod_php running PHP 8.4.26** with a single worker, closely
+  matching a public PoC. Marcus Hutchins called it the strongest confirmation to date. No second-stage
+  payload was observed.
+- **Still no named organisation** has publicly confirmed a compromise through these CVEs. The Unit 42
+  European-government claim remains **retracted** (§5b below). KEV listing and honeypot compromise are
+  not evidence about any specific customer estate.
+- **Reading:** exploitation is real and working; victim attribution is still absent. Patch urgency is now
+  set by the KEV due date, not by whether a victim has been named.
+
 ## 5b. ⚠️ CLAIM → RETRACTION (25 Oct): Unit 42's "European government intrusion" was withdrawn
 
 **Status: retracted.** Timeline, kept as a record because it is instructive:
@@ -151,7 +165,8 @@ Treat your own 17–23 October window as potentially exposed and hunt accordingl
 PHP application** took place, but initial access is **not confirmed** to be CVE-2026-109618/109619. The
 22.6 million exposed-instance estimate and the patching guidance are unchanged.
 
-**Net position: no publicly confirmed victim tied to these two CVEs.** The earlier §30 conclusion was
+**Net position (updated 27 Oct): exploitation is confirmed (KEV, honeypot RCE); no publicly named victim
+is confirmed tied to these two CVEs.** The earlier §30 conclusion was
 right; our correction was premature — single-vendor, unconfirmed victim claims should be labelled
 "vendor-reported, unverified", not "confirmed". See dossier §39.6.
 
