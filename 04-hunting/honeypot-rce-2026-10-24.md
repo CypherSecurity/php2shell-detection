@@ -101,3 +101,26 @@ unexpected Apache-parent shell, ideally followed by an independently observed `i
 The dataset is public and contains packet captures of attacker traffic. It contains **no working exploit
 code**, and the digests above are hashes, not payloads. Do not paste attacker command bodies into shared
 tickets without defanging embedded addresses.
+
+## Attempts versus successes (derived from the dataset)
+
+The question "35 shells out of how many attempts" has no single answer in the data, but the dataset supports
+three defensible ratios.
+
+| Measure | Value |
+|---|---|
+| Total distinct source addresses across both reports | **72** (66 in the attempt window, 6 in the RCE window) |
+| Confirmed successful sources | **2** (`15.204.59[.]70`, `162.35.99[.]94`) |
+| Source-level conversion | **~3%** (2 of 72), and the two successful sources were **not** among the 66 earlier attempt sources |
+| Attempt window volume | 26h43m: **4,227 access records**, 30 OOM triggers, 11 worker crashes, 33 fixed-length probes (22 IPs), 38 core/serializer probes (11 IPs), **0 shells** |
+| RCE window | ~3h40m (15:16–18:57 UTC): **52** disclosure cookies (51 complete) → **35** shells |
+| Leak-to-shell conversion | **~67%** (35/52), with the caveat that a B2 may reuse a leak, so this is indicative rather than a strict rate |
+
+**Request-level success rate cannot be computed** from this data: not every exploit-shaped request is
+captured, some streams are incomplete, and repeated bodies are reused rather than independent attempts.
+What is clear is the shape of the activity: the first 26 hours produced crashes and OOMs but no shells, and
+the successful episodes came from different source infrastructure with a retry-heavy cadence.
+
+**Reading for SOC:** most scanning is noise, the conversion point is a persistent client that retries the
+four-stage chain, and confirmation is the Apache worker → shell parentage, not a 200 response, an OOM or a
+cookie.

@@ -2090,3 +2090,13 @@ than the coverage suggested.
 ### 52.4 What it does not establish
 No named victim, no CVE-2026-109619 path, no attribution, and no reliability measurement beyond the
 single-worker profile. Customer wording should reflect that.
+
+
+### 52.5 Attempts versus successes — what the dataset can and cannot support
+Across both honeypot reports there are **72 distinct source addresses**: 66 in the 26h43m attempt window and
+6 in the ~3h40m RCE window, with **zero overlap**. Only **two** sources produced confirmed shells, so
+source-level conversion is roughly **3%**, and the successful sources were not the earlier attempt sources.
+The RCE window recorded **52 disclosure cookies and 35 shells** (~67% leak-to-shell, indicative only, since a
+B2 may reuse a leak). The attempt window itself had 4,227 access records, 30 OOM triggers and 11 worker
+crashes with **zero shells**. A request-level success rate cannot be computed: capture selection, incomplete
+streams and body reuse all break the denominator. Treat any "one in N requests" figure as unsupported.
