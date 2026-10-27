@@ -1942,3 +1942,25 @@ flipped, and the monitor now confirms both states independently.
 The release-notes pages were already live on 26 Oct (see §46), so this was a confirmation rather than a
 surprise. The monitor caught the transition in the first cycle after it happened, through the timeline
 parser, without requiring a docs re-check.
+
+## 48. 🚨 ESCALATION (2026-10-27 04:55 UTC) — 12.1.7-h11 and 12.2.4-h1 released ahead of ETA
+
+### 48.1 What changed
+In the 04:55 UTC cycle the advisory's timeline added two builds that were not due until 28 October:
+
+| Build | Previous ETA | Now |
+|---|---|---|
+| `12.2.4-h1` | 10/28 | **released** |
+| `12.1.7-h11` | 10/28 | **released** |
+
+Monitor signals: `pan.released_builds` 9 → **11**; `pan.pending_fix_rows` 11 → **9**; advisory updated
+2026-10-27. Verified against the product table: `>= 12.2.4-h1` and `>= 12.1.7-h11` carry no ETA. The other
+12.1 builds are still pending: `12.1.4-h13` (10/29) and `12.1.10-h3` (10/30).
+
+### 48.2 Meaning
+- **Panorama remains the outlier**: still affected with no published fix date, despite its management
+  plane sharing the affected code path.
+- 12.1 administrators on earlier builds should use `12.1.7-h11` if their maintenance window allows; the
+  broader 12.1 branch still waits for `12.1.4-h13` and `12.1.10-h3`.
+- 12.2 administrators can close this out now with `12.2.4-h1`.
+- Nine builds remain pending, with `11.2.13-h4` still the next expected release.
