@@ -70,7 +70,8 @@ and URWB is planned for Feb 2027. **Siemens RUGGEDCOM APE1808** devices running 
 listed PAN-OS branches (Siemens advisory SSA-566512); remediation is the PAN-OS fix for their branch. See `PATCH-AVAILABILITY.md` §8c.
 
 One correction matters here: **WF-500 / WF-500-B are not affected** (vendor corrected its 23 Oct
-listing); **Panorama remains affected with no fix date**. PAN rates its product impact **8.7 HIGH**.
+listing); **Panorama is covered by the same hotfixes** (PAN publishes one shared table for PAN-OS and
+Panorama). PAN rates its product impact **8.7 HIGH**.
 
 - **Do now:** restrict management-interface access (never internet-exposed), and enable the **full
   current Threat Prevention ID list** — **543004, 97622–97625, and the wider set added 24 Oct (`97643`, `97647`, `97649`, `97652`, `97653`, `97656`–`97659`, `97662`–`97664`, `97670`–`97674`, `97676`–`97678`) — content **9162+, 9163, 9164+****. The list grew ~5× on 24 Oct; if you enabled only the
@@ -85,7 +86,8 @@ Six builds remain pending, all with 29 or 30 Oct ETAs (`12.1.4-h13`, `12.1.10-h3
   contact Siemens support.
 - **Not affected:** **WildFire appliances WF-500 / WF-500-B** (all versions). A 23 Oct revision briefly
   listed them as affected, then corrected it. Do not chase WF-500 fixes.
-- **Panorama:** affected, **no published fix date** — plan to stay restricted.
+- **Panorama:** affected, **fixed by the same PAN-OS maintenance releases**; upgrade Panorama to the same
+  hotfix as its train.
 - **Already fixed:** Cortex XCORE (21 Oct), WildFire Cloud (22 Oct).
 - **Scope on the device:** the **HTTPS management web UI *and* the XML API**, plus any dataplane
   interface carrying a **management profile**. GlobalProtect portal/gateway are **not** in scope.

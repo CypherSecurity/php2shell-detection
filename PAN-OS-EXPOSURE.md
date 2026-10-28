@@ -12,7 +12,7 @@ Palo Alto's advisory timeline records releases: **25 Oct** — `10.2.18-h13`, `1
 **27 Oct** — `10.2.13-h27`, `10.2.16-h12`;
 **26 Oct** — `11.1.4-h38`, `11.1.6-h40`, `11.1.10-h36`, `11.1.13-h16`. Release notes for those builds
 state they "include a fix to address CVE-2026-109618". Thirteen further builds remain on ETA 27–30 Oct
-(12.2 / 12.1 / most of 11.2 / 11.1.7 / most of 10.2). **Panorama still has no fix
+(12.2 / 12.1 / most of 11.2 / 11.1.7 / most of 10.2). **Panorama follows the same hotfix table**
 date.** Treat internet-reachable management interfaces as exposed until the relevant build is installed.
 
 ## 1. How many PAN-OS management interfaces are on the internet?
@@ -102,7 +102,7 @@ Per Palo Alto's advisory (revised 23 Oct):
 
 **Timeline:** first hotfixes **26 Oct** (`10.2.18-h13`, `11.1.16-h4`, `11.2.10-h16`); `10.2.13-h27` and
 `10.2.16-h12` released **27 Oct**; rest by
-**30 Oct**. ⚠️ **Panorama has no published date** — plan to run restricted
+**30 Oct**. ⚠️ **Panorama uses the same releases** — upgrade it to the same hotfix as its train; until then run restricted
 indefinitely for those.
 
 ---
@@ -136,7 +136,7 @@ done
 # management interface, silently exposing it on those ports during the Lunar Peak campaign.
 ```
 
-**Also check Panorama** — in scope, no fix date. **WF-500 / WF-500-B are not affected** (vendor correction).
+**Also check Panorama** — in scope, fixed by the same PAN-OS maintenance releases. **WF-500 / WF-500-B are not affected** (vendor correction).
 
 ---
 
@@ -154,7 +154,7 @@ done
 4. **Hunt for crash/reboot events** that correlate with inbound management requests — with PAN's
    availability-only assessment, an unexplained firewall restart is a more likely sign of an attempt
    than a compromised configuration.
-5. **Patch on release:** 26–30 Oct per branch; Panorama pending a vendor date. WF-500 not affected.
+5. **Patch on release:** 26–30 Oct per branch; Panorama uses the same hotfixes. WF-500 not affected.
 
 ---
 

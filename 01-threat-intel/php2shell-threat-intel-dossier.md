@@ -2214,3 +2214,37 @@ NCSC-NL's software status list (updated 28 Oct 11:14 CET) now states the same PA
 with ETAs for the remaining six (`12.1.4-h13`, `12.1.10-h3`, `11.2.4-h23`, `11.1.7-h12`, `10.2.7-h39`,
 `10.2.10-h42`). It also lists the Citrix NetScaler fixed versions we added to `PATCH-AVAILABILITY.md` §8c.
 Useful as a second CSIRT source for the same table, not a new fact.
+
+
+## 56. CORRECTION (2026-10-28) — Panorama is fixed by the same PAN-OS maintenance releases
+
+### 56.1 What we had wrong
+Since 23 October our material said **"Panorama: affected, no fix date"** (§45.3 kept it after the WF-500
+correction). That was a misreading of an omission: the advisory publishes **one shared hotfix table** and has
+**no separate Panorama row**, which we interpreted as "no Panorama fix exists".
+
+### 56.2 What the sources say
+- **PAN advisory:** the product note reads *"This issue is applicable to PAN-OS software on PA-Series and
+  VM-Series firewalls **and on Panorama (virtual and M-Series)**."* The Solution table lists the PAN-OS
+  branches and hotfixes; Panorama runs PAN-OS software and upgrades on the same version numbering
+  (`11.2.4-h23`, `11.1.7-h12`, `10.2.7-h39`, and so on).
+- **Independent reading:** Brandefense's status summary (28 Oct) states *"The advisory lists PAN-OS and
+  Panorama in one row with one set of hotfixes."* NCSC-NL PR #54 applies the same fixed versions to both its
+  PAN-OS (`PHP-0623`) and Panorama (`PHP-0625`) entries and moves both to status **Fix**; its software list
+  row dated 28 Oct 11:14 gives Panorama the same fixed thresholds we publish for PAN-OS.
+
+### 56.3 Corrected statement
+**Panorama is affected and fixed by the same maintenance releases as PAN-OS.** Upgrade Panorama to the same
+hotfix as its train when available; it is not waiting for a separate vendor date. The interim
+management-access restrictions still apply to Panorama until it is upgraded, and to the six PAN-OS builds
+still pending.
+
+### 56.4 Where corrected
+`PATCH-AVAILABILITY.md` §7b (two places), `START-HERE.md` (two places), `PAN-OS-EXPOSURE.md` (four places),
+dossier §56, the public page status line, and a public `[assessment]` entry.
+
+### 56.5 Process note
+This is a reading correction, not a vendor change: no PAN advisory revision moved Panorama. The failure mode
+was treating a missing row as a negative fact. Standing rule: when a vendor publishes a single shared fix
+table plus an applicability note naming extra products, apply the table to those products unless a **separate
+row** contradicts it.

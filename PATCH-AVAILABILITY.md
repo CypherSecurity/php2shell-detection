@@ -146,7 +146,8 @@ CVE-2026-109618".
 
 **Action:** if your branch has a released build, upgrade now (maintenance window, then verify the
 management interface is reachable only from trusted sources). Branches still pending keep the interim
-controls below. **Panorama** still has no announced fix date. **WF-500 / WF-500-B are not affected**
+controls below. **Panorama is covered by the same maintenance releases** (the advisory lists PAN-OS and
+Panorama together; upgrade Panorama to the same hotfix for its train). **WF-500 / WF-500-B are not affected**
 (vendor correction, 23 Oct; verified 26 Oct). Confirm build existence on the
 advisory page before scheduling — PAN revises ETAs.
 
@@ -165,8 +166,11 @@ Cloud NGFW. **Already remediated:** Cortex XCORE (21 Oct), WildFire Cloud (22 Oc
 
 **Not affected (corrected 23 Oct):** **WildFire appliances WF-500 / WF-500-B** (all versions). Earlier
 23 Oct text listed them as affected; the vendor corrected this the same day. Also affected:
-**Panorama** (all versions) — **no published fix date for either**. Plan for restricted management
-access indefinitely rather than waiting for a release.
+**Panorama** (all versions) — **affected, and fixed by the same PAN-OS maintenance releases**: the advisory
+states the issue applies to "PAN-OS software on PA-Series and VM-Series firewalls and on Panorama (virtual and
+M-Series)" and publishes one shared hotfix table. Upgrade Panorama to the same build for its train (for
+example 11.2.4-h23, 11.1.7-h12, 10.2.7-h39) as it becomes available. This replaces the earlier "no fix date"
+line: PAN never published a separate Panorama row, which we had read too literally (see dossier §56).
 
 **Scope:** the HTTPS management web UI **and the XML API service**, plus dataplane interfaces that
 carry a **management profile**. GlobalProtect portal/gateway and captive portal are **not** affected.
