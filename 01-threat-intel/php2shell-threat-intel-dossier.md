@@ -2205,3 +2205,12 @@ Our released-build parser required the phrase "removed **the** ETAs for". The 28
 so the three builds were counted as pending while the advisory already listed them as released. The
 `pan.pending_fix_rows` and `pan.timeline_latest` changes exposed the discrepancy, and the ALERTS block
 flagged the corrected released list after the fix. Parser now accepts the optional "the".
+
+
+### 55.4 Independent corroboration (28 Oct): NCSC-NL mirrors the split
+NCSC-NL's software status list (updated 28 Oct 11:14 CET) now states the same PAN-OS thresholds: fixed in
+`12.2.4-h1`, `12.1.7-h11`, `11.2.7-h23`, `11.2.10-h16`, `11.2.13-h4`, `11.2.16-h1`, `11.1.4-h38`,
+`11.1.6-h40`, `11.1.10-h36`, `11.1.13-h16`, `11.1.16-h4`, `10.2.13-h27`, `10.2.16-h12`, `10.2.18-h13`,
+with ETAs for the remaining six (`12.1.4-h13`, `12.1.10-h3`, `11.2.4-h23`, `11.1.7-h12`, `10.2.7-h39`,
+`10.2.10-h42`). It also lists the Citrix NetScaler fixed versions we added to `PATCH-AVAILABILITY.md` §8c.
+Useful as a second CSIRT source for the same table, not a new fact.
