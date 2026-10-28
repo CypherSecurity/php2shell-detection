@@ -1,0 +1,30 @@
+title: PAM su Configuration Replaced with pam_permit (Fragnesia / root persistence)
+id: 8b1f3c62-4d7a-4e91-9a02-6c5d1e8f7b31
+status: experimental
+description: |
+  Detects modification of /etc/pam.d/su, the technique used by the Fragnesia kernel exploit (CVE-2026-46300)
+  chained after php2shell to gain root on appliances. The observed attack replaced the file with a 774-byte
+  configuration referencing pam_permit.so so that su accepts all users.
+references:
+  - https://dreamgroup.com/blog/chained-php2shell-exploit-roots-25-servers
+  - https://f4n6.co.uk/php2shell/
+author: f4n6
+date: 2026-10-28
+tags:
+  - attack.privilege_escalation
+  - attack.t1548.001
+  - cve.2026-46300
+logsource:
+  category: file_event
+  product: linux
+detection:
+  selection:
+    TargetFilename|endswith: '/etc/pam.d/su'
+  condition: selection
+falsepositives:
+  - Legitimate pam configuration management by an administrator or configuration tool
+level: high
+fields:
+  - TargetFilename
+  - Image
+  - User

@@ -153,6 +153,24 @@ Treat your own 17–23 October window as potentially exposed and hunt accordingl
   0.99997 on 25 Oct. Expected model response to KEV plus confirmed exploitation; still a direction
   statement, not a per-host verdict.
 
+## 5d. 🚨 VENDOR-REPORTED REAL-WORLD VICTIM (27 Oct) — 25 appliances rooted, US government-affiliated org
+
+Dream Group published on **27 October** (artifacts found 25 Oct) a report of **25 servers rooted** across the
+**US, Japan, Taiwan and South Korea**, including **three systems in a US government-affiliated environment**.
+The chain chained a **custom, non-public PHP2Shell exploit** against the **`session.upload_progress`
+mechanism on a firewall vendor's appweb management server** (firewall OS **PHP 8.0.30**) with **Fragnesia
+(CVE-2026-46300)** kernel LPE for root. Post-exploitation reached the organisation's **Active Directory**,
+with a reverse SSH tunnel, decrypted LDAP service-account password, full user/group enumeration and password
+spray. 22 other firewalls remain parked with web shells.
+
+**Caveats, deliberately kept:** vendor and versions **withheld**; **no IOCs published**; single vendor source,
+**not independently verified by us**; no organisation has named itself. Fragnesia is **not in CISA KEV**.
+
+**Net position change: "no compromise reported" is no longer accurate.** There is a vendor-reported,
+government-affiliated, unnamed victim. What remains absent is a named organisation and independent
+confirmation. Fragment detection guidance:
+`04-hunting/incident-firewall-root-2026-10-25.md`.
+
 ## 5b. ⚠️ CLAIM → RETRACTION (25 Oct): Unit 42's "European government intrusion" was withdrawn
 
 **Status: retracted.** Timeline, kept as a record because it is instructive:
@@ -171,8 +189,9 @@ Treat your own 17–23 October window as potentially exposed and hunt accordingl
 PHP application** took place, but initial access is **not confirmed** to be CVE-2026-109618/109619. The
 22.6 million exposed-instance estimate and the patching guidance are unchanged.
 
-**Net position (updated 27 Oct): exploitation is confirmed (KEV, honeypot RCE); no publicly named victim
-is confirmed tied to these two CVEs.** The earlier §30 conclusion was
+**Net position (updated 28 Oct): exploitation is confirmed (KEV, honeypot RCE) and a vendor reports a
+real-world government-affiliated victim (three systems, 25 servers). No organisation has named itself and the
+firewall vendor is undisclosed, so there is still no publicly named victim.** The earlier §30 conclusion was
 right; our correction was premature — single-vendor, unconfirmed victim claims should be labelled
 "vendor-reported, unverified", not "confirmed". See dossier §39.6.
 

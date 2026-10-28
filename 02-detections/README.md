@@ -88,7 +88,7 @@ pid … exit signal"), and **unexpected outbound connections from PHP workers** 
 ## v2.3 — rules validated against the first public in-the-wild dataset (added 2026-10-27)
 
 Source: **`0x4D31/honeypot-data`**, `reports/php2shell` (35 confirmed shells, 22–24 Oct; packet captures and
-process records per case). Now **27 Suricata rules** and **14 Sigma rules**.
+process records per case). Now **27 Suricata rules** and **6 Sigma rules**.
 
 | New rule | Signal | Confidence |
 |---|---|---|
@@ -100,6 +100,10 @@ process records per case). Now **27 Suricata rules** and **14 Sigma rules**.
 `CCCCCCCCCC`, the boundary used in all confirmed chains. This is its first in-the-wild validation.
 
 Full IOC set, body digests and command patterns: `04-hunting/honeypot-rce-2026-10-24.md`.
+
+**v2.4 (28 Oct):** added Sigma `lnx_pam_su_pam_permit_tamper` (Fragnesia root persistence) and
+`lnx_reverse_ssh_tunnel` (post-exploitation pivot), from the Dream appliance-compromise report. Also new
+hunting guide: `04-hunting/incident-firewall-root-2026-10-25.md`.
 
 ## Notes and caveats
 

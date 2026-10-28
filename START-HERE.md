@@ -11,9 +11,13 @@ Severity: **CVSS v4.0 9.2 each** (vendor) · **NIST v3.1: 9.8 for 109618, 8.1 fo
 > against an Apache mod_php PHP 8.4.26 honeypot (35 shells across three sensors, 24 Oct). This is no
 > longer a "not yet exploited" situation.
 >
-> **Still true:** no named organisation has publicly confirmed a compromise through these CVEs. The one
-> reported victim disclosure (Unit 42, 23 Oct) was **retracted by Unit 42 on 25 Oct**. KEV means exploited
-> in the wild, not "confirmed victim in your estate".
+> **Victim position changed on 27 Oct.** Dream Group reports a **vendor-attributed real-world compromise**:
+> 25 servers rooted across the US, Japan, Taiwan and South Korea, including **three systems in a
+> US government-affiliated environment**, using a custom PHP2Shell exploit against an undisclosed firewall
+> vendor's appweb management server plus a kernel LPE (Fragnesia, CVE-2026-46300). **The vendor is
+> undisclosed, no IOCs were published, and no organisation has named itself.** The earlier Unit 42 victim
+> claim remains retracted. KEV means exploited in the wild; the Dream report is a specific but unverified
+> intrusion claim.
 >
 > **Do now:** patch to PHP 8.5.12 / 8.4.27 / 8.3.36 / 8.2.35, restart workers, and check PAN-OS,
 > Citrix NetScaler and Cisco appliances against `PATCH-AVAILABILITY.md`.

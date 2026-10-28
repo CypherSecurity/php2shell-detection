@@ -247,7 +247,24 @@ covered in sections 3 to 5 above. Broadcom has a portfolio response with isolate
 (Symantec Endpoint Protection Manager, Carbon Black App Control Server, CloudSOC SpanVA). If your estate
 includes an appliance not listed here, the vendor advisory is the only reliable source.
 
-## 8b. CVE-2026-115560 — no patch yet; mitigate by configuration
+## 8d. Appliance compromise reported (28 Oct) — undisclosed firewall vendor, 25 rooted servers
+
+Dream Group reports a real-world chain on an **undisclosed firewall vendor's** management server
+(**PHP 8.0.30**, **appweb**) using a custom PHP2Shell exploit plus **Fragnesia (CVE-2026-46300)** kernel LPE
+to gain root on **25 servers**, three of them in a US government-affiliated environment. Vendor and versions
+withheld; no IOCs published; single source, not independently verified.
+
+**What this means for patching:**
+- The appliance's management interface was the entry point. Any internet-exposed appliance management
+  interface running an affected PHP build is in the demonstrated attack path.
+- **Two patch layers:** the PHP runtime fix (vendor firmware or backported package) **and** the kernel fix
+  for CVE-2026-46300. Patching only PHP leaves the root escalation available.
+- The report does not name the vendor, so use the vendor-advisory checks in section 8c for every appliance
+  you own, and treat "runs PHP 8.0.30" as a reason to look harder.
+- Detection guidance (web shell, reverse SSH tunnel, `/etc/pam.d/su` tampering, AD spray from management
+  server) is in `04-hunting/incident-firewall-root-2026-10-25.md`.
+
+## 8b. CVE-2026-115560## 8b. CVE-2026-115560 — no patch yet; mitigate by configuration
 
 PHP published an **informational advisory** on 2026-10-23 (session upload progress) assigning
 **CVE-2026-115560**. **There is no patch yet** — it is queued for the next regular release.

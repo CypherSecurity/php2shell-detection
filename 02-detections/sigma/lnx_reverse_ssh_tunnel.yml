@@ -1,0 +1,40 @@
+title: Reverse SSH Tunnel from Web or Appliance Host (php2shell post-exploitation)
+id: c4a9d1e5-72b8-4f36-8c0a-1d5e9b2f6a47
+status: experimental
+description: |
+  Detects an outbound reverse SSH tunnel, the persistence and pivot method reported after php2shell
+  exploitation of an appliance management server (8-port reverse tunnel, persisted via systemd and rc.local).
+  Legitimate administrative use of ssh -R is common, so baseline before alerting.
+references:
+  - https://dreamgroup.com/blog/chained-php2shell-exploit-roots-25-servers
+  - https://f4n6.co.uk/php2shell/
+author: f4n6
+date: 2026-10-28
+tags:
+  - attack.command_and_control
+  - attack.t1572
+logsource:
+  category: process_creation
+  product: linux
+detection:
+  image:
+    Image|endswith:
+      - '/ssh'
+      - '/autossh'
+  reverse:
+    CommandLine|contains: ' -R '
+  background:
+    CommandLine|contains:
+      - ' -N '
+      - ' -f '
+      - 'GatewayPorts'
+  condition: image and reverse and background
+falsepositives:
+  - Administrators using reverse tunnels for support access
+  - Monitoring or backup tooling that opens reverse tunnels
+level: medium
+fields:
+  - Image
+  - CommandLine
+  - ParentImage
+  - User

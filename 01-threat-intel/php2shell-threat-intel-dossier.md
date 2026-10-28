@@ -2299,3 +2299,76 @@ the URWB acceleration before any other source reflected it.
 Two vendor revisions in 24 hours, with a four-month date swing between them. Single-source, one-shot vendor
 reads age badly; a version-and-date watch is cheap and this one immediately paid. Treat any planned release
 date in customer material as an estimate with the revision number attached.
+
+
+## 59. 🚨 FIRST REAL-WORLD VICTIM REPORT (2026-10-27/28) — Dream Group: 25 rooted appliances
+
+### 59.1 Source and provenance
+**Dream Group** (Israeli security firm) published *"Chained PHP2Shell Exploit Roots 25 Servers, including US
+Government Servers"* on 27 Oct 2026 17:02 UTC, based on artifacts discovered 25 Oct. The Hacker News covered
+it on 28 Oct 17:59 GMT. Primary source: `dreamgroup.com/blog/chained-php2shell-exploit-roots-25-servers`.
+**No IOCs were published** (vendor and versions withheld); the vendor was notified. Single-source,
+vendor-reported, **not independently verified by us.**
+
+### 59.2 What it claims
+- **25 servers rooted** across the **United States, Japan, Taiwan and South Korea**, including **three in a
+  US government-affiliated environment** (two perimeter firewalls plus an internal firewall management
+  server). Persistent access to that organisation's **internal Active Directory domain**.
+- Affected devices run **specific versions of a large vendor's firewall software**; vendor and versions are
+  **withheld**. Stated specifics: the firewall OS runs **PHP 8.0.30** with a high memory limit, and the
+  target is the **`session.upload_progress` mechanism on the firewall's appweb management server**.
+- Exploit: a **custom, non-public build** of the PHP2Shell chain (not a copy of any public exploit),
+  four stages mirroring the public technique (A1 memory exhaustion ~383 MB, B1 out-of-bounds leak via
+  `Set-Cookie`, A2 stale reference setup ~500 MB, B2 forged HashTable with `pDestructor` = `zif_system`),
+  giving code execution as `nobody`. All in a **single B2 request**, chain completing in under 15 minutes.
+- Privilege escalation: **Fragnesia (CVE-2026-46300)**, a Linux kernel LPE in the XFRM ESP-in-TCP subsystem,
+  using page-cache writes to replace `/etc/pam.d/su` with `pam_permit.so` (774-byte file, per-byte
+  splicing). SELinux `httpd_t` confinement is why the second stage was needed.
+- Campaign funnel: FOFA ~**19,000** exposed firewalls, ~**5,000** alive with versions, filtered to the four
+  countries and PHP 8.0.30 branches → **240 targets**; automated batch runner (5 concurrent, 30-minute
+  timeout) → **24 rooted**; two US-government firewalls triaged, second exploited 24 Oct 10:09 UTC; group
+  root 25 with the internal management server at 11:35 UTC. **22 other firewalls remain parked with a
+  103-byte PHP root web shell**, described as likely still active.
+- Post-exploitation: 8-port **reverse SSH tunnel** (LDAP, LDAPS, RDP, internal management, VPN, SOCKS5),
+  persisted via systemd unit plus `rc.local`; LDAP service account password **decrypted from device
+  config** (root gives the master key); full AD user/group enumeration; **password spray with
+  `lockoutThreshold=0`**; attempted backdoor user and machine accounts; AD ACL analysis; attempted SAML
+  signing-key extraction from Keycloak and SSO bypass probing. Outcome of spray/backdoor creation/SAML key
+  extraction **unknown** (results stayed on the management server's filesystem).
+- Attribution: **suspected China-nexus**, not a named actor. Indicators: target countries, FOFA, Chinese
+  `iox` tunnelling utility, DeepSeek and Kimi LLMs configured in an "aiscan" offensive platform, UTC+8
+  infrastructure clocks, Chinese-language prompts. Claimed AI-assisted development across ~40 scripts
+  (Claude Code installed, code style consistent), with the caveat that direct evidence of AI writing the
+  exploit is absent.
+
+### 59.3 What it changes
+1. **Victim position changes from "none" to "vendor-reported government-affiliated compromise".** No
+   organisation has named itself, and Dream withholds the firewall vendor, so it is still not a publicly
+   named victim. It is no longer true to say no compromise has been reported.
+2. **In-the-wild exploitation used a custom exploit, not public PoC.** This reconciles two earlier
+   observations: the public tool is unreliable against real builds (our benchmark), and the recovered
+   profiles store per-version offsets, SHA-256 hashes and ELF build IDs from `libphp.so`. Actors who invest
+   in per-version calibration are not limited by public PoC quality.
+3. **Appliance management planes are the confirmed attack surface in the real world.** This is the threat
+   model we flagged for PAN-OS, Citrix and Cisco, now demonstrated on an undisclosed firewall vendor with
+   PHP 8.0.30 and appweb.
+4. **Chained LPEs matter.** PHP2Shell gave `nobody`; `Fragnesia` (CVE-2026-46300) gave root. Patching PHP
+   alone would not have prevented root on those appliances unless the kernel was also patched.
+
+### 59.4 What it does not change
+- No named organisation, no vendor name, no IOCs, no hashes, no IPs. Triage cannot rely on this report for
+  matching.
+- Our benchmarked capability statement stands: public tool single-worker 100%, multi-worker 15%; the
+  attacker's success came from custom offsets and a favourable target profile.
+- Fragnesia is **not in CISA KEV** (catalog 2026.10.27); our two CVEs remain listed, due 29 Oct.
+- The Unit 42 retraction (25 Oct) remains retracted. This Dream report is a different claim, from a different
+  source, about a different (undisclosed) environment.
+
+### 59.5 Our exposure reading
+Any internet-exposed management interface on an appliance that bundles PHP 8.0.30 (or another affected
+build) is now a demonstrated path to root, with a second kernel bug needed for privilege escalation. The
+defensive actions are the ones already in our PAN-OS guidance, plus appliance-specific checks: look for PHP
+web shells in web-accessible directories, reverse SSH tunnels persisted via systemd or `rc.local`,
+unexpected `/etc/pam.d/su` content, AD enumeration and sprays originating from appliance management
+servers, and SAML IdP key access. Detection guidance is in
+`04-hunting/incident-firewall-root-2026-10-25.md`.

@@ -344,7 +344,8 @@ The zip's own hash cannot be embedded inside itself, so it ships as a sidecar
     decoded-body digests, 14 shell commands. IOC/hunt file: `04-hunting/honeypot-rce-2026-10-24.md`.
 78. **Detection additions (validated):** Suricata `2202610125` (no User-Agent + PHP_SESSION_UPLOAD_PROGRESS)
     and `2202610126` (B2 size 451,384); Sigma `lnx_apache_worker_shell_spawn`. Rules now 27 Suricata /
-    14 Sigma. **Our boundary rule `2202610123` was validated in the wild**: attackers used `CCCCCCCCCC`.
+    5 Sigma in this package (the earlier "14" counted outreach drafts that were never shipped; corrected
+    28 Oct). **Our boundary rule `2202610123` was validated in the wild**: attackers used `CCCCCCCCCC`.
 79. **Nuance recorded:** in-the-wild traffic matches the 9bie PoC family, but early chains lacked pointers
     above that revision's filter, so a modified or different build was used. Consistent with our lab
     failure on that exact revision; capability statement unchanged.
