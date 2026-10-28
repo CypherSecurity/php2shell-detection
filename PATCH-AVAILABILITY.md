@@ -222,6 +222,18 @@ Advisory: *"Vulnerabilities in PHP Affecting Cisco Products: October 2026"*
 Cisco lists workarounds in the relevant bug IDs. Planned release versions are not downloads: confirm in the
 Cisco download channel before scheduling.
 
+### Siemens RUGGEDCOM APE1808 (with PAN-OS) — affected; remediate via PAN-OS
+
+Advisory **SSA-566512** (published 2026-10-23, V1.0): **RUGGEDCOM APE1808** devices running PAN-OS are
+affected in **every listed PAN-OS branch: 10.2, 11.1, 11.2, 12.1, 12.2**. Siemens directs customers to the
+Palo Alto Networks advisories and workarounds; there is no separate Siemens firmware fix listed in V1.0. In
+practice the PAN-OS fix chain in section 7b is the remediation, and the APE1808 must follow its branch's
+PAN-OS release.
+
+Why this matters for scanning: NVD added Siemens CPE entries (`ruggedcom_ape1808_firmware`,
+`ruggedcom_ape1808`) to both CVEs on 2026-10-28, so CPE-based scanners will flag these industrial edge
+devices. They are PAN-OS hosts, not a separate PHP runtime.
+
 ### Other vendor positions worth checking (not tracked in detail here)
 Red Hat, Ubuntu, Debian, cPanel, Plesk, Sophos and Veeam have published positions; the distributions are
 covered in sections 3 to 5 above. Broadcom has a portfolio response with isolated affected products

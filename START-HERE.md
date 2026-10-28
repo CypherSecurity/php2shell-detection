@@ -66,7 +66,8 @@ Two of those (`12.1.7-h11`, `12.2.4-h1`) arrived ahead of their ETAs.
 
 **Appliance vendors beyond PAN-OS:** **Citrix NetScaler ADC / Gateway** are impacted and fixes were
 published 27 Oct (CTX697263: 14.1-73.49, 13.1-64.32). **Cisco** Expressway fix (15.5.21) is still pending
-and URWB is planned for Feb 2027. See `PATCH-AVAILABILITY.md` §8c.
+and URWB is planned for Feb 2027. **Siemens RUGGEDCOM APE1808** devices running PAN-OS are affected in all
+listed PAN-OS branches (Siemens advisory SSA-566512); remediation is the PAN-OS fix for their branch. See `PATCH-AVAILABILITY.md` §8c.
 
 One correction matters here: **WF-500 / WF-500-B are not affected** (vendor corrected its 23 Oct
 listing); **Panorama remains affected with no fix date**. PAN rates its product impact **8.7 HIGH**.

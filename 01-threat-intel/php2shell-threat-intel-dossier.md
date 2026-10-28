@@ -2160,3 +2160,22 @@ still cannot call FPM confirmed. A fair reproduction would build PHP the same wa
 lab's own `calibrate` against the Docker build (which the client supports).
 
 **Status: UNVERIFIED.** Affected builds claim now includes 7.4.33. Exposure shape unchanged.
+
+
+## 54. Product-scope addition (2026-10-28) — Siemens RUGGEDCOM APE1808 (PAN-OS host)
+
+**Trigger:** NVD's 28 October modification of both CVEs added Siemens CPE configurations
+(`cpe:2.3:o:siemens:ruggedcom_ape1808_firmware` and the hardware CPE) alongside the PHP CPEs. That makes
+industrial edge devices visible to CPE-based scanners, so the product scope needed checking.
+
+**Source:** Siemens advisory **SSA-566512** *"PHP2Shell Vulnerabilities in Palo Alto Networks PAN-OS on
+RUGGEDCOM APE1808 Devices"*, published 2026-10-23, V1.0, CVSS v3.1 9.8 / v4.0 9.2. It lists **RUGGEDCOM
+APE1808 with PAN-OS, all versions** affected across **10.2, 11.1, 11.2, 12.1 and 12.2** branches, and points
+to the PAN-OS advisories for remediation. No separate Siemens firmware fix in V1.0.
+
+**Reading:** this is not a fourth independent PHP runtime. It is a PAN-OS host in an industrial form factor,
+so the PAN-OS fix chain applies and the APE1808 follows its branch's release. It also means "patch your
+PAN-OS management plane" guidance should include OT estates hosting PAN-OS on APE1808, where change windows
+are slower.
+
+**Coverage:** added to `PATCH-AVAILABILITY.md` §8c and `START-HERE.md` appliance line.
