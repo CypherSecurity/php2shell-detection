@@ -258,7 +258,8 @@ withheld; no IOCs published; single source, not independently verified.
 - The appliance's management interface was the entry point. Any internet-exposed appliance management
   interface running an affected PHP build is in the demonstrated attack path.
 - **Two patch layers:** the PHP runtime fix (vendor firmware or backported package) **and** the kernel fix
-  for CVE-2026-46300. Patching only PHP leaves the root escalation available.
+  for CVE-2026-46300. Patching only PHP leaves the root escalation available. **Both are now KEV-listed:**
+  PHP2Shell due **29 Oct**, Fragnesia (CVE-2026-46300) added 28 Oct and due **31 Oct**.
 - The report does not name the vendor, so use the vendor-advisory checks in section 8c for every appliance
   you own, and treat "runs PHP 8.0.30" as a reason to look harder.
 - Detection guidance (web shell, reverse SSH tunnel, `/etc/pam.d/su` tampering, AD spray from management

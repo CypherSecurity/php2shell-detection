@@ -164,7 +164,8 @@ with a reverse SSH tunnel, decrypted LDAP service-account password, full user/gr
 spray. 22 other firewalls remain parked with web shells.
 
 **Caveats, deliberately kept:** vendor and versions **withheld**; **no IOCs published**; single vendor source,
-**not independently verified by us**; no organisation has named itself. Fragnesia is **not in CISA KEV**.
+**not independently verified by us**; no organisation has named itself. **Fragnesia was added to CISA KEV on
+28 Oct (CVE-2026-46300, due 31 Oct)**, so both halves of that chain now carry KEV deadlines.
 
 **Net position change: "no compromise reported" is no longer accurate.** There is a vendor-reported,
 government-affiliated, unnamed victim. What remains absent is a named organisation and independent

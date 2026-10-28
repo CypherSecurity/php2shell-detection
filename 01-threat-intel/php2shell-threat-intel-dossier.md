@@ -2372,3 +2372,25 @@ web shells in web-accessible directories, reverse SSH tunnels persisted via syst
 unexpected `/etc/pam.d/su` content, AD enumeration and sprays originating from appliance management
 servers, and SAML IdP key access. Detection guidance is in
 `04-hunting/incident-firewall-root-2026-10-25.md`.
+
+
+## 60. UPDATE (2026-10-28) — Fragnesia (CVE-2026-46300) added to CISA KEV, due 31 Oct
+
+### 60.1 The change
+CISA added **CVE-2026-46300** (Linux Kernel, "missing initialization of a variable" allowing unintended
+modification of page-cache-backed data via socket-buffer coalescing and ESP input processing) to KEV on
+**2026-10-28**, with a **2026-10-31** remediation due date (catalog 2026.10.28, 1,762 entries). This is the
+kernel LPE that Dream Group reported chained after PHP2Shell to gain root on 25 rooted appliances (§59).
+
+### 60.2 What it corrects
+§59 recorded "Fragnesia is not in CISA KEV" (true when written, catalog 2026.10.27). That is now wrong.
+
+### 60.3 Why it matters
+**Both halves of the observed real-world chain are now KEV-listed:**
+- PHP2Shell (CVE-2026-109618 / CVE-2026-109619), added 26 Oct, due **29 Oct**.
+- Fragnesia (CVE-2026-46300), added 28 Oct, due **31 Oct**.
+
+For appliance estates this closes a gap in urgency: patching the PHP runtime does not remove the root stage.
+The kernel fix is a separate, now-deadline-bound action. The KEV description matches the technique Dream
+described (page-cache modification), which is independent corroboration that the kernel bug is the one used,
+though not verification of the victim claim itself.
