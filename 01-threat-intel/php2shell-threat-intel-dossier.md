@@ -2248,3 +2248,31 @@ This is a reading correction, not a vendor change: no PAN advisory revision move
 was treating a missing row as a negative fact. Standing rule: when a vendor publishes a single shared fix
 table plus an applicability note naming extra products, apply the table to those products unless a **separate
 row** contradicts it.
+
+
+## 57. Cisco advisory v1.8 (2026-10-27): URWB fix slipped to March 2027, ISE Portal Builder listed
+
+### 57.1 What changed
+Cisco's advisory `cisco-sa-php-october26-Jj384Daq` is now **version 1.8, last updated 27 October 2026
+20:49 GMT** (we had cited the 26 Oct revision). Two changes matter:
+
+1. **Ultra-Reliable Wireless Backhaul (URWB)**: fixed release **27.1.1 now planned March 2027**, not
+   February 2027. Bug CSCwx37073. Exploitation requires administrator authentication, CVSS 6.6, workaround
+   documented in the bug.
+2. **Identity Services Engine (ISE) Portal Builder**: now listed as affected with the remedy
+   **"Offline for remediation"** and no fixed release. No bug ID is published for it in the table;
+   workarounds are referenced from the advisory.
+
+Unchanged: Expressway Series / Select Series fix **15.5.21** with no date, and Duo Access Gateway fixed in
+**3.2.0**.
+
+### 57.2 Why it matters
+Our `PATCH-AVAILABILITY.md` §8c said URWB was planned for February; that date has moved a month later, and a
+product we were not listing at all (ISE Portal Builder) is now affected. Neither changes exposure for
+PHP-runtime estates, but both matter to anyone using the Cisco table for scheduling.
+
+### 57.3 Process gap
+Our monitor does not watch the Cisco advisory; the change surfaced because NCSC-NL's software list began
+listing Cisco ISE and URWB rows and I checked the primary source. Cisco publishes "Last Updated" plus a
+version number, so it is tractable to watch. Candidate for the monitor: parse `Last Updated` and the URWB /
+ISE rows. Not yet implemented.
