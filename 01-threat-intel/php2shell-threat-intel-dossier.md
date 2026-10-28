@@ -2276,3 +2276,26 @@ Our monitor does not watch the Cisco advisory; the change surfaced because NCSC-
 listing Cisco ISE and URWB rows and I checked the primary source. Cisco publishes "Last Updated" plus a
 version number, so it is tractable to watch. Candidate for the monitor: parse `Last Updated` and the URWB /
 ISE rows. Not yet implemented.
+
+
+## 58. Cisco advisory v1.9 (2026-10-28 16:48 GMT): URWB fix accelerated to November 2026
+
+### 58.1 The change
+One hour after we corrected our Cisco table to v1.8's **March 2027** URWB date, Cisco published **v1.9**
+(28 Oct 16:48 GMT). It moves the Ultra-Reliable Wireless Backhaul fixed release **27.1.1 from March 2027 to
+November 2026**, a four-month acceleration. ISE Portal Builder remains "offline for remediation"; Expressway
+Series remains on 15.5.21 with no date; Duo Access Gateway remains fixed in 3.2.0.
+
+Verified directly from the advisory: *"Last Updated: 2026 October 28 16:48 GMT Version 1.9"* and the row
+`CSCwx37073 | 27.1.1 (Nov 2026)`.
+
+### 58.2 Monitor change that caught it
+The v1.8 lag was found manually (via NCSC-NL rows). Within the same hour I added a Cisco advisory section to
+`check.sh` (section 7c): it parses `Last Updated` + version, the URWB and Expressway fixed-release rows, and
+the ISE row status, and the ALERTS block now fires on any version change. Its first live run caught v1.9 and
+the URWB acceleration before any other source reflected it.
+
+### 58.3 Lesson
+Two vendor revisions in 24 hours, with a four-month date swing between them. Single-source, one-shot vendor
+reads age badly; a version-and-date watch is cheap and this one immediately paid. Treat any planned release
+date in customer material as an estimate with the revision number attached.

@@ -215,14 +215,14 @@ you would treat PAN-OS MGT.
 ### Cisco — PARTLY AFFECTED, mostly fixes not yet available
 
 Advisory: *"Vulnerabilities in PHP Affecting Cisco Products: October 2026"*
-(cisco-sa-php-october26-Jj384Daq), **last updated 27 Oct 20:49 GMT, version 1.8**. Cisco's rule: a product not
-listed is not affected. Version 1.8 moved the URWB fix to March 2027 and listed ISE Portal Builder as
-offline for remediation.
+(cisco-sa-php-october26-Jj384Daq), **last updated 28 Oct 16:48 GMT, version 1.9**. Cisco's rule: a product not
+listed is not affected. **v1.9 accelerated the URWB fix to November 2026** (v1.8 had said March 2027); ISE
+Portal Builder remains offline for remediation.
 
 | Cisco product | Bug | Fixed release |
 |---|---|---|
 | Expressway Series / Expressway Select Series | CSCwx37062 | **15.5.21**, availability date TBD |
-| Ultra-Reliable Wireless Backhaul (URWB) | CSCwx37073 | **27.1.1, now planned March 2027** (was February). Requires administrator authentication, CVSS 6.6, workaround available |
+| Ultra-Reliable Wireless Backhaul (URWB) | CSCwx37073 | **27.1.1, now planned November 2026** (v1.8 said March 2027; v1.9 accelerated it). Requires administrator authentication, CVSS 6.6, workaround available |
 | Duo Access Gateway | — | **3.2.0** (released) |
 | Identity Services Engine (ISE) Portal Builder | — | **Offline for remediation**; no fixed release listed. Workarounds in the advisory |
 
