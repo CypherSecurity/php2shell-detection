@@ -2179,3 +2179,29 @@ PAN-OS management plane" guidance should include OT estates hosting PAN-OS on AP
 are slower.
 
 **Coverage:** added to `PATCH-AVAILABILITY.md` §8c and `START-HERE.md` appliance line.
+
+
+## 55. PAN-OS: three more hotfixes released (advisory timeline 2026-10-28)
+
+### 55.1 What shipped
+The advisory's 28 October timeline entry: *"Removed ETAs for 11.2.7-h23, 11.2.13-h4 and 11.2.16-h1 as
+these versions are released."* Released total is now **14 of 20 builds**:
+
+- 25 Oct: `10.2.18-h13`, `11.1.16-h4`, `11.2.10-h16`
+- 26 Oct: `11.1.4-h38`, `11.1.6-h40`, `11.1.10-h36`, `11.1.13-h16`
+- 27 Oct: `10.2.13-h27`, `10.2.16-h12`, `12.1.7-h11`, `12.2.4-h1`, plus the three announced above
+
+Remaining **6**, all with 29–30 Oct ETAs: `12.1.4-h13`, `12.1.10-h3`, `11.1.7-h12`, `11.2.4-h23`,
+`10.2.7-h39`, `10.2.10-h42`. **Panorama still has no fix date.** `11.2.13-h4` thus shipped one day after
+its own 27 Oct ETA, consistent with the docs-first pattern rather than a plan change.
+
+### 55.2 `11.2.10-h17` note
+The advisory FAQ states the same hotfix covers both the PHP and Brotli vulnerabilities, with the exception
+that `11.2.10-h16` contains the PHP fix only while `11.2.10-h17` contains both. If an estate also tracks the
+Brotli KEV entry (`CVE-2026-111497`, added 27 Oct), `h17` is the build that clears both.
+
+### 55.3 Monitor defect found and fixed
+Our released-build parser required the phrase "removed **the** ETAs for". The 28 October entry drops "the",
+so the three builds were counted as pending while the advisory already listed them as released. The
+`pan.pending_fix_rows` and `pan.timeline_latest` changes exposed the discrepancy, and the ALERTS block
+flagged the corrected released list after the fix. Parser now accepts the optional "the".
