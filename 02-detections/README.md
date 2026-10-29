@@ -88,7 +88,7 @@ pid … exit signal"), and **unexpected outbound connections from PHP workers** 
 ## v2.3 — rules validated against the first public in-the-wild dataset (added 2026-10-27)
 
 Source: **`0x4D31/honeypot-data`**, `reports/php2shell` (35 confirmed shells, 22–24 Oct; packet captures and
-process records per case). Now **34 Suricata rules** and **7 Sigma rules**.
+process records per case). Now **36 Suricata rules** and **7 Sigma rules**.
 
 | New rule | Signal | Confidence |
 |---|---|---|
