@@ -2448,3 +2448,25 @@ patch is the complete fix.
 Its exploit code and detection rule bodies. We built our own signatures from the described behaviour. Its
 chain claims remain unverified; testing five chains is a larger lab effort than the single-tool benchmark we
 ran.
+
+
+## 62. PAN-OS fixes nearly complete (2026-10-29): 19 of 20 builds released, one pending
+
+### 62.1 What shipped
+Advisory timeline, 29 Oct: *"Removed ETAs for 10.2.7-h39, 10.2.10-h42, 11.2.4-h23, 12.1.4-h13 and 12.1.10-h3
+as these versions are released."* Released total **19 of 20**. Only **`11.1.7-h12`** remains pending, with an
+ETA of **30 Oct**.
+
+Released by wave:
+- 25 Oct: `10.2.18-h13`, `11.1.16-h4`, `11.2.10-h16`
+- 26 Oct: `11.1.4-h38`, `11.1.6-h40`, `11.1.10-h36`, `11.1.13-h16`
+- 27 Oct: `10.2.13-h27`, `10.2.16-h12`, `12.1.7-h11`, `12.2.4-h1`
+- 28 Oct: `11.2.7-h23`, `11.2.13-h4`, `11.2.16-h1`
+- 29 Oct: `10.2.7-h39`, `10.2.10-h42`, `11.2.4-h23`, `12.1.4-h13`, `12.1.10-h3`
+
+**Panorama uses the same releases** (§56). **WF-500 / WF-500-B remain not affected.** Docs-first staging again
+preceded this wave: three of these builds had release-notes pages live before publication.
+
+### 62.2 What remains
+One build, `11.1.7-h12`, ETA 30 Oct. Until it lands, 11.1.x estates below `11.1.16-h4` that cannot move branch
+still need the interim controls. Everything else in scope can be upgraded today.

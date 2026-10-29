@@ -64,7 +64,7 @@ so the two cannot drift. Safe to share with customers; it contains no exploit co
 ## 🚨 If you run Palo Alto PAN-OS or Panorama — read this first (added 2026-10-23)
 
 **PAN-OS / Panorama are affected by both CVEs, no special configuration required.** Fixes are now
-**shipping**: 14 hotfix builds released on 25–27 Oct (`10.2.18-h13`, `11.1.16-h4`, `11.2.10-h16`,
+**shipping**: 19 hotfix builds released on 25–29 Oct (`10.2.18-h13`, `11.1.16-h4`, `11.2.10-h16`,
 `11.1.4-h38`, `11.1.6-h40`, `11.1.10-h36`, `11.1.13-h16`, `10.2.13-h27`, `10.2.16-h12`, `12.1.7-h11`,
 `12.2.4-h1`); 9 more on ETA 27–30 Oct. Panorama and
 Two of those (`12.1.7-h11`, `12.2.4-h1`) arrived ahead of their ETAs.
@@ -84,7 +84,7 @@ Panorama). PAN rates its product impact **8.7 HIGH**.
   inspects management traffic (route MGT via a DP port, replace the inbound cert, decrypt inbound,
   enable threat prevention on management services).
 - **Check your branch first** — the released builds cover 10.2.18/10.2.13/10.2.16, 11.1.4/6/10/13/16, 11.2.7/10/13/16, 12.1.7 and 12.2.4.
-Six builds remain pending, all with 29 or 30 Oct ETAs (`12.1.4-h13`, `12.1.10-h3`, `11.1.7-h12`, `11.2.4-h23`, `10.2.7-h39`, `10.2.10-h42`).
+**Only `11.1.7-h12` remains pending (ETA 30 Oct); every other build is released.**
 - **Do not** assume patching your web servers fixes the firewall — PAN-OS ships its own embedded
   PHP. Only PAN-OS maintenance releases address it.
 - **Industrial:** Siemens **RUGGEDCOM APE1808** hosting PAN-OS is affected (SSA-566512) —

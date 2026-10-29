@@ -119,16 +119,16 @@ dpkg -l | grep -E '^ii\s+php' | awk '{print $2, $3}'
 ## 7b. ⚠️ Palo Alto Networks PAN-OS / Panorama — affected; **fixes now shipping (since 25 Oct)**
 
 PAN-OS and Panorama are **affected** by both CVEs, with **no special configuration required**.
-**14 of 20 hotfix builds are released; 6 remain pending with ETAs 29–30 Oct 2026.** PAN rates its own
-product impact **CVSS-B 8.7 HIGH** (suggested urgency: MODERATE).
+**19 of 20 hotfix builds are released; only `11.1.7-h12` remains pending (ETA 30 Oct 2026).** PAN rates its
+own product impact **CVSS-B 8.7 HIGH** (suggested urgency: MODERATE).
 
 | Branch | Fixed builds | Status |
 |---|---|---|
 | 12.2 | `12.2.4-h1` | released 27 Oct |
-| 12.1 | `12.1.7-h11` released · `12.1.4-h13` · `12.1.10-h3` | pending 10/29 – 10/30 |
-| 11.2 | `11.2.10-h16` · `11.2.7-h23` · `11.2.13-h4` · `11.2.16-h1` released · `11.2.4-h23` | pending 10/30 |
-| 11.1 | `11.1.4-h38` · `11.1.6-h40` · `11.1.10-h36` · `11.1.13-h16` · `11.1.16-h4` released · `11.1.7-h12` | pending 10/30 |
-| 10.2 | `10.2.18-h13` · `10.2.13-h27` · `10.2.16-h12` released · `10.2.10-h42` · `10.2.7-h39` | pending 10/29 – 10/30 |
+| 12.1 | `12.1.7-h11` · `12.1.4-h13` · `12.1.10-h3` | all released by 29 Oct |
+| 11.2 | `11.2.10-h16` · `11.2.7-h23` · `11.2.13-h4` · `11.2.16-h1` · `11.2.4-h23` | all released by 29 Oct |
+| 11.1 | `11.1.4-h38` · `11.1.6-h40` · `11.1.10-h36` · `11.1.13-h16` · `11.1.16-h4` released · `11.1.7-h12` | **last pending, ETA 30 Oct** |
+| 10.2 | `10.2.18-h13` · `10.2.13-h27` · `10.2.16-h12` · `10.2.7-h39` · `10.2.10-h42` | all released by 29 Oct |
 
 
 **UPDATE 2026-10-26 — hotfixes have begun to ship.** Palo Alto's advisory carries its own timeline:
@@ -142,7 +142,8 @@ CVE-2026-109618".
 | **Released 25 Oct** | `10.2.18-h13` · `11.1.16-h4` · `11.2.10-h16` |
 | **Released 27 Oct** | `10.2.13-h27` · `10.2.16-h12` · `12.1.7-h11` · `12.2.4-h1` · `11.2.7-h23` · `11.2.13-h4` · `11.2.16-h1` (timeline confirmed 28 Oct) |
 | **Released 26 Oct** | `11.1.4-h38` · `11.1.6-h40` · `11.1.10-h36` · `11.1.13-h16` |
-| Still pending (ETA) | `11.1.7-h12` (10/30) · `11.2.4-h23` (10/30) · `10.2.7-h39` (10/30) · `10.2.10-h42` (10/29) · `12.1.4-h13` (10/29) · `12.1.10-h3` (10/30) |
+| **Released 29 Oct** | `10.2.7-h39` · `10.2.10-h42` · `11.2.4-h23` · `12.1.4-h13` · `12.1.10-h3` |
+| Still pending (ETA) | **`11.1.7-h12` (10/30) only** |
 
 **Action:** if your branch has a released build, upgrade now (maintenance window, then verify the
 management interface is reachable only from trusted sources). Branches still pending keep the interim
