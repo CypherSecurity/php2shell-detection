@@ -240,3 +240,23 @@ alert http any any -> [$HOME_NET,$HTTP_SERVERS] any (msg:"ET LOCAL LOOK-ALIKE wp
 alert http any any -> [$HOME_NET,$HTTP_SERVERS] any (msg:"ET LOCAL php2shell multipart to PHP with NO User-Agent and PHP_SESSION_UPLOAD_PROGRESS (honeypot-confirmed fingerprint)"; flow:established,to_server; http.method; content:"POST"; http.request_header; content:"multipart/form-data"; nocase; http.request_body; content:"PHP_SESSION_UPLOAD_PROGRESS"; pkt_data; pcre:"/(?![\s\S]*User-Agent\x3a)/iH"; classtype:web-application-attack; sid:2202610125; rev:3; metadata:created_at 2026_10_27, cve CVE-2026-109618, confidence high, source honeypot_0x4d31_2026_10_24, note absent_ua_observed_on_all_35_confirmed_chains;)
 
 alert http any any -> [$HOME_NET,$HTTP_SERVERS] any (msg:"ET LOCAL php2shell execution-stage body size 451384 with fixed-length multipart (honeypot-observed B2)"; flow:established,to_server; http.method; content:"POST"; http.request_header; content:"multipart/form-data"; nocase; pkt_data; pcre:"/(?=[\s\S]*Content-Length\x3a\s*451384)/isH"; classtype:web-application-attack; sid:2202610126; rev:3; metadata:created_at 2026_10_27, cve CVE-2026-109618, confidence medium, source honeypot_0x4d31_2026_10_24, note size_specific_kit_variants_vary;)
+
+# ---------------------------------------------------------------------------
+# v2.5 additions — 2026-10-28 — wild signatures from the ikow tracker (aggregating Arctic Wolf, Sophos,
+# Nokia Deepfield, Wiz, Wordfence, SOCRadar). Not independently verified; the ----p2shell boundary and the
+# Potassium loader URLs are the highest-value additions.
+# ---------------------------------------------------------------------------
+
+alert http any any -> [$HOME_NET,$HTTP_SERVERS] any (msg:"ET LOCAL php2shell scanner User-Agent php2shell-scan/109618"; flow:established,to_server; http.user_agent; content:"php2shell-scan/109618"; nocase; classtype:web-application-attack; sid:2202610127; rev:1; metadata:created_at 2026_10_28, cve CVE-2026-109618, confidence high, source ikow_tracker_2026_10_28;)
+
+alert http any any -> [$HOME_NET,$HTTP_SERVERS] any (msg:"ET LOCAL php2shell scanner User-Agent php2shell-test/2.0.0"; flow:established,to_server; http.user_agent; content:"php2shell-test/2.0.0"; nocase; classtype:web-application-attack; sid:2202610128; rev:1; metadata:created_at 2026_10_28, cve CVE-2026-109618, confidence high, source ikow_tracker_2026_10_28;)
+
+alert http any any -> [$HOME_NET,$HTTP_SERVERS] any (msg:"ET LOCAL php2shell multipart boundary ----p2shell (new kit family)"; flow:established,to_server; http.request_header; content:"boundary=----p2shell"; nocase; classtype:web-application-attack; sid:2202610129; rev:1; metadata:created_at 2026_10_28, cve CVE-2026-109618, confidence high, source ikow_tracker_2026_10_28, note boundary_variant;)
+
+alert http any any -> [$HOME_NET,$HTTP_SERVERS] any (msg:"ET LOCAL Potassium loader payload request (nfs-setup / mountpoint)"; flow:established,to_server; http.uri; content:"/nfs-setup"; nocase; classtype:trojan-activity; sid:2202610130; rev:1; metadata:created_at 2026_10_28, confidence high, source ikow_tracker_2026_10_28, note potassium_mirai_loader;)
+
+alert dns any any -> any any (msg:"ET LOCAL DNS query for Potassium C2 godofthunder.st"; dns.query; content:"godofthunder"; nocase; classtype:trojan-activity; sid:2202610131; rev:1; metadata:created_at 2026_10_28, confidence high, source ikow_tracker_2026_10_28;)
+
+alert http any any -> [$HOME_NET,$HTTP_SERVERS] any (msg:"ET LOCAL Potassium loader mountpoint request"; flow:established,to_server; http.uri; content:"/mountpoint"; nocase; classtype:trojan-activity; sid:2202610132; rev:1; metadata:created_at 2026_10_28, confidence high, source ikow_tracker_2026_10_28, note potassium_mirai_loader;)
+
+alert dns any any -> any any (msg:"ET LOCAL DNS query for Potassium update host botlesscucks.st"; dns.query; content:"botlesscucks"; nocase; classtype:trojan-activity; sid:2202610133; rev:1; metadata:created_at 2026_10_28, confidence high, source ikow_tracker_2026_10_28;)

@@ -1,0 +1,36 @@
+title: Potassium Mirai Variant Process Names (php2shell delivery)
+id: 5d2e7a94-1c63-4b8f-9e47-3a0f6b1d8c25
+status: experimental
+description: |
+  Detects the two process names reported for the Potassium Mirai variant delivered through php2shell
+  (2026-10-22 onwards, per Nokia Deepfield and Sophos as aggregated by a public tracker). Single-source
+  aggregated IOCs, so treat as a lead rather than a complete detection.
+references:
+  - https://github.com/ikow/php2shell-poc/blob/main/docs/EXPLOITATION.md
+  - https://f4n6.co.uk/php2shell/
+author: f4n6
+date: 2026-10-28
+tags:
+  - attack.command_and_control
+  - attack.t1071
+  - cve.2026-109618
+logsource:
+  category: process_creation
+  product: linux
+detection:
+  selection:
+    Image|endswith:
+      - '/dvrLocker'
+      - '/dvrInside'
+    CommandLine|contains:
+      - 'dvrLocker'
+      - 'dvrInside'
+  condition: selection
+falsepositives:
+  - Unlikely outside botnet activity
+level: critical
+fields:
+  - Image
+  - CommandLine
+  - ParentImage
+  - User

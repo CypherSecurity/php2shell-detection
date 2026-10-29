@@ -2394,3 +2394,57 @@ For appliance estates this closes a gap in urgency: patching the PHP runtime doe
 The kernel fix is a separate, now-deadline-bound action. The KEV description matches the technique Dream
 described (page-cache modification), which is independent corroboration that the kernel bug is the one used,
 though not verification of the victim claim itself.
+
+
+## 61. PUBLIC ECOSYSTEM ASSESSMENT (2026-10-28) — ikow repo: 5 chains, botnet delivery, new IOCs
+
+### 61.1 What the repo is
+`ikow/php2shell-poc` (MIT, created 21 Oct, **1,889 stars, 642 forks**, 2.7 MB, Python) describes itself as
+"CVE-2026-109618/109619: 5 RCE chains + detection rules". It is now the most visible public research repo,
+and it also aggregates wild-activity reporting. **We have not tested its chains.**
+
+### 61.2 The five chains (as claimed)
+| Chain | Vector | Pre-auth | Conditions | SAPI |
+|---|---|---|---|---|
+| A | Session injection + LFI | Yes | App has an LFI sink | All |
+| B | var_destroy UAF then handler overwrite | No | App calls `unserialize()` | All |
+| C | Handler mismatch then `__destruct` | Yes | Two dirs with different serialize_handler | FPM |
+| **D** | **OOM corruption then stale `EG()`** | **Yes** | **None, any endpoint** | **mod_php** |
+| **E** | **FPM session OOM then stale `BG()`** | **Yes** | Producer: any `session_start()` endpoint; Consumer: any endpoint | **FPM** |
+
+Chain D is the concerning one: it claims **zero-dependency pre-auth RCE on Apache mod_php**. Chain E claims
+near-universal FPM applicability. If true, our benchmarked shape (Joas tool, mod_php+prefork, needs
+upload_progress) understates the public capability. Two independent projects now claim FPM RCE (this and
+VABISMO, §53), which we still have not reproduced.
+
+### 61.3 Mitigation nuance we had too strong
+Our line was "`session.upload_progress.enabled=0` breaks the path". The repo's own mitigation section agrees
+it blocks the primary upload vector, but states the **Zend-engine OOM corruption (Chain D) has no INI fix**;
+patching is the only complete fix. Corrected in START-HERE: the INI setting reduces attack surface, the PHP
+patch is the complete fix.
+
+### 61.4 Wild activity it aggregates
+- **Potassium**, a Mirai-derived DDoS botnet, delivered via php2shell from **22 Oct**, per Nokia Deepfield
+  and Sophos. Loader host `92.118.112[.]100` (`/nfs-setup` x86, `/mountpoint` ARM), C2 `134.199.154[.]64`
+  and `thunder[.]godofthunder[.]st`, secondary payload `/cCmono`. Two payload SHA-256s listed.
+- **Request signatures:** UA `php2shell-scan/109618`, `php2shell-test/2.0.0`; **new boundary
+  `----p2shell`**; default command `uname -a; id; echo JACKALPOC`.
+- **Scanning sources** (Wordfence): nine IPs.
+- Its tracker also lists the two 0x4D31 honeypot source clusters (`15.204.59[.]70`, `162.35.99[.]94`),
+  attributed to Wiz. Cross-source agreement on the same clusters.
+- "Downstream pre-auth RCE confirmed" list: WordPress, Joomla, Drupal, Magento, Laravel, Roundcube,
+  phpMyAdmin, Nextcloud, Symfony, MediaWiki, WooCommerce, Shopware, WHMCS. Aggregated from Wiz and others,
+  **not verified by us**.
+
+### 61.5 What we adopted
+- New hunting doc `04-hunting/potassium-botnet-php2shell-2026-10-28.md` with defanged IOCs, Potassium wire
+  behaviour (XOR 0xED, fixed header, port pools, process names `dvrLocker`/`dvrInside`, TCP 1234, C2 50792)
+  and hunting queries.
+- Seven new Suricata rules (34 total): scanner UAs, `----p2shell` boundary, loader URLs, C2 domains.
+- One new Sigma rule (7 total): Potassium process names.
+- Monitor tracks the repo and its exploitation tracker for changes.
+
+### 61.6 What we did not adopt
+Its exploit code and detection rule bodies. We built our own signatures from the described behaviour. Its
+chain claims remain unverified; testing five chains is a larger lab effort than the single-tool benchmark we
+ran.

@@ -88,7 +88,7 @@ pid … exit signal"), and **unexpected outbound connections from PHP workers** 
 ## v2.3 — rules validated against the first public in-the-wild dataset (added 2026-10-27)
 
 Source: **`0x4D31/honeypot-data`**, `reports/php2shell` (35 confirmed shells, 22–24 Oct; packet captures and
-process records per case). Now **27 Suricata rules** and **6 Sigma rules**.
+process records per case). Now **34 Suricata rules** and **7 Sigma rules**.
 
 | New rule | Signal | Confidence |
 |---|---|---|
@@ -104,6 +104,13 @@ Full IOC set, body digests and command patterns: `04-hunting/honeypot-rce-2026-1
 **v2.4 (28 Oct):** added Sigma `lnx_pam_su_pam_permit_tamper` (Fragnesia root persistence) and
 `lnx_reverse_ssh_tunnel` (post-exploitation pivot), from the Dream appliance-compromise report. Also new
 hunting guide: `04-hunting/incident-firewall-root-2026-10-25.md`.
+
+**v2.5 (28 Oct):** public ecosystem update. Added Suricata `2202610127`/`…128` (scanner User-Agents
+`php2shell-scan/109618`, `php2shell-test/2.0.0`), `…129` (new boundary family `----p2shell`), `…130`/`…132`
+(Potassium loader `/nfs-setup`, `/mountpoint`), `…131`/`…133` (Potassium C2 domains `godofthunder.st`,
+`botlesscucks.st`), and Sigma `lnx_potassium_mirai_process` (process names `dvrLocker`, `dvrInside`). IOCs
+and bot behaviour: `04-hunting/potassium-botnet-php2shell-2026-10-28.md`. Source: public tracker aggregating
+Arctic Wolf, Sophos, Nokia Deepfield, Wiz, Wordfence, SOCRadar; **not independently verified**.
 
 ## Notes and caveats
 
