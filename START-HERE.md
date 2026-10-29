@@ -25,7 +25,12 @@ Severity: **CVSS v4.0 9.2 each** (vendor) · **NIST v3.1: 9.8 for 109618, 8.1 fo
 
 ---
 
-## TL;DR for whoever you're sending this to
+> **Extra precaution (unresolved separate issue):** a Full Disclosure post claims a PHP-CGI `PATH_INFO`
+> underflow under this CVE. It is real (upstream PR php-src#23411 is open, unmerged) but **not** the CVE as the
+> advisory defines it, and not fixed by the 21 Oct release. Keep the official actions, and additionally set
+> `cgi.fix_pathinfo=0` if you serve CGI or FPM with the default `1`. Details: `PATCH-AVAILABILITY.md` §8e.
+
+## TL;DR for whoever you're sending this to## TL;DR for whoever you're sending this to
 
 Two memory-safety bugs **in PHP core itself** — not in WordPress/Laravel/anything.
 Any `.php` URL can be attacked **before your application code runs**:

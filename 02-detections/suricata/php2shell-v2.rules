@@ -260,3 +260,12 @@ alert dns any any -> any any (msg:"ET LOCAL DNS query for Potassium C2 godofthun
 alert http any any -> [$HOME_NET,$HTTP_SERVERS] any (msg:"ET LOCAL Potassium loader mountpoint request"; flow:established,to_server; http.uri; content:"/mountpoint"; nocase; classtype:trojan-activity; sid:2202610132; rev:1; metadata:created_at 2026_10_28, confidence high, source ikow_tracker_2026_10_28, note potassium_mirai_loader;)
 
 alert dns any any -> any any (msg:"ET LOCAL DNS query for Potassium update host botlesscucks.st"; dns.query; content:"botlesscucks"; nocase; classtype:trojan-activity; sid:2202610133; rev:1; metadata:created_at 2026_10_28, confidence high, source ikow_tracker_2026_10_28;)
+
+# ---------------------------------------------------------------------------
+# v2.6 — 2026-10-29 — CGI SAPI path-underflow probe class (separate unassigned issue; see dossier §63).
+# The Full Disclosure post that raised it suggests %0a/%0d in a URI path to .php endpoints, low FP.
+# ---------------------------------------------------------------------------
+
+alert http any any -> [$HOME_NET,$HTTP_SERVERS] any (msg:"ET LOCAL encoded newline (%%0a) in URI path to PHP endpoint (CGI path-underflow probe)"; flow:established,to_server; http.uri; content:"%0a"; nocase; http.uri; content:".php"; nocase; classtype:web-application-attack; sid:2202610134; rev:1; metadata:created_at 2026_10_29, confidence medium, source full_disclosure_2026_10_27, note cgi_path_info_claim;)
+
+alert http any any -> [$HOME_NET,$HTTP_SERVERS] any (msg:"ET LOCAL encoded carriage return (%%0d) in URI path to PHP endpoint (CGI path-underflow probe)"; flow:established,to_server; http.uri; content:"%0d"; nocase; http.uri; content:".php"; nocase; classtype:web-application-attack; sid:2202610135; rev:1; metadata:created_at 2026_10_29, confidence medium, source full_disclosure_2026_10_27, note cgi_path_info_claim;)

@@ -283,7 +283,18 @@ apps which never change the serialize handler at runtime can leave upload progre
 **This is not a bypass of the 8.5.12 / 8.4.27 / 8.3.36 / 8.2.35 fixes** — see
 `CLARIFICATION-second-vulnerability-claim.md` §6.
 
-## 9. Fleet status summary (2026-10-23)
+## 8e. Unresolved CGI SAPI claim (28 Oct) — separate issue, precaution only
+
+A Full Disclosure post (27 Oct) claims a **PHP-CGI `PATH_INFO` pointer underflow** (CVE-2019-11043 class,
+`sapi/cgi/cgi_main.c`) and labels it CVE-2026-109618. The defect is real (upstream PR **php-src#23411** is
+open), but the **CVE mapping is contested**: the official advisory and release describe OOM corruption, and
+PR #23411 is **not merged**, so it is not fixed by the 21 Oct release as the post claims.
+
+**What to do:** keep the official CVE actions (patch, disable `session.upload_progress`), and **additionally**
+set `cgi.fix_pathinfo=0` if you run CGI or FPM with the default `1`. That is cheap defense-in-depth against an
+unpatched, separate issue, not a substitute for patching. Do not cite the post's exposure figures.
+
+## 9. Fleet status summary## 9. Fleet status summary (2026-10-23)
 
 | Population | Status |
 |---|---|

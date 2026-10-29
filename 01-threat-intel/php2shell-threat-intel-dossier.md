@@ -2470,3 +2470,49 @@ preceded this wave: three of these builds had release-notes pages live before pu
 ### 62.2 What remains
 One build, `11.1.7-h12`, ETA 30 Oct. Until it lands, 11.1.x estates below `11.1.16-h4` that cannot move branch
 still need the interim controls. Everything else in scope can be upgraded today.
+
+
+## 63. COMPETING CLAIM (2026-10-27/29) — "PHP-CGI pointer underflow" posted as CVE-2026-109618
+
+### 63.1 The claim
+A Full Disclosure post by "jose" (27 Oct, message 38; NVD added it as an untagged reference on 29 Oct,
+taking refs to 9 and status to Modified) states that CVE-2026-109618 is **not** the OOM/longjmp corruption but a
+**CGI SAPI pointer underflow** in `sapi/cgi/cgi_main.c`, same class as CVE-2019-11043, affecting all PHP 5.x to
+8.4.26 with `cgi.fix_pathinfo=1`. It claims a four-stage chain (OOB read, fcgi_data_seg pointer leak,
+write primitive, `.user.ini` `auto_prepend_file` injection), 9/9 automated tests, mitigation
+`cgi.fix_pathinfo=0`, and states that disabling `session.upload_progress` does not mitigate it. It also says
+several public "php2shell" PoCs actually exploit the upload_progress UAF, a different vulnerability. Its
+detection suggestion is `%0a`/`%0d` in URI paths targeting `.php`.
+
+### 63.2 What we verified
+- **The underlying defect is real.** Upstream PR **php-src#23411** ("Fix path_info pointer underflow in CGI
+  fix_pathinfo handling", author iliaal, base PHP-8.4) is genuine and explains that FPM received this guard in
+  commit `ab061f95ca9` (CVE-2019-11043, 2019) while CGI did not.
+- **It is not fixed in the 21 Oct security release as the post claims.** PR #23411 is **open and unmerged**
+  (created 22 Aug). `sapi/cgi/cgi_main.c` has no path_info fix in its recent history; the 8.4.27 changelog has
+  no CGI path_info entry. If PHP fixed it privately, the public record does not show it.
+- **The CVE mapping is wrong or contested.** The official advisory for CVE-2026-109618 (GHSA-w8hw-w9fx-j79w)
+  and the 21 Oct release describe OOM/`longjmp` request-cleanup corruption. KEV, the honeypot dataset and every
+  exploitation report we track describe the `session.upload_progress`/OOM chain. Nothing in the primary
+  advisory connects this CVE to a CGI `PATH_INFO` underflow.
+
+### 63.3 Our position
+1. Treat the post as describing **a real but separate, currently unassigned vulnerability** in the CGI SAPI,
+   mislabeled with this CVE ID. The mislabel matters: its advice ("disabling upload_progress does not
+   mitigate") is true for *that bug*, but false for the CVE as defined and exploited.
+2. **Do not change the CVE mitigation.** Patch to 8.5.12/8.4.27/8.3.36/8.2.35, and keep
+   `session.upload_progress` disabled where possible until the next PHP release.
+3. **Add the precaution the post implies**, clearly labelled as defense-in-depth for an unpatched separate
+   issue: if you run CGI or FPM with `cgi.fix_pathinfo=1` (the default), set **`cgi.fix_pathinfo=0`**. It is
+   cheap, it removes a 2019-class path underflow surface, and it costs nothing operationally on modern
+   application layouts.
+4. **Detection:** `%0a`/`%0d` in a URI path targeting `.php` is a reasonable low-FP rule for the CGI issue.
+   Added as SID `2202610134`.
+5. **Do not cite the post's "884,000 exposed hosts" figure.** It is unsourced and does not distinguish the
+   CGI bug from the CVE.
+
+### 63.4 Monitoring
+Added php-src PR #23411 state to the monitor (`php.cgi_pr23411=open|merged`), plus the Full Disclosure
+thread hash. If the PR merges or a CVE is assigned to the CGI bug, that becomes a separate advisory and this
+entry gets a follow-up. NVD reference count is now 9 (was 8) and status `Modified`; neither changes the
+advisory facts.
