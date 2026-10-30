@@ -2580,3 +2580,19 @@ it on its own advisory.
 - **NVD sweep 62 → 95** over the ten-hour gap reflects NVD publication backlog, not a new PHP core CVE; our
   targeted check of 29–30 Oct PHP-keyword records found **no core PHP vulnerability**. No new PHP release
   either (php.version unchanged).
+
+
+## 67. CYFIRMA advisory re-issue (24 Oct) — staging IOC set now captured
+
+The CYFIRMA advisory (`CYF-EWR-2026-1022-PHP2SHELL-DPRK`, page grew to ~226 KB by 30 Oct) now carries the
+indicator set that our earlier coverage lacked: **21 scan-node addresses added, 17 Version 2 addresses and 15
+staging addresses still valid**, plus request-body hashes and operator tradecraft from a closed I2P channel.
+Target set claimed at **581 hosts, expanded from the original 216** across 10 countries.
+
+**Overlaps that raise confidence:** `92.118.112[.]100` is the Potassium loader host; `45.198.224[.]169` and
+`85.11.167[.]243` appear in Wiz/Arctic Wolf reporting; `0c5486f0…` is the Arctic Wolf Potassium ARM payload.
+**Caveat repeated by the advisory:** some hashes are of **HTTP request bodies, not files**, so they only match
+byte-for-byte captures.
+
+Added hunting doc `04-hunting/cyfirma-staging-2026-10-24.md` (defanged, provenance-labelled, caveated). Still
+**suspected** infrastructure; attribution unverified by us; scanning is not compromise.
