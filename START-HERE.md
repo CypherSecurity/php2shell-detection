@@ -11,14 +11,15 @@ Severity: **CVSS v4.0 9.2 each** (vendor) · **NIST v3.1: 9.8 for 109618, 8.1 fo
 > against an Apache mod_php PHP 8.4.26 honeypot (35 shells across three sensors, 24 Oct). This is no
 > longer a "not yet exploited" situation.
 >
-> **Victim position changed on 27 Oct.** Dream Group reports a **vendor-attributed real-world compromise**:
-> 25 servers rooted across the US, Japan, Taiwan and South Korea, including **three systems in a
-> US government-affiliated environment**, using a custom PHP2Shell exploit against an undisclosed firewall
-> vendor's appweb management server plus a kernel LPE (Fragnesia, CVE-2026-46300). **The vendor is
-> undisclosed, no IOCs were published, and no organisation has named itself.** The earlier Unit 42 victim
-> claim remains retracted. **Fragnesia (CVE-2026-46300) was added to KEV on 28 Oct, due 31 Oct**, so both
-> halves of that chain now carry KEV deadlines. KEV means exploited in the wild; the Dream report is a
-> specific but unverified intrusion claim.
+> **Victim position changed again on 29 Oct: the vendor is named and the campaign is verified.** Dream Group's
+> report now names **Palo Alto Networks PAN-OS** as the firewall hit by the custom PHP2Shell + Fragnesia
+> chain (25 servers rooted, including **three systems in a US government-affiliated environment**, US/Japan/
+> Taiwan/South Korea). **Palo Alto Networks' Unit 42 has independently verified the attacker's tooling and
+> confirmed the results**, and Palo Alto's advisory records **active exploitation against internet-exposed
+> management interfaces** (TLP:AMBER, CVSS-BT 9.2). **No victim organisation has named itself, and vendor
+> IOCs are on Palo Alto's site rather than in Dream's post.** Unit 42's earlier European-government claim was
+> retracted on 25 Oct and is separate from this verified PAN-OS campaign. **Fragnesia (CVE-2026-46300) is
+> KEV-listed, due 31 Oct**; php2shell's own KEV deadline was 29 Oct.
 >
 > **Do now:** patch to PHP 8.5.12 / 8.4.27 / 8.3.36 / 8.2.35, restart workers, and check PAN-OS,
 > Citrix NetScaler and Cisco appliances against `PATCH-AVAILABILITY.md`.
@@ -68,11 +69,10 @@ so the two cannot drift. Safe to share with customers; it contains no exploit co
 
 ## 🚨 If you run Palo Alto PAN-OS or Panorama — read this first (added 2026-10-23)
 
-**PAN-OS / Panorama are affected by both CVEs, no special configuration required.** Fixes are now
-**shipping**: 19 hotfix builds released on 25–29 Oct (`10.2.18-h13`, `11.1.16-h4`, `11.2.10-h16`,
-`11.1.4-h38`, `11.1.6-h40`, `11.1.10-h36`, `11.1.13-h16`, `10.2.13-h27`, `10.2.16-h12`, `12.1.7-h11`,
-`12.2.4-h1`); 9 more on ETA 27–30 Oct. Panorama and
-Two of those (`12.1.7-h11`, `12.2.4-h1`) arrived ahead of their ETAs.
+**PAN-OS / Panorama are affected by both CVEs, no special configuration required. All 20 fixes are now
+released** (25–29 Oct), including the final `11.1.7-h12` on 29 Oct. **Palo Alto's advisory records active
+exploitation against internet-exposed management interfaces** (TLP:AMBER, CVSS-BT 9.2). Panorama is covered
+by the same releases.
 
 **Appliance vendors beyond PAN-OS:** **Citrix NetScaler ADC / Gateway** are impacted and fixes were
 published 27 Oct (CTX697263: 14.1-73.49, 13.1-64.32). **Cisco** Expressway fix (15.5.21) is still pending, URWB is now planned for **November 2026** (Cisco accelerated it in advisory v1.9, 28 Oct),
@@ -89,7 +89,7 @@ Panorama). PAN rates its product impact **8.7 HIGH**.
   inspects management traffic (route MGT via a DP port, replace the inbound cert, decrypt inbound,
   enable threat prevention on management services).
 - **Check your branch first** — the released builds cover 10.2.18/10.2.13/10.2.16, 11.1.4/6/10/13/16, 11.2.7/10/13/16, 12.1.7 and 12.2.4.
-**Only `11.1.7-h12` remains pending (ETA 30 Oct); every other build is released.**
+**All 20 builds are released**, including `11.1.7-h12` (29 Oct). No PAN-OS build remains pending.
 - **Do not** assume patching your web servers fixes the firewall — PAN-OS ships its own embedded
   PHP. Only PAN-OS maintenance releases address it.
 - **Industrial:** Siemens **RUGGEDCOM APE1808** hosting PAN-OS is affected (SSA-566512) —

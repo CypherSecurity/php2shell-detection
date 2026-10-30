@@ -1,8 +1,10 @@
 # Hunting guide: appliance rooted via PHP2Shell + Fragnesia (Dream report, 25-27 Oct 2026)
 
 **Source:** Dream Group, *"Chained PHP2Shell Exploit Roots 25 Servers, including US Government Servers"*,
-27 Oct 2026 (artifacts discovered 25 Oct). THN summary 28 Oct. No IOCs published, vendor and versions
-withheld. Single-source, vendor-reported, not independently verified.
+27 Oct 2026, **updated 29 Oct 2026**. **Vendor now named: Palo Alto Networks PAN-OS.** **Unit 42 has
+independently verified the attacker's tooling and confirmed the reported results** (PAN threat brief updated
+29 Oct 11:00 PT); PAN's advisory records active exploitation against internet-exposed management interfaces.
+No named victim organisation; vendor IOCs are on Palo Alto's website, not in Dream's post. THN summary 28 Oct.
 
 **Why it matters:** this is the first vendor-reported real-world compromise chain using these CVEs. It did
 not use the public PoC. It rooted appliances through an exposed management interface, then chained a Linux
@@ -10,8 +12,8 @@ kernel LPE for root.
 
 ## The chain, in order
 
-1. **Discovery:** FOFA search for ~19,000 internet-facing firewalls (undisclosed vendor) with exposed
-   management interfaces.
+1. **Discovery:** FOFA search for ~19,000 internet-facing firewalls (**PAN-OS**) with exposed management
+   interfaces. The management web server is **appweb**, which also fronts the **GlobalProtect portal**.
 2. **Fingerprint:** custom scanner, ~5,000 alive with OS version, filtered to US / JP / TW / KR and PHP
    **8.0.30** branches, yielding 240 targets.
 3. **Exploit:** custom PHP2Shell build against the **`session.upload_progress`** mechanism on the
@@ -72,8 +74,25 @@ government-affiliated systems. 22 further firewalls were left parked with web sh
    authentication from the management server.
 5. Patch both layers: the PHP runtime fix (or vendor firmware) and the kernel LPE.
 
+## PAN-OS-specific containment (added 29 Oct)
+
+The vendor is named, so the containment advice narrows:
+
+1. **Remove internet exposure from PAN-OS management interfaces.** PAN's advisory says the interface is not
+   exposed by default and recommends removing public access if enabled, restricting management to trusted
+   internal IPs, and applying the fixes. The **GlobalProtect portal** shares the appweb stack, so treat an
+   internet-facing portal as part of the same attack surface.
+2. **Patch the management plane.** All 20 PAN-OS hotfixes are released (final build `11.1.7-h12`, 29 Oct).
+   Panorama uses the same releases. WF-500/WF-500-B are not affected.
+3. **Patch the kernel stage.** Fragnesia (CVE-2026-46300) is a separate KEV-listed flaw due 31 Oct. PAN-OS
+   fixes address PHP2Shell; confirm kernel exposure separately for any host that ran vulnerable PHP.
+4. **Ask Palo Alto for the IOCs.** Dream directs readers to Palo Alto's website for indicators; Unit 42's
+   public brief text does not carry hashes or network indicators. Until those are in hand, hunt on technique.
+
 ## Limits
 
-Vendor and versions withheld, no IOCs, no hashes, no IPs. These checks are designed from described
-behaviour, not from observed artefacts. They may produce false positives on legitimate appliance
-management and automation, so baseline first.
+No IOCs, hashes or IPs in Dream's post; vendor IOCs are on Palo Alto's site and are not reproduced here. The
+checks below are designed from described behaviour, not from observed artefacts, and may produce false
+positives on legitimate appliance management and automation. Baseline first. Verification status: campaign
+tooling/results vendor-verified by Unit 42; **victim identity still unnamed**, so this remains a hunting
+guide, not an incident report about any specific organisation.

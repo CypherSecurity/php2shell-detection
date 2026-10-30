@@ -119,15 +119,17 @@ dpkg -l | grep -E '^ii\s+php' | awk '{print $2, $3}'
 ## 7b. ⚠️ Palo Alto Networks PAN-OS / Panorama — affected; **fixes now shipping (since 25 Oct)**
 
 PAN-OS and Panorama are **affected** by both CVEs, with **no special configuration required**.
-**19 of 20 hotfix builds are released; only `11.1.7-h12` remains pending (ETA 30 Oct 2026).** PAN rates its
-own product impact **CVSS-B 8.7 HIGH** (suggested urgency: MODERATE).
+**All 20 hotfix builds are released.** The final build, `11.1.7-h12`, shipped on 29 Oct. PAN's advisory
+records **Exploitation Status: active exploitation targeting the management interface when exposed to the
+internet** (TLP:AMBER, CVSS-BT 9.2). PAN rates its own product impact **CVSS-B 8.7 HIGH** (suggested
+urgency: MODERATE).
 
 | Branch | Fixed builds | Status |
 |---|---|---|
 | 12.2 | `12.2.4-h1` | released 27 Oct |
 | 12.1 | `12.1.7-h11` · `12.1.4-h13` · `12.1.10-h3` | all released by 29 Oct |
 | 11.2 | `11.2.10-h16` · `11.2.7-h23` · `11.2.13-h4` · `11.2.16-h1` · `11.2.4-h23` | all released by 29 Oct |
-| 11.1 | `11.1.4-h38` · `11.1.6-h40` · `11.1.10-h36` · `11.1.13-h16` · `11.1.16-h4` released · `11.1.7-h12` | **last pending, ETA 30 Oct** |
+| 11.1 | `11.1.4-h38` · `11.1.6-h40` · `11.1.10-h36` · `11.1.13-h16` · `11.1.16-h4` · `11.1.7-h12` | all released by 29 Oct |
 | 10.2 | `10.2.18-h13` · `10.2.13-h27` · `10.2.16-h12` · `10.2.7-h39` · `10.2.10-h42` | all released by 29 Oct |
 
 
@@ -143,7 +145,7 @@ CVE-2026-109618".
 | **Released 27 Oct** | `10.2.13-h27` · `10.2.16-h12` · `12.1.7-h11` · `12.2.4-h1` · `11.2.7-h23` · `11.2.13-h4` · `11.2.16-h1` (timeline confirmed 28 Oct) |
 | **Released 26 Oct** | `11.1.4-h38` · `11.1.6-h40` · `11.1.10-h36` · `11.1.13-h16` |
 | **Released 29 Oct** | `10.2.7-h39` · `10.2.10-h42` · `11.2.4-h23` · `12.1.4-h13` · `12.1.10-h3` |
-| Still pending (ETA) | **`11.1.7-h12` (10/30) only** |
+| Released 29 Oct | **`11.1.7-h12`** — **no builds remain pending** |
 
 **Action:** if your branch has a released build, upgrade now (maintenance window, then verify the
 management interface is reachable only from trusted sources). Branches still pending keep the interim
@@ -248,12 +250,14 @@ covered in sections 3 to 5 above. Broadcom has a portfolio response with isolate
 (Symantec Endpoint Protection Manager, Carbon Black App Control Server, CloudSOC SpanVA). If your estate
 includes an appliance not listed here, the vendor advisory is the only reliable source.
 
-## 8d. Appliance compromise reported (28 Oct) — undisclosed firewall vendor, 25 rooted servers
+## 8d. Appliance compromise confirmed (27→29 Oct) — PAN-OS named, Unit 42 verified, 25 rooted servers
 
-Dream Group reports a real-world chain on an **undisclosed firewall vendor's** management server
-(**PHP 8.0.30**, **appweb**) using a custom PHP2Shell exploit plus **Fragnesia (CVE-2026-46300)** kernel LPE
-to gain root on **25 servers**, three of them in a US government-affiliated environment. Vendor and versions
-withheld; no IOCs published; single source, not independently verified.
+Dream Group reports a real-world chain on **Palo Alto Networks PAN-OS** management servers (**PHP 8**, **appweb**,
+which also fronts the GlobalProtect portal) using a custom PHP2Shell exploit plus **Fragnesia
+(CVE-2026-46300)** kernel LPE to gain root on **25 servers**, three in a US government-affiliated environment.
+**Palo Alto Networks' Unit 42 has independently verified the attacker's tooling and results**, and PAN's
+advisory records active exploitation against internet-exposed management interfaces. **No victim organisation
+has named itself; vendor IOCs are on Palo Alto's site.**
 
 **What this means for patching:**
 - The appliance's management interface was the entry point. Any internet-exposed appliance management

@@ -143,17 +143,21 @@ Treat your own 17–23 October window as potentially exposed and hunt accordingl
   (`15.204.59[.]70`, 3 shells; `162.35.99[.]94`, 32 shells). Requests carried **no User-Agent** and a
   ten-character `C` boundary. The chain is consistent with CVE-2026-109618; it does **not** establish a
   separate CVE-2026-109619 path. No second-stage payload was observed.
-- **Still no named organisation** has publicly confirmed a compromise through these CVEs. The Unit 42
-  European-government claim remains **retracted** (§5b below). KEV listing and honeypot compromise are
-  not evidence about any specific customer estate.
-- **Reading:** exploitation is real and working; victim attribution is still absent. Patch urgency is now
-  set by the KEV due date, not by whether a victim has been named.
+- **Victim position changed twice:** Dream Group's 27 Oct report was updated on 29 Oct to **name Palo Alto
+  Networks PAN-OS** as the affected firewall vendor, and **Unit 42 has independently verified the attacker's
+  tooling and results**. That resolves the vendor question and the independence question. **Still no named
+  victim organisation.** Unit 42's earlier European-government claim remains retracted (§5b), a separate
+  matter from the PAN-OS campaign it now confirms.
+- **Reading:** exploitation is real and working, the affected product is now named, and the tooling has
+  independent vendor verification. Victim identity is still absent. Patch urgency was set by the KEV due
+  date; that date has now passed for php2shell (29 Oct), so the operative deadline is the kernel stage,
+  Fragnesia, due 31 Oct.
 
 - **EPSS (27 Oct):** both CVEs are now **0.99999** in First's official daily dataset, up from 0.99981 and
   0.99997 on 25 Oct. Expected model response to KEV plus confirmed exploitation; still a direction
   statement, not a per-host verdict.
 
-## 5d. 🚨 VENDOR-REPORTED REAL-WORLD VICTIM (27 Oct) — 25 appliances rooted, US government-affiliated org
+## 5d. 🚨 CONFIRMED CAMPAIGN (27→29 Oct) — PAN-OS named, Unit 42 verified, 25 servers rooted, US gov-affiliated
 
 Dream Group published on **27 October** (artifacts found 25 Oct) a report of **25 servers rooted** across the
 **US, Japan, Taiwan and South Korea**, including **three systems in a US government-affiliated environment**.
@@ -163,14 +167,21 @@ mechanism on a firewall vendor's appweb management server** (firewall OS **PHP 8
 with a reverse SSH tunnel, decrypted LDAP service-account password, full user/group enumeration and password
 spray. 22 other firewalls remain parked with web shells.
 
-**Caveats, deliberately kept:** vendor and versions **withheld**; **no IOCs published**; single vendor source,
-**not independently verified by us**; no organisation has named itself. **Fragnesia was added to CISA KEV on
-28 Oct (CVE-2026-46300, due 31 Oct)**, so both halves of that chain now carry KEV deadlines.
+**What changed on 29 Oct:** Dream updated the report to name **Palo Alto Networks PAN-OS** as the vendor, and
+state that **Unit 42 has independently verified the attacker's tooling and confirmed the results**. Palo Alto's
+advisory now records **Exploitation Status: active exploitation observed targeting the management interface
+when exposed to the internet** (TLP:AMBER, CVSS-BT 9.2 with E:A). Dream also points readers to Palo Alto's
+website for IOCs, so IOCs exist at the vendor but were not in Dream's post. **Fragnesia was added to KEV on
+28 Oct (CVE-2026-46300, due 31 Oct).**
 
-**Net position change: "no compromise reported" is no longer accurate.** There is a vendor-reported,
-government-affiliated, unnamed victim. What remains absent is a named organisation and independent
-confirmation. Fragment detection guidance:
-`04-hunting/incident-firewall-root-2026-10-25.md`.
+**Caveats kept:** we have not seen the PAN IOCs ourselves; **no organisation has named itself**; the tooling
+verification is a vendor statement, not an independent third-party audit. Unit 42's earlier
+European-government claim remains retracted and is **not** the same as this PAN-OS campaign.
+
+**Net position (29 Oct): a confirmed, independently verified campaign with a named affected product and an
+unnamed victim.** What remains absent is the victim organisation's name and public IOCs we can hand to a
+SOC. Fragment detection guidance:
+`04-hunting/incident-firewall-root-2026-10-25.md`; PAN advisory for vendor IOCs.
 
 ## 5b. ⚠️ CLAIM → RETRACTION (25 Oct): Unit 42's "European government intrusion" was withdrawn
 
@@ -185,14 +196,19 @@ confirmation. Fragment detection guidance:
    initial access is associated with the specific PHP2Shell CVEs. We have retracted our previous update
    from October 23."*
 4. **25 Oct (~21:55 UTC)** — we verified the retraction and reversed the correction here and on the page.
+5. **29 Oct** — Unit 42 published a separate update: it **independently verified Dream's PAN-OS campaign
+tooling and results**. The retraction above still stands for the European-government initial-access claim;
+the verified PAN-OS campaign is a different finding. Dream attributes the campaign to a Chinese-speaking
+actor in UTC+8 and says Unit 42 tracks it as **CL-UNK-1280** (no public confirmation of the CL-UNK label on
+the Unit 42 page we read).
 
 **What survives:** a real attack against a European government agency **in the context of a vulnerable
 PHP application** took place, but initial access is **not confirmed** to be CVE-2026-109618/109619. The
 22.6 million exposed-instance estimate and the patching guidance are unchanged.
 
-**Net position (updated 28 Oct): exploitation is confirmed (KEV, honeypot RCE) and a vendor reports a
-real-world government-affiliated victim (three systems, 25 servers). No organisation has named itself and the
-firewall vendor is undisclosed, so there is still no publicly named victim.** The earlier §30 conclusion was
+**Net position (updated 29 Oct): exploitation is confirmed (KEV, honeypot RCE), the affected product is named
+(PAN-OS) and the campaign tooling is vendor-verified by Palo Alto's Unit 42. The victim is government-affiliated
+(three systems, 25 servers) but unnamed.** The earlier §30 conclusion was
 right; our correction was premature — single-vendor, unconfirmed victim claims should be labelled
 "vendor-reported, unverified", not "confirmed". See dossier §39.6.
 
@@ -202,9 +218,9 @@ assessment, not a victim claim.
 
 ## 6. What would change the picture (watch items)
 
-- First **confirmed** compromise with technical detail (webshell, skimming script, credential theft).
-  *Unit 42's 23 Oct claim was retracted on 25 Oct; the European government intrusion it described is real
-  but its initial access is not confirmed as php2shell. Still open.*
+- First **named victim** organisation. The campaign itself is now confirmed and vendor-verified; what remains
+  open is identity and public IOCs. *Unit 42's 23 Oct European-government claim was retracted on 25 Oct and
+  is separate from the PAN-OS campaign it verified on 29 Oct.*
 - A **public ASLR-bypassing exploit** for x86-64 — would immediately change mass-exploitation odds.
 - **KEV addition** — CISA's confirmation of in-the-wild exploitation.
 - Hosting provider reporting successful intrusion rather than blocked attempts.
@@ -212,11 +228,12 @@ assessment, not a victim claim.
 
 ## 7. What to say if asked "has anyone been hacked?"
 
-> "No organisation has publicly confirmed compromise **from these two CVEs**. One claim came close:
-> Palo Alto Networks Unit 42 described a European government agency intrusion, but **retracted it on 25
-> October**, saying it could not confirm initial access came from php2shell — the attack was real and the
-> application was a vulnerable PHP app, but the CVE attribution is unconfirmed. The one widely reported
-> victim, Sophos, retracted its own claim. With millions of exploitation attempts, a memory-disclosure
+> "A real campaign is confirmed. Dream Group found 25 rooted servers, including three in a US
+government-affiliated environment, and **Palo Alto's Unit 42 has independently verified the attacker's tooling
+and results**. The affected product is PAN-OS. **No victim organisation has named itself, and we have not seen
+the vendor IOCs.** One earlier attribution came close and was retracted: Unit 42's 23 October claim about a
+European government agency could not be tied to php2shell and was withdrawn on 25 October; that is a different
+finding from the PAN-OS campaign it verified on 29 October. With millions of exploitation attempts, a memory-disclosure
 > path that leaves no obvious trace, and an attempt four days before disclosure, absence of confirmed
 > victims is not evidence of safety — hunt from 17 October."
 

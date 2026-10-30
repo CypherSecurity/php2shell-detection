@@ -2516,3 +2516,67 @@ Added php-src PR #23411 state to the monitor (`php.cgi_pr23411=open|merged`), pl
 thread hash. If the PR merges or a CVE is assigned to the CGI bug, that becomes a separate advisory and this
 entry gets a follow-up. NVD reference count is now 9 (was 8) and status `Modified`; neither changes the
 advisory facts.
+
+
+## 64. CONFIRMATION (2026-10-29) — PAN-OS named, Unit 42 independently verified the campaign
+
+### 64.1 What changed
+Dream Group **updated its report on 29 October** (published 27 Oct, updated 29 Oct 18:02 UTC):
+- The affected firewall vendor is now named: **Palo Alto Networks PAN-OS**. Dream says it is "collaborating
+  on an investigation with Palo Alto Networks, the vendor of the firewall in question".
+- **"Palo Alto Networks' Unit 42 has independently verified the attacker's tooling and results"** (Dream's
+  wording). Palo Alto's own Unit 42 brief, updated **29 Oct 11:00 PT**, states: "Unit 42 has independently
+  verified the same attacker's tooling and confirmed the reported results."
+- Dream attributes the campaign to a Chinese-speaking attacker in **UTC+8** and says Unit 42 tracks it as
+  **CL-UNK-1280** (we did not see that label on the Unit 42 page itself).
+- Palo Alto's advisory now records **Exploitation Status: "Active exploitation has been observed targeting the
+  Palo Alto Networks management interface exposed to the internet"** (TLP:AMBER, CVSS-BT 9.2 with E:A).
+- Dream title now reads "Roots 25 Servers, including US Government Servers"; the report adds detail: PAN-OS
+  management web server (**appweb**) also fronts the **GlobalProtect portal**; PAN-OS ships PHP 8; the actor
+  profiled **9 PAN-OS versions** and calibrated memory geometry per version.
+- 22 other firewalls remained web-shell-parked at the time of the report; PAN telemetry shows continued
+  exploitation attempts.
+
+### 64.2 What this resolves
+- **Vendor question: resolved.** The earlier "undisclosed firewall vendor" is PAN-OS.
+- **Independence question: resolved at the tooling level.** Two organisations (Dream, PAN Unit 42) now agree
+  the recovered tooling and results are real. This is vendor verification, not a third-party audit.
+- **Retraction nuance preserved:** Unit 42's **23 Oct European-government claim was retracted on 25 Oct** and
+  is **not** the same finding as the PAN-OS campaign it verified on 29 Oct. Our §39.6 correction stands.
+
+### 64.3 What remains open
+- **No named victim organisation.** "US government-affiliated" is still the strongest description.
+- **No IOCs in our hands.** Dream points to Palo Alto's website; the Unit 42 brief text we extracted contains
+  no hashes or network indicators. Our hunting guide therefore stays technique-based, with vendor IOCs as a
+  follow-up.
+- The claim that Dream's report is "unverified" is now too strong for the tooling/results, and still correct
+  for the victim claim. Wording in §59/§5d adjusted accordingly.
+
+### 64.4 Why the naming matters commercially
+It converts the question from "some firewall vendor might have a problem" into "**check your PAN-OS
+management plane**". We had already covered PAN-OS exposure from 23 Oct (§44–§56, PATCH-AVAILABILITY §7b),
+so the advisory did not need rebuilding, only the victim line and verification status.
+
+## 65. PAN-OS FIXES COMPLETE (29 Oct): 20 of 20 builds released
+
+Final build **`11.1.7-h12` was released on 29 October** (advisory timeline: "Removed ETAs for 11.1.7-h12 as
+the version is released"). **No PAN-OS build remains pending.** Released across 25–29 Oct: 3 + 4 + 4 + 3 + 6
+builds; see §62 for the list. Panorama covered by the same releases; WF-500/WF-500-B not affected.
+
+The 29 Oct wave also carried the **Exploitation Status** line now present on the advisory ("Active
+exploitation has been observed targeting the Palo Alto Networks management interface exposed to the
+internet"). Until this point the exploitation evidence was CISA KEV plus third-party reporting; PAN now states
+it on its own advisory.
+
+## 66. NVD re-analysis closed (29 Oct) — CGI claim not adopted; KEV additions unrelated
+
+- NVD returned CVE-2026-109618 from **Undergoing Analysis to Analyzed** (last modified 29 Oct 17:30 UTC). The
+  **description is unchanged** (OOM/`longjmp` request-cleanup corruption). The Full Disclosure reference we
+  examined in §63 is now tagged **"Mailing List"** rather than untagged, i.e. a discussion reference, not an
+  endorsed description. Our §63 position stands.
+- **KEV catalog 2026.10.29 (1,764, +2):** `CVE-2026-97229` (GitLab CE/EE, due 1 Nov) and `CVE-2026-76418`
+  (Cisco Secure Firewall ASA/FTD, due 1 Nov). Neither is php2shell-related. Both CVE deadlines fall 1 Nov and
+  are worth noting only as competing patch workload.
+- **NVD sweep 62 → 95** over the ten-hour gap reflects NVD publication backlog, not a new PHP core CVE; our
+  targeted check of 29–30 Oct PHP-keyword records found **no core PHP vulnerability**. No new PHP release
+  either (php.version unchanged).
