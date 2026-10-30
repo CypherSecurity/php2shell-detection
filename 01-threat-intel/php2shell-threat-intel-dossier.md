@@ -2596,3 +2596,15 @@ byte-for-byte captures.
 
 Added hunting doc `04-hunting/cyfirma-staging-2026-10-24.md` (defanged, provenance-labelled, caveated). Still
 **suspected** infrastructure; attribution unverified by us; scanning is not compromise.
+
+
+### 67.1 Update (30 Oct): advisory restructured into V1–V4; attribution upgraded
+The CYFIRMA page now exposes four dated versions: **V1 (22 Oct, 27 infrastructure/C2 addresses)**, **V2 (23 Oct,
+17 source IPs)**, **V3 (24 Oct, 21 scan-node addresses)** and **V4 (29 Oct, 24 current scan/staging addresses)**.
+The V4 bottom line **upgrades attribution**: Korean-speaking operators, assessed **with high confidence as
+North Korean (DPRK) state-nexus, Lazarus Group ecosystem**, dual financial and espionage mandate. Earlier
+versions said "suspected". Target set claimed at **581 hosts, up from 216**.
+
+Our hunting doc was rewritten around the advisory's own versioning, replacing a flattened list captured from an
+earlier page revision. Hashes: earlier revision showed four, some explicitly **HTTP request-body hashes**; the
+restructured page exposes fewer in text, so we no longer republish them and point to DeCYFIR instead.
