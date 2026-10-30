@@ -218,27 +218,46 @@ you would treat PAN-OS MGT.
 ### Cisco — PARTLY AFFECTED, mostly fixes not yet available
 
 Advisory: *"Vulnerabilities in PHP Affecting Cisco Products: October 2026"*
-(cisco-sa-php-october26-Jj384Daq), **last updated 28 Oct 16:48 GMT, version 1.9**. Cisco's rule: a product not
-listed is not affected. **v1.9 accelerated the URWB fix to November 2026** (v1.8 had said March 2027); ISE
-Portal Builder remains offline for remediation.
+(cisco-sa-php-october26-Jj384Daq), **last updated 30 Oct 19:24 GMT, version 1.10 — marked Final**. Cisco's
+rule: a product not listed is not affected.
 
 | Cisco product | Bug | Fixed release |
 |---|---|---|
 | Expressway Series / Expressway Select Series | CSCwx37062 | **15.5.21**, availability date TBD |
-| Ultra-Reliable Wireless Backhaul (URWB) | CSCwx37073 | **27.1.1, now planned November 2026** (v1.8 said March 2027; v1.9 accelerated it). Requires administrator authentication, CVSS 6.6, workaround available |
+| Ultra-Reliable Wireless Backhaul (URWB) | CSCwx37073 | **26.2.1.9, planned November 2026** (v1.10 corrected the version from 27.1.1 to 26.2.1.9; v1.8 had said March 2027). Requires administrator authentication, CVSS 6.6, workaround available |
 | Duo Access Gateway | — | **3.2.0** (released) |
-| Identity Services Engine (ISE) Portal Builder | — | **Offline for remediation**; no fixed release listed. Workarounds in the advisory |
+| Identity Services Engine (ISE) Portal Builder | — | **Fix deployed, no customer action required** (v1.10; earlier v1.9 said offline for remediation) |
 
 Cisco lists workarounds in the relevant bug IDs. Planned release versions are not downloads: confirm in the
 Cisco download channel before scheduling.
 
-### Siemens RUGGEDCOM APE1808 (with PAN-OS) — affected; remediate via PAN-OS
+### Siemens — RUGGEDCOM APE1808 plus a software portfolio (expanded 29–30 Oct)
 
-Advisory **SSA-566512** (published 2026-10-23, V1.0): **RUGGEDCOM APE1808** devices running PAN-OS are
-affected in **every listed PAN-OS branch: 10.2, 11.1, 11.2, 12.1, 12.2**. Siemens directs customers to the
-Palo Alto Networks advisories and workarounds; there is no separate Siemens firmware fix listed in V1.0. In
-practice the PAN-OS fix chain in section 7b is the remediation, and the APE1808 must follow its branch's
-PAN-OS release.
+**RUGGEDCOM APE1808 (with PAN-OS):** advisory **SSA-566512** (2026-10-23, V1.0): **RUGGEDCOM APE1808**
+devices running PAN-OS are affected in **every listed PAN-OS branch: 10.2, 11.1, 11.2, 12.1, 12.2**. Siemens
+directs customers to the Palo Alto Networks advisories; the PAN-OS fix chain in section 7b is the remediation,
+and the APE1808 must follow its branch's PAN-OS release. No separate Siemens firmware fix.
+
+**Software products:** advisory **SSA-166980** (V1.2, updated **29 Oct**) now lists a much wider affected
+portfolio than the appliance. **Most of it has no fix.** Affected entries include:
+
+| Siemens product | Fix status |
+|---|---|
+| AMIS TS (all versions) | **No fix available** |
+| blueplanet 360 NX3 M6 WM OD IISX (and `- S`) | **No fix available** |
+| Energy Engage V2.0SP9 | **No fix planned** |
+| Energy Engage V3.1SP1 | Upgrade PHP to 8.1.34 release 6 |
+| Spectrum Power 3 (IHM/NagiosXI on RHEL 7) | Red Hat PHP patch for RHEL 7 |
+| Spectrum Power 4 (Nagios/Zabbix, Web Office Portal V3.0–3.2, HISViews V1.0) | **No fix available** |
+| Spectrum Power 7 (IHM/NagiosXI) | Red Hat PHP patch for RHEL 8/9 |
+| Spectrum Power TG (WebConsole/WebQuery on Windows) | Upgrade PHP to 8.5.12 |
+
+A companion advisory, **SSA-566435 (V1.4, updated 30 Oct)**, lists products Siemens has determined are **not
+affected** (component not present). NVD added both SSA-166980 and SSA-566435 as references to both CVEs on
+30 Oct (refs now 11 for 109618, 19 for 109619). The practical point for energy/SCADA estates: this is no
+longer only an appliance question; the affected list includes grid and energy-management software, and where
+Siemens says "no fix available" the mitigation is exposure reduction (management/web interfaces off untrusted
+networks) plus compensating controls.
 
 Why this matters for scanning: NVD added Siemens CPE entries (`ruggedcom_ape1808_firmware`,
 `ruggedcom_ape1808`) to both CVEs on 2026-10-28, so CPE-based scanners will flag these industrial edge

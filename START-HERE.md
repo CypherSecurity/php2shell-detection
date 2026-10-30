@@ -75,9 +75,11 @@ exploitation against internet-exposed management interfaces** (TLP:AMBER, CVSS-B
 by the same releases.
 
 **Appliance vendors beyond PAN-OS:** **Citrix NetScaler ADC / Gateway** are impacted and fixes were
-published 27 Oct (CTX697263: 14.1-73.49, 13.1-64.32). **Cisco** Expressway fix (15.5.21) is still pending, URWB is now planned for **November 2026** (Cisco accelerated it in advisory v1.9, 28 Oct),
-and ISE Portal Builder is offline for remediation. **Siemens RUGGEDCOM APE1808** devices running PAN-OS are affected in all
-listed PAN-OS branches (Siemens advisory SSA-566512); remediation is the PAN-OS fix for their branch. See `PATCH-AVAILABILITY.md` §8c.
+published 27 Oct (CTX697263: 14.1-73.49, 13.1-64.32). **Cisco** Expressway fix (15.5.21) is still pending, URWB is planned for **November 2026** and v1.10 (30 Oct, final) corrects the URWB version to **26.2.1.9**;
+ISE Portal Builder is now **fixed and deployed, no customer action required**. **Siemens:** RUGGEDCOM APE1808 devices running PAN-OS are affected in all listed PAN-OS branches
+(SSA-566512); remediation is the PAN-OS fix. **Siemens also lists a wider affected software portfolio**
+(SSA-166980 V1.2, 29 Oct: AMIS TS, blueplanet NX3, Energy Engage, Spectrum Power 3/4/7/TG), **most with no
+fix available**; see PATCH-AVAILABILITY §8c. See `PATCH-AVAILABILITY.md` §8c.
 
 One correction matters here: **WF-500 / WF-500-B are not affected** (vendor corrected its 23 Oct
 listing); **Panorama is covered by the same hotfixes** (PAN publishes one shared table for PAN-OS and
@@ -92,8 +94,9 @@ Panorama). PAN rates its product impact **8.7 HIGH**.
 **All 20 builds are released**, including `11.1.7-h12` (29 Oct). No PAN-OS build remains pending.
 - **Do not** assume patching your web servers fixes the firewall — PAN-OS ships its own embedded
   PHP. Only PAN-OS maintenance releases address it.
-- **Industrial:** Siemens **RUGGEDCOM APE1808** hosting PAN-OS is affected (SSA-566512) —
-  contact Siemens support.
+- **Industrial:** Siemens **RUGGEDCOM APE1808** hosting PAN-OS is affected (SSA-566512);
+  **Siemens software (Spectrum Power, Energy Engage, blueplanet NX3, AMIS TS) is also affected per
+  SSA-166980, much of it with no fix** — see PATCH-AVAILABILITY §8c.
 - **Not affected:** **WildFire appliances WF-500 / WF-500-B** (all versions). A 23 Oct revision briefly
   listed them as affected, then corrected it. Do not chase WF-500 fixes.
 - **Panorama:** affected, **fixed by the same PAN-OS maintenance releases**; upgrade Panorama to the same

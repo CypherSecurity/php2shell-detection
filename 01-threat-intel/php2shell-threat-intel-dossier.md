@@ -2608,3 +2608,30 @@ versions said "suspected". Target set claimed at **581 hosts, up from 216**.
 Our hunting doc was rewritten around the advisory's own versioning, replacing a flattened list captured from an
 earlier page revision. Hashes: earlier revision showed four, some explicitly **HTTP request-body hashes**; the
 restructured page exposes fewer in text, so we no longer republish them and point to DeCYFIR instead.
+
+
+## 68. Vendor-status update (30 Oct): Cisco advisory final; Siemens portfolio much wider
+
+### 68.1 Cisco v1.10 (30 Oct 19:24 GMT) — marked Final
+- **URWB fixed release corrected to `26.2.1.9`, planned November 2026** (v1.9 had 27.1.1; v1.8 March 2027).
+  The moved version is a correction, not a second acceleration.
+- **Expressway 15.5.21**, availability TBD. **Duo Access Gateway 3.2.0** released.
+- **ISE Portal Builder: "Fix deployed, no customer action required"** (v1.9 had said offline for remediation).
+- Advisory now marked **Final**. Cisco rule remains: unlisted product = not affected.
+
+### 68.2 Siemens SSA-166980 V1.2 (29 Oct) — affected software, mostly unfixed
+Beyond RUGGEDCOM APE1808 (SSA-566512), Siemens lists **AMIS TS, blueplanet 360 NX3 M6 WM OD IISX, Energy
+Engage (V2.0SP9, V3.1SP1), Spectrum Power 3/4/7/TG** as affected. Fix status varies: **no fix available** for
+AMIS TS, blueplanet NX3, Spectrum Power 4; **no fix planned** for Energy Engage V2.0SP9; PHP upgrades for
+Energy Engage V3.1SP1 (8.1.34) and Spectrum Power TG (8.5.12); Red Hat PHP patches for Spectrum Power 3 and 7.
+Companion **SSA-566435 V1.4 (30 Oct)** lists products determined not affected (PHP component not present).
+
+**NVD added both Siemens advisories as references on 30 Oct**, taking refs to **11** (109618) and **19**
+(109619), and moved both records back into analysis (`Undergoing Analysis` / `Modified`). No description or
+metric change yet; the OOM description stands.
+
+### 68.3 Why this matters
+For energy/utility and industrial estates the question is no longer only "patch the firewall". Grid and
+energy-management applications on the list may have **no vendor fix**, so exposure reduction and compensating
+controls are the only near-term options. We have not tested any of these products; the status above is what
+Siemens publishes.
