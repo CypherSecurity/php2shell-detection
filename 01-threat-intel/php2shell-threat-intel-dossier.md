@@ -2667,7 +2667,9 @@ on 0x4D31: most attempts fail, the ones that land go straight to payload retriev
 
 ### 69.2 NCSC-NL / CERT-EU inventory (2 Nov)
 The `NCSC-NL/php2shell` README was restructured on 2 Nov: inventory stats now read **929 products tracked,
-217 vulnerable, 165 fixed** ("software list last status update: 2 November 2026 09:55 CET"), and SPDX output
+217 vulnerable, 165 fixed** ("software list last status update: 2 November 2026 09:55 CET"); by the 11:41 CET
+snapshot the same hour it was **214 vulnerable, 166 fixed**, so a product moved from vulnerable to fixed between
+the two refreshes. SPDX output
 now represents runtime-dependent PHP scopes (PR #77, "investigate-runtime-dependent-advisories"). Their
 guidance aligns with ours: patch, then keep `session.upload_progress.enabled=0` until the next regular PHP
 bugfix release because of CVE-2026-115560. The README also links the Delft telemetry above. Our package now
