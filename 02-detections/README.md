@@ -88,7 +88,7 @@ pid … exit signal"), and **unexpected outbound connections from PHP workers** 
 ## v2.3 — rules validated against the first public in-the-wild dataset (added 2026-10-27)
 
 Source: **`0x4D31/honeypot-data`**, `reports/php2shell` (35 confirmed shells, 22–24 Oct; packet captures and
-process records per case). Now **36 Suricata rules** and **7 Sigma rules**.
+process records per case). Now **42 Suricata rules** and **7 Sigma rules**.
 
 | New rule | Signal | Confidence |
 |---|---|---|
@@ -111,6 +111,14 @@ hunting guide: `04-hunting/incident-firewall-root-2026-10-25.md`.
 `botlesscucks.st`), and Sigma `lnx_potassium_mirai_process` (process names `dvrLocker`, `dvrInside`). IOCs
 and bot behaviour: `04-hunting/potassium-botnet-php2shell-2026-10-28.md`. Source: public tracker aggregating
 Arctic Wolf, Sophos, Nokia Deepfield, Wiz, Wordfence, SOCRadar; **not independently verified**.
+
+**v2.7 (2 Nov): TU Delft live telemetry.** Added Suricata `2202610136`–`…141` for delivery-stage indicators
+observed by the Delft Threat Intelligence Lab across 83,038 exploitation requests (21 Oct–2 Nov):
+`45.74.7[.]227/collect/p2srun.php`, `176.65.139[.]153/wget.sh`, `217.60.102[.]5/sh`,
+`92.118.112[.]100` loader paths, `pastebin.com/raw/wCYGVCBG`, and the `webhook.site` collection UUID
+`c8370342-…`. Full telemetry, funnel and malware hashes: `04-hunting/delft-intellab-telemetry-2026-11-02.md`.
+Source is independent research telemetry, **not verified by us**; rules validated to load under Suricata
+8.0.7.
 
 ## Notes and caveats
 

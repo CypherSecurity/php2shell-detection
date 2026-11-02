@@ -2635,3 +2635,41 @@ For energy/utility and industrial estates the question is no longer only "patch 
 energy-management applications on the list may have **no vendor fix**, so exposure reduction and compensating
 controls are the only near-term options. We have not tested any of these products; the status above is what
 Siemens publishes.
+
+
+## 69. Independent telemetry (2 Nov): TU Delft live data and the NCSC-NL inventory
+
+### 69.1 Delft Threat Intelligence Lab — honeypots + network telescope
+New live source, `php2shell.delftintellab.com` (TU Delft; contributors Harm Griffioen, Zohar Cochavi, Murtuza
+Ali), publishing exploitation data since 20 Oct and refreshing every five minutes. Captured at **2026-11-02
+10:12 UTC**:
+
+- **83,038 exploitation requests, 787 source IPs, 330 ASNs, 73 countries**, 21 Oct 08:37:17 to 2 Nov 10:08:07 UTC.
+- **181 source IPs sent code or a dropper.** Funnel: probe 61,797/672 IPs; code execution 10,597/154;
+  overload 5,916/152; dropper 4,728/51. Busiest hour **26 Oct 14:00 UTC, 8,179 requests**; 819 multipart
+  boundaries; 2,727 sensor addresses hit.
+- First sightings on 21 Oct: request resembling PHP2Shell 08:37:17, high-interaction honeypot 13:00:12,
+  first OS command 13:25:25, first UAF 13:42:29, first dropper 14:25:31, first session deserialization
+  gadget 15:01:07.
+- **Delivery URLs** include `45.74.7[.]227/collect/p2srun.php` (16 IPs), `217.60.102[.]5/sh` (4 IPs),
+  `176.65.139[.]153/wget.sh` (6 IPs), `pastebin.com/raw/wCYGVCBG` (2 IPs), several `webhook.site`
+  collection UUIDs, `217.15.162[.]38:27182`, `134.209.89[.]212`, `87.251.64[.]204`, `185.225.191[.]232`,
+  `191.217.250[.]227:8081`, `45.115.26[.]26:8000`, and **`92.118.112[.]100`** paths `/p`, `/s`, `/nfs`.
+- **Malware:** `nfs` Mirai-derived bot (same SHA-256 prefix `0c5486f0…` as the Potassium sample we already
+  carried), a Mirai 2.0.4_socks5 variant, a Nim implant `crong3-agent` posing as `sysmon` with ENS/Solana C2,
+  and an unidentified DoT beacon. Most active networks are hosting/proxy providers (M247, GSL, Zenlayer,
+  Datacamp, DigitalOcean); **AS presence is not attribution**.
+- Caveat: telescope data includes opportunistic scanning that resembles PHP2Shell without being it; the
+  page itself says "first request resembling". Snapshot values churn.
+
+This is the largest independent view we have of attempt-versus-success, and it matches the ratio we measured
+on 0x4D31: most attempts fail, the ones that land go straight to payload retrieval.
+
+### 69.2 NCSC-NL / CERT-EU inventory (2 Nov)
+The `NCSC-NL/php2shell` README was restructured on 2 Nov: inventory stats now read **929 products tracked,
+217 vulnerable, 165 fixed** ("software list last status update: 2 November 2026 09:55 CET"), and SPDX output
+now represents runtime-dependent PHP scopes (PR #77, "investigate-runtime-dependent-advisories"). Their
+guidance aligns with ours: patch, then keep `session.upload_progress.enabled=0` until the next regular PHP
+bugfix release because of CVE-2026-115560. The README also links the Delft telemetry above. Our package now
+carries Delft-derived delivery rules (Suricata `…136`–`…141`, 42 rules total) and a hunting note
+`04-hunting/delft-intellab-telemetry-2026-11-02.md`.

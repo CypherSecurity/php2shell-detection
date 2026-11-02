@@ -2,7 +2,7 @@
 
 **CVE-2026-109618 / CVE-2026-109619** · PHP pre-auth RCE + silent memory disclosure
 Severity: **CVSS v4.0 9.2 each** (vendor) · **NIST v3.1: 9.8 for 109618, 8.1 for 109619** · Patched **2026-10-21 14:00 UTC**
-**Content current as of 2026-10-24 00:00 UTC** · see `BUILD-INFO.md` for what changed and how to verify you have the latest copy
+**Content current as of 2026-11-02 10:30 UTC** · see `BUILD-INFO.md` for what changed and how to verify you have the latest copy
 
 
 > ## ⚠️ CISA KEV — ACTIVELY EXPLOITED (26 Oct)
@@ -157,7 +157,7 @@ and **a package upgrade without a worker restart leaves you exploitable**.
 | `01-threat-intel/` | everyone | The dossier: root cause, timeline, IOCs, exploitation analysis |
 | `02-detections/` | SOC / detection engineering | Suricata, Zeek, ModSecurity, Sigma, YARA — **ready to deploy** |
 | `03-hardening/` | sysadmin / platform | Apache mod_php, PHP-FPM pool, nginx configs |
-| `04-hunting/` | threat hunting / IR | 29 Splunk/Elastic/Defender/auditd queries |
+| `04-hunting/` | threat hunting / IR | 29 Splunk/Elastic/Defender/auditd queries + live-telemetry note |
 | `05-validation/` | skeptics / managers | Lab evidence that these signatures fire on real traffic |
 
 **Start with `02-detections/README.md`** — it has the coverage matrix and deploy order.
@@ -193,6 +193,11 @@ still appeared. Coverage is environment-independent; exploits are not. Deploy th
 detections, especially `DETECTION-MEMORY-DISCLOSURE.md`.
 
 ## 🔴 UPDATE 2026-10-22 — EXPLOITED IN THE WILD, POSSIBLY SINCE 17 OCTOBER
+
+**2 Nov update:** independent telemetry from the Delft Threat Intelligence Lab (TU Delft) now covers
+83,038 exploitation requests from 787 source IPs since 20 Oct. **181 of those IPs delivered code or a
+dropper**, and the report names the delivery hosts. New delivery rules (`2202610136`–`…141`) and a hunting
+note are in this package: `04-hunting/delft-intellab-telemetry-2026-11-02.md`.
 
 Amazon Threat Intelligence (MadPot honeypot network) reports **first PHP2Shell exploitation
 attempt on 2026-10-17 — four days before disclosure** — from a commercial anonymisation

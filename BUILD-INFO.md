@@ -382,3 +382,10 @@ The zip's own hash cannot be embedded inside itself, so it ships as a sidecar
   `session.upload_progress`-heavy applications.
 - The `display_errors=Off` RCE claim from public research is **unverified** by us.
 - No KEV addition as of this build; the two CVEs remain NVD status `Modified`.
+
+
+## 2026-11-02 10:30 UTC — telemetry increment (v2.7)
+
+Added six Suricata rules (`2202610136`–`…141`, 42 total) for delivery-stage indicators from the Delft Threat
+Intelligence Lab live telemetry, plus `04-hunting/delft-intellab-telemetry-2026-11-02.md`. Rules validated to
+load under Suricata 8.0.7. No detection logic was changed; this widens delivery coverage after code execution.
