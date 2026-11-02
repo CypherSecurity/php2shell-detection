@@ -2699,3 +2699,33 @@ release because of CVE-2026-115560, and treat `cgi.fix_pathinfo=0` only as a pre
 
 Note for the record: NVD's status labels are workflow states, not a quality statement. "Analyzed" here
 confirms the record was reviewed; it does not mean NVD tested exploitation.
+
+
+## 71. PHP follow-up issue status (2 Nov): a correction and a third route
+
+While checking the guard module's new release (v3.2.6, 2 Nov), its README made a checkable claim: three
+non-php2shell PHP issues remain unfixed in any release. Verified directly against php-src on 2 Nov:
+
+| Issue | State | What it is |
+|---|---|---|
+| [php-src#24481](https://github.com/php/php-src/issues/24481) | **closed 30 Oct 2026**, fix in source, **not in any release** | `unserialize()` re-entrancy UAF: cleanup frees bookkeeping, then destructors run, and a destructor calling `unserialize()` works on freed memory. No CVE; PHP does not assign CVEs to `unserialize()` bugs |
+| [php-src#24674](https://github.com/php/php-src/issues/24674) | **open** | Same UAF through further routes (`SplObjectStorage::__unserialize()`, GC destructors, error handlers, `__toString()`, `session_decode()`, fibers). Fix PR [#24751](https://github.com/php/php-src/pull/24751) is **open against master, unmerged** |
+| [php-src#24488](https://github.com/php/php-src/issues/24488) | **closed 22 Oct**, fix in source, **not in any release** | SimpleXML GC double-free **introduced by 8.4.27 / 8.5.12**; crashed worker (`zend_mm_heap corrupted`) |
+| [CVE-2026-115560](https://www.php.net/archive/2026.php#2026-10-23-1) | unfixed | Narrow upload-progress issue; `session.upload_progress.enabled=0` mitigates |
+
+**Correction to our own record:** the package's clarification document described #24481 as *open* as of
+24 Oct. It was closed on 30 Oct when the fix landed in source; it is still unreleased. Updated in
+`CLARIFICATION-second-vulnerability-claim.md` and PATCH-AVAILABILITY §10.
+
+**Do these re-open php2shell?** No. They are separate issues; the php2shell fixes shipped on 21 Oct close
+CVE-2026-109618/109619. But "#24481 and #24488 are closed" must not be read as "fixed for customers": no PHP
+release since 21 Oct contains either fix, and #24488 is a regression the security release itself introduced.
+Practical advice is unchanged: patch to 8.5.12 / 8.4.27 / 8.3.36 / 8.2.35, keep
+`session.upload_progress.enabled=0` until the next release, and stage the upgrade where SimpleXML
+`json_encode`/`(array)` conversions run in reference cycles.
+
+**On the guard module:** `HOSTED-POWER/php_uploadprogress_guard` v3.2.6 (2 Nov) fixes a fiber-isolation bug
+in the module itself (PHP 8.1+: saved `unserialize()` state could be restored after another fiber freed it).
+The project claims parity across the three issues above and a Valgrind-clean test matrix. We have **not**
+tested this module and do not endorse it; it is recorded as a third-party option for hosts that cannot patch
+PHP.

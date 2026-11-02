@@ -349,15 +349,30 @@ reference cycle, PHP aborts the worker with `zend_mm_heap corrupted`.
 | Upstream issue | [php-src#24488](https://github.com/php/php-src/issues/24488) — closed, `Status: Verified` |
 | Affects | PHP 8.4.27 and 8.5.12 (introduced by the security release); 8.3.36 / 8.2.35 not affected by this change |
 | Impact | Availability only — crashed worker, no memory corruption primitive demonstrated |
-| Fix | Merged upstream, **not in any released build** as of 24 October |
+| Fix | Merged upstream 22 October, **not in any released build** as of 2 November (latest releases remain 8.5.12 / 8.4.27 / 8.3.36 / 8.2.35) |
 | What to do | Stage the upgrade; search for the conversion pattern on SimpleXML objects; know the crash signature. **Do not roll back to a vulnerable PHP build.** |
+
+**Other PHP follow-ups, none of which change the php2shell patch advice.** These are not bypasses of the
+php2shell fixes and PHP does not treat them as re-opening CVE-2026-109618/109619:
+
+| Issue | State at 2 November | Relevance |
+|---|---|---|
+| [`php-src#24481`](https://github.com/php/php-src/issues/24481) — `unserialize()` re-entrancy UAF | **closed 30 Oct**, fix in source, **not in any release**; no CVE | Reachable when the application unserializes attacker-controlled data, or by code already executing. Not a php2shell bypass |
+| [`php-src#24674`](https://github.com/php/php-src/issues/24674) — same UAF via `SplObjectStorage::__unserialize()` and other routes | **open**; fix PR [`#24751`](https://github.com/php/php-src/pull/24751) **open against master, unmerged** | Further entry points to the same class of bug. One tracker claims the fix is aimed at the next major only; that is their reading, the PR itself targets master |
+| [`CVE-2026-115560`](https://www.php.net/archive/2026.php#2026-10-23-1) | **unfixed in any release**; `session.upload_progress.enabled=0` is the mitigation | Already in our guidance; see §8e |
+
+Practical read: patching to the 21 October releases remains correct and closes php2shell. These three are
+separate, lower-impact issues that will land in a later PHP release; keep `session.upload_progress.enabled=0`
+until then, and if you run SimpleXML conversions in reference cycles, plan for the #24488 crash.
 
 ## 11. Community mitigation for hosts that cannot patch (third-party)
 
 `HOSTED-POWER/php_uploadprogress_guard` — a native PHP extension that mirrors the official fix for
 CVE-2026-109618/109619 on unpatched PHP, forces `session.upload_progress.enabled=0` (covering
-CVE-2026-115560), and applies upstream fixes for two unrelated PHP bugs by patching from inside the
-extension. Prebuilt for Linux x86_64/aarch64 and Windows x64, with checksums.
+CVE-2026-115560), and applies upstream fixes for three open PHP issues (CVE-2026-115560, the `unserialize()` UAF, and the
+SimpleXML regression) by patching from inside the extension. **v3.2.6 (2 November)** also fixes a
+fiber-isolation bug in the module itself: with PHP 8.1+ fibers, its saved `unserialize()` state could be
+restored after another fiber freed it. We have not tested this module. Prebuilt for Linux x86_64/aarch64 and Windows x64, with checksums.
 
 **Caveats:** third-party native extension loaded into the web server — supply-chain and stability
 risk. It is **not** a substitute for the official fixed builds. Recommended only where patching is
