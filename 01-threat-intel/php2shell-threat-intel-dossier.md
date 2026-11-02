@@ -2668,10 +2668,34 @@ on 0x4D31: most attempts fail, the ones that land go straight to payload retriev
 ### 69.2 NCSC-NL / CERT-EU inventory (2 Nov)
 The `NCSC-NL/php2shell` README was restructured on 2 Nov: inventory stats now read **929 products tracked,
 217 vulnerable, 165 fixed** ("software list last status update: 2 November 2026 09:55 CET"); by the 11:41 CET
-snapshot the same hour it was **214 vulnerable, 166 fixed**, so a product moved from vulnerable to fixed between
-the two refreshes. SPDX output
+snapshot the same hour it was **214 vulnerable, 166 fixed**, then **215 vulnerable, 166 fixed at 15:28 CET**, so
+the inventory is actively reclassifying individual products during the day. SPDX output
 now represents runtime-dependent PHP scopes (PR #77, "investigate-runtime-dependent-advisories"). Their
 guidance aligns with ours: patch, then keep `session.upload_progress.enabled=0` until the next regular PHP
 bugfix release because of CVE-2026-115560. The README also links the Delft telemetry above. Our package now
 carries Delft-derived delivery rules (Suricata `…136`–`…141`, 42 rules total) and a hunting note
 `04-hunting/delft-intellab-telemetry-2026-11-02.md`.
+
+
+## 70. NVD re-analysis closed (2 Nov): status Analyzed, no change of substance
+
+Both records finished re-analysis on **2026-11-02** and are now **`Analyzed`** (modified 2 Nov, were
+`Undergoing Analysis` since 30 Oct when the two Siemens advisories were added as references).
+
+| Field | CVE-2026-109618 | CVE-2026-109619 |
+|---|---|---|
+| Status | **Analyzed** | **Analyzed** |
+| References | 11 | 19 |
+| Description | unchanged, longjmp/OOM corruption, request cleanup reads uninitialized memory, multiple OOM strategies → RCE | unchanged, stale global state pointing into freed request memory reused by later requests → RCE |
+| NIST v3.1 | 9.8 (AV:N/AC:L/PR:N/UI:N) | 8.1 (AV:N/AC:H/PR:N/UI:N) |
+| Vendor v4.0 | 9.2 (AV:N/AC:H/AT:P) | 9.2 |
+| CWE set | CWE-1325, CWE-416, CWE-755, CWE-824 | same |
+
+**What this means:** the re-analysis produced no re-mapping, no description change, no metric change and no
+new authority for the PHP-CGI `PATH_INFO` claim in §63. NVD still describes both bugs as the OOM and stale-state
+conditions, with the CWE set broad enough to cover the memory-safety character. Our guidance is unchanged:
+patch to 8.5.12 / 8.4.27 / 8.3.36 / 8.2.35, keep `session.upload_progress.enabled=0` until the next bugfix
+release because of CVE-2026-115560, and treat `cgi.fix_pathinfo=0` only as a precaution.
+
+Note for the record: NVD's status labels are workflow states, not a quality statement. "Analyzed" here
+confirms the record was reviewed; it does not mean NVD tested exploitation.
