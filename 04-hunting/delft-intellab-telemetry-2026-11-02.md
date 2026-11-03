@@ -125,7 +125,13 @@ anonymisation layer. **AS presence is not attribution**; rented hosts are routin
 
 ## Caveats
 
-- Snapshot values; the page refreshes every five minutes and totals only grow/churn.
+- **Snapshot values, and totals are "as of the page's data window end", not live.** The page re-renders
+  every five minutes, but the lab ingests in batches with pauses: on 3 November the data window froze at
+  10:17 UTC for about 4.5 hours and again from 20:07 UTC, while the refresh timestamp kept advancing. A
+  flat total therefore means *missing data*, not a quiet network. Read the stated window end (for example
+  "2026-10-21 08:37:17 to 2026-11-03 20:07:00 UTC") before drawing any trend conclusion. On recovery the
+  backlog lands in one hour (observed: +338 and +210 catch-up hours), so a post-outage jump with a flat
+  source count is backfill, not a surge.
 - Research telescope data includes opportunistic scanning that resembles PHP2Shell without being it.
   The page's own "first request resembling" wording acknowledges this.
 - Sensor placeholders (`<sensor>`) mean URLs in the source are not literal; we reproduce them with the

@@ -2662,6 +2662,12 @@ Ali), publishing exploitation data since 20 Oct and refreshing every five minute
 - Caveat: telescope data includes opportunistic scanning that resembles PHP2Shell without being it; the
   page itself says "first request resembling". Snapshot values churn.
 
+**Freshness caveat (learned 3 Nov):** the page re-renders every five minutes but the underlying data is
+batched. Twice on 3 November the window end froze for hours (10:17 UTC for about 4.5 h; from 20:07 UTC) while
+the refresh timestamp advanced, so flat totals meant missing data, not quiet activity. Recovery delivers the
+backlog in one hour (+338, then +210), which is backfill rather than a surge when the source-IP count is flat.
+Quote Delft totals as "as of the window end", never as live.
+
 This is the largest independent view we have of attempt-versus-success, and it matches the ratio we measured
 on 0x4D31: most attempts fail, the ones that land go straight to payload retrieval.
 
