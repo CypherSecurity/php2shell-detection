@@ -2683,6 +2683,30 @@ carries Delft-derived delivery rules (Suricata `…136`–`…141`, 42 rules tot
 `04-hunting/delft-intellab-telemetry-2026-11-02.md`.
 
 
+### 69.3 NCSC-NL inventory update (4 Nov): +18 vendor-confirmed fixed scopes
+
+Issue [#81](https://github.com/NCSC-NL/php2shell/issues/81) was opened and closed on 4 November, adding
+**18 fixed scopes** for both CVEs while retaining all existing affected scopes. The inventory now reads
+**948 products tracked, 215 vulnerable, 185 fixed** (status "4 November 2026 08:15 CET"); vulnerable count is
+unchanged, so this is added coverage, not a reclassification of affected products.
+
+The 18 additions, per the issue text:
+
+| Kind | Records |
+|---|---|
+| Containers (7) | EGroupware, Snipe-IT, ProjectSend, Pterodactyl Panel, ownCloud 10, ownCloud 11, Invoice Ninja (Debian and Octane) |
+| Hosted services (5) | EGroupware, Snipe-IT, Centreon, MODX, Vtiger |
+| RHEL 9 SAP Update Services (6) | six RHEL 9 SAP update-service scopes |
+
+The same commit extends the existing **Part-DB** image record to releases **2.20.3 and 2.20.4**, and updates
+the SPDX segments for containers/images, hosting/cloud, OS distributions and observability/admin.
+
+**How to use this:** it answers "which downstream products have a fixed build" for app images and hosted
+services, not just PHP itself. Patch level remains the PHP build; these rows tell you whether a vendor image
+has picked it up. NCSC's guidance is unchanged (patch, keep `session.upload_progress.enabled=0` until the next
+PHP release). This is vendor-published status, not our testing.
+
+
 ## 70. NVD re-analysis closed (2 Nov): status Analyzed, no change of substance
 
 Both records finished re-analysis on **2026-11-02** and are now **`Analyzed`** (modified 2 Nov, were
