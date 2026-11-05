@@ -138,3 +138,8 @@ anonymisation layer. **AS presence is not attribution**; rented hosts are routin
   placeholder intact.
 - We have not independently validated the malware hashes or the C2 claims. Hashes are for triage and
   blocking decisions, and the `nfs` hash matches an independently reported sample.
+- **Coverage gap, measured:** the lab's data window last advanced to **2026-11-04 21:10:31 UTC**. As of
+  **2026-11-05 10:55 UTC** no further data has appeared (page refreshes, total frozen at 85,521). This is an
+  **open-ended gap** of ~13.7 h at the time of writing, longer than any previous episode. Treat every figure
+  above as **as of 2026-11-04 21:10 UTC**, not as current, and do not infer a drop in activity from the flat
+  total. The end of the gap will be recorded here when the data window advances.
