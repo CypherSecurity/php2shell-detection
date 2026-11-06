@@ -218,13 +218,14 @@ you would treat PAN-OS MGT.
 ### Cisco — PARTLY AFFECTED, mostly fixes not yet available
 
 Advisory: *"Vulnerabilities in PHP Affecting Cisco Products: October 2026"*
-(cisco-sa-php-october26-Jj384Daq), **last updated 30 Oct 19:24 GMT, version 1.10 — marked Final**. Cisco's
-rule: a product not listed is not affected.
+(cisco-sa-php-october26-Jj384Daq), **last updated 6 Nov 14:21 GMT, version 1.11 — marked Final**. Cisco's
+rule: a product not listed is not affected. v1.11 marks the URWB / Unified Industrial Wireless fix as
+**available**, and adds Snort rules **1:67375, 1:67359, 1:67360** for the advisory.
 
 | Cisco product | Bug | Fixed release |
 |---|---|---|
 | Expressway Series / Expressway Select Series | CSCwx37062 | **15.5.21**, availability date TBD |
-| Ultra-Reliable Wireless Backhaul (URWB) | CSCwx37073 | **26.2.1.9, planned November 2026** (v1.10 corrected the version from 27.1.1 to 26.2.1.9; v1.8 had said March 2027). Requires administrator authentication, CVSS 6.6, workaround available |
+| Ultra-Reliable Wireless Backhaul (URWB) / Unified Industrial Wireless Software | CSCwx37073 | **26.2.1.9, now available** (v1.11, 6 Nov; v1.10 had it planned for November 2026 and corrected the version from 27.1.1; v1.8 had said March 2027). Requires administrator authentication, CVSS 6.6, workaround available |
 | Duo Access Gateway | — | **3.2.0** (released) |
 | Identity Services Engine (ISE) Portal Builder | — | **Fix deployed, no customer action required** (v1.10; earlier v1.9 said offline for remediation) |
 

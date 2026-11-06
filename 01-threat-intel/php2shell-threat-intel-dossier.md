@@ -2612,7 +2612,14 @@ restructured page exposes fewer in text, so we no longer republish them and poin
 
 ## 68. Vendor-status update (30 Oct): Cisco advisory final; Siemens portfolio much wider
 
-### 68.1 Cisco v1.10 (30 Oct 19:24 GMT) — marked Final
+### 68.0 Cisco v1.11 (6 Nov 14:21 GMT) — URWB fix now available
+- **URWB / Unified Industrial Wireless 26.2.1.9 is now available** (v1.10 had it "planned November 2026").
+  Version already corrected in v1.10 from 27.1.1; v1.8 had said March 2027.
+- Advisory **v1.11, still marked Final**; adds **Snort rules 1:67375, 1:67359, 1:67360**.
+- Expressway **15.5.21** still TBD; Duo Access Gateway 3.2.0 released; ISE Portal Builder fix deployed.
+  Cisco rule unchanged: unlisted product = not affected.
+
+### 68.1 Cisco v1.10 (30 Oct 19:24 GMT) — marked Final (superseded by v1.11)
 - **URWB fixed release corrected to `26.2.1.9`, planned November 2026** (v1.9 had 27.1.1; v1.8 March 2027).
   The moved version is a correction, not a second acceleration.
 - **Expressway 15.5.21**, availability TBD. **Duo Access Gateway 3.2.0** released.

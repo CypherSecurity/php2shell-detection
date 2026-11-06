@@ -75,7 +75,7 @@ exploitation against internet-exposed management interfaces** (TLP:AMBER, CVSS-B
 by the same releases.
 
 **Appliance vendors beyond PAN-OS:** **Citrix NetScaler ADC / Gateway** are impacted and fixes were
-published 27 Oct (CTX697263: 14.1-73.49, 13.1-64.32). **Cisco** Expressway fix (15.5.21) is still pending, URWB is planned for **November 2026** and v1.10 (30 Oct, final) corrects the URWB version to **26.2.1.9**;
+published 27 Oct (CTX697263: 14.1-73.49, 13.1-64.32). **Cisco** (v1.11, 6 Nov, final): the URWB / Unified Industrial Wireless fix **26.2.1.9 is now available**, Expressway fix (15.5.21) is still pending, and the advisory adds Snort rules 1:67375, 1:67359, 1:67360;
 ISE Portal Builder is now **fixed and deployed, no customer action required**. **Siemens:** RUGGEDCOM APE1808 devices running PAN-OS are affected in all listed PAN-OS branches
 (SSA-566512); remediation is the PAN-OS fix. **Siemens also lists a wider affected software portfolio**
 (SSA-166980 V1.2, 29 Oct: AMIS TS, blueplanet NX3, Energy Engage, Spectrum Power 3/4/7/TG), **most with no
