@@ -138,8 +138,10 @@ anonymisation layer. **AS presence is not attribution**; rented hosts are routin
   placeholder intact.
 - We have not independently validated the malware hashes or the C2 claims. Hashes are for triage and
   blocking decisions, and the `nfs` hash matches an independently reported sample.
-- **Coverage gap, measured:** the lab's data window last advanced to **2026-11-04 21:10:31 UTC**. As of
-  **2026-11-05 10:55 UTC** no further data has appeared (page refreshes, total frozen at 85,521). This is an
-  **open-ended gap** of ~13.7 h at the time of writing, longer than any previous episode. Treat every figure
-  above as **as of 2026-11-04 21:10 UTC**, not as current, and do not infer a drop in activity from the flat
-  total. The end of the gap will be recorded here when the data window advances.
+- **Coverage gap, measured and closed:** the data window stalled at **2026-11-04 21:10:31 UTC** and did not
+  advance for **~40.4 h**. It resumed at **2026-11-06 13:36:20 UTC**, with the total moving only from 85,521
+  to **85,525 (+4)** while source IPs (798) and code-or-dropper senders (181) stayed flat. Two readings fit
+  that increment and this page cannot separate them: the interval simply carried almost no traffic, or the
+  long outage was never replayed (earlier, shorter stalls *were* replayed, in one-hour jumps of +338, +210,
+  +78 and +370). **Do not present the +4 as evidence of a quiet network, and do not present it as evidence
+  of a drop either.** Treat the pre-gap funnel and per-ASN figures as **as of 2026-11-04 21:10 UTC**.

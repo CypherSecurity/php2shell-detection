@@ -2754,6 +2754,13 @@ Practical advice is unchanged: patch to 8.5.12 / 8.4.27 / 8.3.36 / 8.2.35, keep
 `session.upload_progress.enabled=0` until the next release, and stage the upgrade where SimpleXML
 `json_encode`/`(array)` conversions run in reference cycles.
 
+**Telemetry gap (4–6 Nov), measured and closed:** the lab's data window stalled at **2026-11-04
+21:10:31 UTC** and did not advance for **~40.4 h**, its longest interruption. It resumed at **2026-11-06
+13:36:20 UTC** with the total moving only **85,521 → 85,525 (+4)**, source IPs flat at 798 and
+code-or-dropper senders flat at 181. Earlier, shorter stalls were replayed in one-hour jumps (+338, +210,
++78, +370); this one was not, so the +4 cannot be read either as a quiet network or as a collapse in
+activity. All pre-gap figures stand as of the 4 Nov cutoff. Documented in `04-hunting/delft-intellab-telemetry-2026-11-02.md`.
+
 **On the guard module:** `HOSTED-POWER/php_uploadprogress_guard` v3.2.6 (2 Nov) fixes a fiber-isolation bug
 in the module itself (PHP 8.1+: saved `unserialize()` state could be restored after another fiber freed it).
 The project claims parity across the three issues above and a Valgrind-clean test matrix. We have **not**
