@@ -146,8 +146,10 @@ anonymisation layer. **AS presence is not attribution**; rented hosts are routin
   +78 and +370). **Do not present the +4 as evidence of a quiet network, and do not present it as evidence
   of a drop either.** Treat the pre-gap funnel and per-ASN figures as **as of 2026-11-04 21:10 UTC**.
 
-- **Second coverage gap, open at time of writing (7 Nov):** after the series resumed on 6 Nov, the data window
-  advanced only to **2026-11-06 19:33:53 UTC** and stalled again. As of **2026-11-07 07:55 UTC** the total
-  remains **85,982** (798 source IPs, 181 code-or-dropper senders) with no further records, a gap of about
-  **12.4 h** on top of the earlier 40 h interruption. Treat every figure as of the 6 Nov 19:33 cutoff, and do
-  not read the flat total as a quiet period. The end will be added here when the window next advances.
+- **Second coverage gap, measured and closed:** after the series resumed on 6 Nov, the data window stalled
+  again at **2026-11-06 19:33:53 UTC** and did not advance for **16 h 26 min**. It resumed at
+  **2026-11-07 12:00:06 UTC**, with the total moving from 85,982 to **86,018 (+36)**, source IPs from 798 to
+  **799 (+1)** and code-or-dropper senders from 181 to **182 (+1)**. Unlike the 40 h gap, this one did produce
+  a small increment, but +36 across 16.4 h is a fraction of the rate seen while the window was advancing
+  normally, so the interval is only partly covered. Treat pre-12:00 figures as of the 6 Nov 19:33 cutoff and
+  do not read either flat period as a quiet network.

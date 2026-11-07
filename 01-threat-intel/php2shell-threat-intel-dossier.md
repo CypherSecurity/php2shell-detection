@@ -2768,10 +2768,12 @@ code-or-dropper senders flat at 181. Earlier, shorter stalls were replayed in on
 +78, +370); this one was not, so the +4 cannot be read either as a quiet network or as a collapse in
 activity. All pre-gap figures stand as of the 4 Nov cutoff. Documented in `04-hunting/delft-intellab-telemetry-2026-11-02.md`.
 
-**Second telemetry gap (7 Nov, open at time of writing):** after resuming on 6 Nov the data window stalled
-again at **2026-11-06 19:33:53 UTC**. As of **07:55 UTC on 7 Nov** the total was unchanged at **85,982**
-(798 sources, 181 code-or-dropper), roughly **12.4 h** without records. Pre-gap figures stand as of the 6 Nov
-cutoff; the flat total is missing data, not a quiet network.
+**Second telemetry gap (7 Nov, measured and closed):** after resuming on 6 Nov the data window stalled again
+at **2026-11-06 19:33:53 UTC** and did not advance for **16 h 26 min**, resuming at **2026-11-07 12:00:06
+UTC**. The total moved 85,982 → **86,018 (+36)**, source IPs 798 → **799**, code-or-dropper senders 181 →
+**182**. The increment is far below the rate seen while the window was advancing normally, so coverage of the
+interval is partial. Pre-gap figures stand as of the 6 Nov cutoff; neither flat period is evidence of a quiet
+network.
 
 **On the guard module:** `HOSTED-POWER/php_uploadprogress_guard` v3.2.6 (2 Nov) fixes a fiber-isolation bug
 in the module itself (PHP 8.1+: saved `unserialize()` state could be restored after another fiber freed it).
