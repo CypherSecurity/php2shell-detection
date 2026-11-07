@@ -145,3 +145,9 @@ anonymisation layer. **AS presence is not attribution**; rented hosts are routin
   long outage was never replayed (earlier, shorter stalls *were* replayed, in one-hour jumps of +338, +210,
   +78 and +370). **Do not present the +4 as evidence of a quiet network, and do not present it as evidence
   of a drop either.** Treat the pre-gap funnel and per-ASN figures as **as of 2026-11-04 21:10 UTC**.
+
+- **Second coverage gap, open at time of writing (7 Nov):** after the series resumed on 6 Nov, the data window
+  advanced only to **2026-11-06 19:33:53 UTC** and stalled again. As of **2026-11-07 07:55 UTC** the total
+  remains **85,982** (798 source IPs, 181 code-or-dropper senders) with no further records, a gap of about
+  **12.4 h** on top of the earlier 40 h interruption. Treat every figure as of the 6 Nov 19:33 cutoff, and do
+  not read the flat total as a quiet period. The end will be added here when the window next advances.
