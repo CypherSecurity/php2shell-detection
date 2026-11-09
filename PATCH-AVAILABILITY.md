@@ -76,6 +76,23 @@ your notes say otherwise, they are out of date.
   that day.
 - Distribution PHP packages (if you use them) follow your distro's advisory stream.
 
+**AlmaLinux and Rocky Linux fixed builds are now documented (9 Nov).** The NCSC-NL inventory merged
+vendor-errata evidence for both distributions, with the fixed package scopes below. Confirm the exact
+package on the host, since module streams are assessed separately:
+
+| Distribution / stream | Fixed build |
+|---|---|
+| AlmaLinux 10 default PHP (8.3) | **8.3.36-1.el10_2** (ALSA-2026:87070) |
+| AlmaLinux 10 `php8.4` | **8.4.27-1.el10_2** (ALSA-2026:87071) |
+| AlmaLinux 8 `php:7.2` / `php:7.3` | **7.2.24-1.module_el8.10.0+4315+7b734bf3.alma.1** / **7.3.20-1.module_el8.10.0+4316+90ea5fe5.alma.1** |
+| AlmaLinux 8 `php:7.4` / `php:8.0` / `php:8.2` | **7.4.33-8.module_el8.10.0+4321+cf5fd4bb** / **8.0.30-1.module_el8.10.0+4319+26f10322.alma.1** / **8.2.35-1.module_el8.10.0+4323+fc907035** |
+| AlmaLinux 9 default PHP (8.0) / `php:8.1` / `php:8.2` / `php:8.3` | **8.0.30-8.el9_8.1** / **8.1.32-1.module_el9.8.0+326+528679fc.alma.1** / **8.2.35-1.module_el9.8.0+329+e5668d75** / **8.3.36-1.module_el9.8.0+330+fdc30075** |
+| Rocky Linux 10 / 9 / 8 fixed streams | equivalent RLSA rebuilds of the RHSA/Alma builds above (RLSA-2026:87070/87071/87151/87072/87079/87080/87073, plus Rocky 8 `php:7.4` and `php:8.2`) |
+
+**Recorded as Investigation, not fixed:** Rocky Linux 8 `php:7.2`, `php:7.3`, `php:8.0` and Rocky Linux 9
+`php:8.1`. Absence of a vendor assessment for a stream is not evidence that it is unaffected — treat those
+streams as needing manual confirmation.
+
 **Action:** check the package *origin* on each host (`rpm -qi php`), not just the version
 string — a host can look patched and still be running Remi bits, or vice versa.
 
@@ -266,11 +283,20 @@ devices. They are PAN-OS hosts, not a separate PHP runtime.
 
 ### Fortinet — FortiSOAR fixes confirmed via NCSC-NL inventory (9 Nov)
 
-No standalone Fortinet advisory is tracked here, but the NCSC-NL php2shell inventory added
-vendor-confirmed fixed status for **FortiSOAR** and **FortiSOAR PaaS** against both CVEs. That status was
-recorded in the repository commit of 6 Nov and **merged on 9 Nov 08:39 UTC** (PR #83); the inventory's fixed
-count moved from 185 to **187**, with the product and vulnerable counts unchanged. Treat FortiSOAR patching
-as available and confirm the exact build in the Fortinet support channel before scheduling.
+Fortinet's PSIRT advisory **FG-IR-26-186** confirms both CVEs affect **FortiSOAR** and **FortiSOAR PaaS**,
+with fixes available:
+
+| Product | Fixed releases |
+|---|---|
+| FortiSOAR / FortiSOAR PaaS | **8.0.1 or later**; **8.0.0 + Security Patch #2**; **7.6.7 or 7.5.4 + Security Patch #1** |
+
+The patches update bundled PHP to **8.2.35**. Two calibration points matter when you brief this:
+Fortinet describes the confirmed impact as **PHP-service and GUI availability (denial of service)**, scored
+**CVSS 3.1 5.3**, which is narrower than the upstream RCE description and narrower than our own benchmark
+results on stock PHP. Treat "Fortinet rates it 5.3" and "PHP rates the underlying bug critical" as both
+true but not interchangeable. Unpatched older releases remain affected; 7.6.8 and 7.5.5 were described as
+upcoming at the time of the merge. NCSC-NL recorded this in a 6 Nov commit, merged **9 Nov 08:39 UTC**
+(PR #83).
 
 ### Other vendor positions worth checking (not tracked in detail here)
 Red Hat, Ubuntu, Debian, cPanel, Plesk, Sophos and Veeam have published positions; the distributions are

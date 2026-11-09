@@ -2698,8 +2698,27 @@ vendor-confirmed fixed status for **FortiSOAR** and **FortiSOAR PaaS** against b
 **948 products tracked, 215 vulnerable, 187 fixed** (status "6 November 2026 09:21 CET"). Products and
 vulnerable counts are unchanged, so this is two additional fixed scopes rather than a reclassification.
 
-**Still open:** PR [#82](https://github.com/NCSC-NL/php2shell/pull/82) (AlmaLinux/Rocky 8/9/10 PHP fix
-status) remains unmerged.
+### 69.5 NCSC-NL PR #82 merged (9 Nov): AlmaLinux and Rocky fix scopes; inventory 968 / 215 / 205
+
+Exactly 19 minutes after the FortiSOAR merge, PR [#82](https://github.com/NCSC-NL/php2shell/pull/82)
+(**external contributor `dvershinin`**) merged at **2026-11-09 08:58:10 UTC**. The inventory moved from
+948 products / 215 vulnerable / 187 fixed to **968 products / 215 vulnerable / 205 fixed** (status "9
+November 2026 09:49 CET"): **+20 product scopes and +18 fixed**, with the vulnerable count again unchanged.
+No open PRs or issues remain in the repository as of this check.
+
+Fixed scopes recorded, per the generated changelog: **AlmaLinux** 10 default PHP (8.3.36) and `php8.4`
+(8.4.27), 8 `php:7.2`/`7.3`/`7.4`/`8.0`/`8.2`, and 9 default PHP (8.0.30) plus `php:8.1`/`8.2`/`8.3`;
+**Rocky Linux** the equivalent RLSA rebuilds for 10, 9 and 8 `php:7.4`/`8.2`. Four streams are recorded as
+**Investigation** rather than fixed: Rocky 8 `php:7.2`, `7.3`, `8.0` and Rocky 9 `php:8.1`. This is
+vendor-errata evidence with linked ALSA/RLSA advisories, not our testing.
+
+**Calibration note for one of the merged entries:** the FortiSOAR records cite Fortinet's **FG-IR-26-186**,
+which rates the confirmed impact as **PHP-service/GUI denial of service, CVSS 3.1 5.3**, with fixes in 8.0.1+,
+8.0.0 + Security Patch #2, and 7.6.7/7.5.4 + Security Patch #1, updating bundled PHP to 8.2.35. That is
+narrower than the upstream RCE description; both statements are vendor-published, and neither replaces the
+other.
+
+**Still open:** none. Both tracked proposals (#82, #83) are merged as of 9 Nov.
 
 ### 69.3 NCSC-NL inventory update (4 Nov): +18 vendor-confirmed fixed scopes
 
