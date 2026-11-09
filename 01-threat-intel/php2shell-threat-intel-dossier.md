@@ -2690,6 +2690,17 @@ carries Delft-derived delivery rules (Suricata `…136`–`…141`, 42 rules tot
 `04-hunting/delft-intellab-telemetry-2026-11-02.md`.
 
 
+### 69.4 NCSC-NL FortiSOAR merge (9 Nov): fixed count 185 → 187
+
+PR [#83](https://github.com/NCSC-NL/php2shell/pull/83) merged on **9 November at 08:39 UTC**, adding
+vendor-confirmed fixed status for **FortiSOAR** and **FortiSOAR PaaS** against both php2shell CVEs (commit
+`1069b1ad`, "Record FortiSOAR fixes confirmed by Fortinet", authored 6 Nov). The inventory now reads
+**948 products tracked, 215 vulnerable, 187 fixed** (status "6 November 2026 09:21 CET"). Products and
+vulnerable counts are unchanged, so this is two additional fixed scopes rather than a reclassification.
+
+**Still open:** PR [#82](https://github.com/NCSC-NL/php2shell/pull/82) (AlmaLinux/Rocky 8/9/10 PHP fix
+status) remains unmerged.
+
 ### 69.3 NCSC-NL inventory update (4 Nov): +18 vendor-confirmed fixed scopes
 
 Issue [#81](https://github.com/NCSC-NL/php2shell/issues/81) was opened and closed on 4 November, adding

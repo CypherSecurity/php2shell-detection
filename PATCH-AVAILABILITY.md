@@ -264,6 +264,14 @@ Why this matters for scanning: NVD added Siemens CPE entries (`ruggedcom_ape1808
 `ruggedcom_ape1808`) to both CVEs on 2026-10-28, so CPE-based scanners will flag these industrial edge
 devices. They are PAN-OS hosts, not a separate PHP runtime.
 
+### Fortinet — FortiSOAR fixes confirmed via NCSC-NL inventory (9 Nov)
+
+No standalone Fortinet advisory is tracked here, but the NCSC-NL php2shell inventory added
+vendor-confirmed fixed status for **FortiSOAR** and **FortiSOAR PaaS** against both CVEs. That status was
+recorded in the repository commit of 6 Nov and **merged on 9 Nov 08:39 UTC** (PR #83); the inventory's fixed
+count moved from 185 to **187**, with the product and vulnerable counts unchanged. Treat FortiSOAR patching
+as available and confirm the exact build in the Fortinet support channel before scheduling.
+
 ### Other vendor positions worth checking (not tracked in detail here)
 Red Hat, Ubuntu, Debian, cPanel, Plesk, Sophos and Veeam have published positions; the distributions are
 covered in sections 3 to 5 above. Broadcom has a portfolio response with isolated affected products
