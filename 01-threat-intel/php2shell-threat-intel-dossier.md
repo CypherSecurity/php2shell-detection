@@ -2720,6 +2720,48 @@ other.
 
 **Still open:** none. Both tracked proposals (#82, #83) are merged as of 9 Nov.
 
+### 69.6 NCSC-NL PR #84 merged (12 Nov): eight vendor-confirmed fixed scopes; inventory 972 / 212 / 213
+
+PR [#84](https://github.com/NCSC-NL/php2shell/pull/84) ("Record vendor-confirmed PHP2Shell fixes and
+mitigation scopes") was opened by `NCSC-NL-DFIR` on **2026-11-12 at 07:59:06 UTC** and merged by
+`NCSC-NL-Graham` at **11:39:07 UTC** (merge commit `c1492abd`, branch
+`updated-software-list-20261112-084453`). It carried **0 comments and 0 review comments** in the public
+timeline; the merge is the human review. The inventory moved from 968 / 215 / 205 to
+**972 products tracked, 212 vulnerable, 213 fixed** (status "12 November 2026 08:56 CET"): tracked **+4**,
+fixed **+8**, vulnerable **−3**. The eight fixed scopes are the increments the PR describes; the vulnerable
+decrease is three scopes moving out of that bucket, not a new assessment of scope we had missed.
+
+Eight scopes confirmed fixed for both CVEs:
+
+| Product / scope | Fixed version | Vendor source |
+|---|---|---|
+| Cisco Ultra-Reliable Wireless Backhaul (URWB) | **26.2.1.9** | Cisco advisory v1.11 (cisco-sa-php-october26-Jj384Daq) |
+| Cisco Unified Industrial Wireless Software | **26.2.1.9** | same |
+| QNAP QNE (ADRA) | **1.0.7.q327** | QSA-26-19 |
+| Xerox AltaLink 82xx/81xx and EC81xx | **123.xxx.006.29800** | XRX26-016 v6 |
+| Xerox VersaLink C/B415, C/B625, C/B620 | **123.xxx.006.30100** | XRX26-016 v6 |
+| Trend Micro Apex One 2019 (Japanese Windows) | **Critical Patch 20113** | KA-0025018, KA-0024807 |
+| Trend Micro Apex Central 2019 (Japanese Windows) | **Critical Patch 7351** | KA-0025014, KA-0024807 |
+| OroCommerce on OroCloud | managed environments patched **22 October** | Oro security update |
+
+Scopes deliberately **retained as Vulnerable**, which is the part worth copying into client advice:
+Xerox **AltaLink C80xx/B80xx/EC80xx** (XRX26-018 is configuration mitigation, not full remediation),
+**WorkCentre 3655/3655i, EC7836/EC7856** (mitigation patch `1088114v1.dlm` plus prerequisite service
+packs), generic **Apex One/Apex Central** on unpatched installations (the new patches are scoped to
+Japanese Windows editions), **self-hosted OroCommerce** (the hosted fix does not update independently
+managed runtimes), **Observium** (its changelog documents request filtering, not a fixed interpreter),
+**Fiery DFE** and the Xerox Worldwide Ticketing Tool (planned dates or development status only). This
+matches the rule we apply elsewhere: a mitigation is not a fix.
+
+**Our own verification of the cited primaries:** the QNAP advisory is reachable and its table reads
+"QNE (ADRA) 1.0.7 and earlier **Resolved**, fixed **1.0.7.q327**", matching the PR; the Trend Micro
+KA-0024807 page answers 200; the Xerox XRX26-016 v6 PDF is reachable (205,337 B, version strings not
+machine-extracted); the OroCommerce blog returns **403** to our fetcher, so that scope is recorded as
+cited-not-verified on our side. All values are **vendor-published status**, not our testing.
+
+**Repository state after the merge:** last push 11:39:07 UTC, **0 open issues, 0 open PRs**. This is the
+first NCSC movement since 9 Nov.
+
 ### 69.3 NCSC-NL inventory update (4 Nov): +18 vendor-confirmed fixed scopes
 
 Issue [#81](https://github.com/NCSC-NL/php2shell/issues/81) was opened and closed on 4 November, adding

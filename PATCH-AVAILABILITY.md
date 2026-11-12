@@ -249,6 +249,32 @@ rule: a product not listed is not affected. v1.11 marks the URWB / Unified Indus
 Cisco lists workarounds in the relevant bug IDs. Planned release versions are not downloads: confirm in the
 Cisco download channel before scheduling.
 
+### QNAP, Xerox, Trend Micro, OroCommerce — vendor-confirmed fixed scopes (12 Nov)
+
+Added from NCSC-NL PR #84, which merged on **2026-11-12 11:39 UTC** and moved the inventory to
+**972 products tracked, 212 vulnerable, 213 fixed** (status "12 November 2026 08:56 CET"). These are
+vendor-published fixes, not our testing; we read the QNAP advisory directly (see below).
+
+| Product / scope | Fixed version | Source |
+|---|---|---|
+| Cisco URWB / Unified Industrial Wireless | 26.2.1.9 | Cisco advisory v1.11 (see the Cisco section) |
+| QNAP QNE (ADRA) | **1.0.7.q327** | QSA-26-19 |
+| Xerox AltaLink 82xx/81xx, EC81xx | **123.xxx.006.29800** | XRX26-016 v6 |
+| Xerox VersaLink C/B415, C/B625, C/B620 | **123.xxx.006.30100** | XRX26-016 v6 |
+| Trend Micro Apex One 2019, Japanese Windows | **Critical Patch 20113** | KA-0025018 / KA-0024807 |
+| Trend Micro Apex Central 2019, Japanese Windows | **Critical Patch 7351** | KA-0025014 / KA-0024807 |
+| OroCommerce on OroCloud | managed environments patched 22 Oct | Oro security update |
+
+**Still Vulnerable on the same evidence:** Xerox AltaLink **C80xx/B80xx/EC80xx** (XRX26-018 is a
+configuration mitigation), **WorkCentre 3655/3655i, EC7836/EC7856** (mitigation patch `1088114v1.dlm`),
+generic **Apex One / Apex Central** (new patches are Japanese-Windows scoped), **self-hosted
+OroCommerce**, **Observium** (request filtering, not a fixed interpreter), **Fiery DFE** and the Xerox
+Worldwide Ticketing Tool. A mitigation patch does not close the finding.
+
+**Verification note:** we confirmed the QNAP advisory text ("QNE (ADRA) 1.0.7 and earlier → Resolved,
+1.0.7.q327") and reached the Trend Micro and Xerox pages; the OroCommerce page returned 403 to our
+fetcher, so treat that row as vendor-cited rather than independently checked here.
+
 ### Siemens — RUGGEDCOM APE1808 plus a software portfolio (expanded 29–30 Oct)
 
 **RUGGEDCOM APE1808 (with PAN-OS):** advisory **SSA-566512** (2026-10-23, V1.0): **RUGGEDCOM APE1808**
@@ -424,6 +450,12 @@ government CERT:
 - Per product: supplier, product, versions, **status for CVE-2026-109618 / CVE-2026-109619**
   (`Vulnerable` / `Fix` / `Not vuln` / …), and links to the vendor's own advisory
 - TLP:CLEAR — safe to redistribute
+
+**Current inventory (12 Nov):** **972 products tracked, 212 vulnerable, 213 fixed** (status "12
+November 2026 08:56 CET"), after PR #84 merged at 11:39 UTC with eight vendor-confirmed fixed scopes
+(Cisco URWB/UIW, QNAP QNE, Xerox AltaLink/VersaLink, Trend Micro Apex One/Apex Central Japanese Windows,
+OroCommerce on OroCloud). No open PRs or issues remain. See the QNAP/Xerox/Trend Micro/OroCommerce
+subsection above and dossier §69.6.
 
 **Why it matters for us:** it closes the gap our patch matrix cannot cover — **embedded PHP in
 commercial appliances**. Every "can't patch this product" question now has an authoritative place to

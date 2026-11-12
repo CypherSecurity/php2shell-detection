@@ -1,7 +1,7 @@
 # BUILD INFO — php2shell detection & response package
 
-**Build timestamp:** 2026-10-26 13:40 UTC
-**Package name:** `php2shell-detection-package-2026-10-24`
+**Build timestamp:** 2026-11-12 12:00 UTC
+**Package name:** `php2shell-detection-package-2026-10-26`
 **Why the name changed:** the package was first assembled on 2026-10-21 and then materially
 updated through 2026-10-22 (tested exploit results, corrected findings, repaired Suricata
 ruleset). The folder is now named for the **content date**, not the original assembly date.
@@ -381,7 +381,9 @@ The zip's own hash cannot be embedded inside itself, so it ships as a sidecar
   been tuned against production traffic volumes. Expect false positives on
   `session.upload_progress`-heavy applications.
 - The `display_errors=Off` RCE claim from public research is **unverified** by us.
-- No KEV addition as of this build; the two CVEs remain NVD status `Modified`.
+- Both CVEs are in **CISA KEV** (added 26 Oct) and NVD status is **`Analyzed`** (re-analysis closed 2
+  Nov). KEV means exploited in the wild, not that any given estate was breached. (This line previously
+  read "no KEV addition as of this build" and was stale; corrected 12 Nov.)
 
 
 ## 2026-11-02 10:30 UTC — telemetry increment (v2.7)
@@ -389,3 +391,19 @@ The zip's own hash cannot be embedded inside itself, so it ships as a sidecar
 Added six Suricata rules (`2202610136`–`…141`, 42 total) for delivery-stage indicators from the Delft Threat
 Intelligence Lab live telemetry, plus `04-hunting/delft-intellab-telemetry-2026-11-02.md`. Rules validated to
 load under Suricata 8.0.7. No detection logic was changed; this widens delivery coverage after code execution.
+
+## 2026-11-12 12:00 UTC — NCSC-NL inventory: eight vendor-confirmed fixed scopes
+
+`PATCH-AVAILABILITY.md` §8c now lists the vendor-confirmed fixes merged into the NCSC-NL inventory on
+12 Nov (PR #84, merged 11:39 UTC): Cisco URWB and Unified Industrial Wireless **26.2.1.9**, QNAP QNE
+(ADRA) **1.0.7.q327**, Xerox AltaLink 82xx/81xx/EC81xx **123.xxx.006.29800**, Xerox VersaLink
+C/B415/C/B625/C/B620 **123.xxx.006.30100**, Trend Micro Apex One 2019 **Critical Patch 20113** and Apex
+Central 2019 **Critical Patch 7351** (Japanese Windows), and OroCommerce on OroCloud (patched 22 Oct).
+The same group of scopes that vendors only mitigated, rather than fixed, is listed as still Vulnerable.
+Dossier §69.6 records the merge, the inventory change (**968 / 215 / 205 → 972 / 212 / 213**) and our own
+verification of the QNAP advisory.
+
+Also fixed in this build: the two stale lines above (build timestamp/package name; KEV/NVD status).
+
+Not appended per rebuild between 2 and 12 Nov: the FortiSOAR and AlmaLinux/Rocky merges are recorded in
+`PATCH-AVAILABILITY.md`, the dossier (§69.4, §69.5) and the public update history instead.

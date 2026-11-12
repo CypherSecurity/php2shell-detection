@@ -2,7 +2,7 @@
 
 **CVE-2026-109618 / CVE-2026-109619** · PHP pre-auth RCE + silent memory disclosure
 Severity: **CVSS v4.0 9.2 each** (vendor) · **NIST v3.1: 9.8 for 109618, 8.1 for 109619** · Patched **2026-10-21 14:00 UTC**
-**Content current as of 2026-11-02 10:30 UTC** · see `BUILD-INFO.md` for what changed and how to verify you have the latest copy
+**Content current as of 2026-11-12 12:00 UTC** · see `BUILD-INFO.md` for what changed and how to verify you have the latest copy
 
 
 > ## ⚠️ CISA KEV — ACTIVELY EXPLOITED (26 Oct)
