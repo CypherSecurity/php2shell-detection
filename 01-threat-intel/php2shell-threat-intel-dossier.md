@@ -2852,3 +2852,21 @@ in the module itself (PHP 8.1+: saved `unserialize()` state could be restored af
 The project claims parity across the three issues above and a Valgrind-clean test matrix. We have **not**
 tested this module and do not endorse it; it is recorded as a third-party option for hosts that cannot patch
 PHP.
+
+### 71.1 Guard module v3.2.7 released (12 Nov)
+
+`HOSTED-POWER/php_uploadprogress_guard` published **v3.2.7 on 12 November at 15:20:41 UTC** (tag
+`b760ece0`; release assets `hp_uploadprogress_guard-3.2.7.tar.gz` 3,188,436 B,
+`hp_uploadprogress_guard-3.2.7.zip` 3,235,118 B, `SHA256SUMS`). Changes the author lists: `unserialize()`
+state isolation extended to `session_start()`/`session_reset()`, ext/filter's copy of a dropped form
+emptied, and the upload-progress headroom guard no longer refuses a request before PHP releases its cached
+chunks. The README now leads with **"three issues PHP has not fixed in a release yet, covered"** and states
+that CVE-2026-115560 is mitigated by default (handler detached and `session.upload_progress.enabled`
+forced to `0`, locked against `ini_set`/`.user.ini`), that the php2shell layers step aside on a patched
+PHP, and that results were checked with Valgrind and PHP's own test suites across branches.
+
+**Calibration:** every one of those statements is the **author's claim**. We have not built, installed or
+tested the module at any version, and we do not endorse it. What we can say from primary sources is
+narrower and unchanged: the three PHP issues are real, no PHP release yet contains their fixes, and the
+official PHP releases remain the only complete fix for php2shell. The module is recorded as a third-party
+option for hosts that genuinely cannot patch, subject to source review, checksum verification and staging.

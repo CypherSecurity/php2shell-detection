@@ -431,9 +431,16 @@ until then, and if you run SimpleXML conversions in reference cycles, plan for t
 `HOSTED-POWER/php_uploadprogress_guard` — a native PHP extension that mirrors the official fix for
 CVE-2026-109618/109619 on unpatched PHP, forces `session.upload_progress.enabled=0` (covering
 CVE-2026-115560), and applies upstream fixes for three open PHP issues (CVE-2026-115560, the `unserialize()` UAF, and the
-SimpleXML regression) by patching from inside the extension. **v3.2.6 (2 November)** also fixes a
+SimpleXML regression) by patching from inside the extension. **v3.2.6 (2 November)** fixed a
 fiber-isolation bug in the module itself: with PHP 8.1+ fibers, its saved `unserialize()` state could be
-restored after another fiber freed it. We have not tested this module. Prebuilt for Linux x86_64/aarch64 and Windows x64, with checksums.
+restored after another fiber freed it. **v3.2.7 (12 November)** is the current release: it isolates
+`unserialize()` state across `session_start()`/`session_reset()` as well, clears ext/filter's copy of a
+dropped form, and lets PHP release cached chunks before the upload-progress headroom guard refuses a
+request. Its README states that it covers all three unreleased PHP issues by default, including
+CVE-2026-115560, and that the php2shell layers step aside on an already-patched PHP. Those are the
+author's claims: **we have not tested this module at any version.** Prebuilt for Linux x86_64/aarch64 and
+Windows x64, with checksums (release assets: `hp_uploadprogress_guard-3.2.7.tar.gz`,
+`hp_uploadprogress_guard-3.2.7.zip`, `SHA256SUMS`).
 
 **Caveats:** third-party native extension loaded into the web server — supply-chain and stability
 risk. It is **not** a substitute for the official fixed builds. Recommended only where patching is
