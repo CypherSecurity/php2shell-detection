@@ -153,3 +153,13 @@ anonymisation layer. **AS presence is not attribution**; rented hosts are routin
   a small increment, but +36 across 16.4 h is a fraction of the rate seen while the window was advancing
   normally, so the interval is only partly covered. Treat pre-12:00 figures as of the 6 Nov 19:33 cutoff and
   do not read either flat period as a quiet network.
+
+- **Third coverage gap, open at time of writing (14 Nov):** the data window last advanced to
+  **2026-11-14 05:34:35 UTC**; at the **22:00 UTC** check it had not moved for **16 h 25 min** and was still
+  frozen. The total is flat at **89,569**, source IPs **802**, code-or-dropper senders **182**, ASN **337**,
+  countries **74**, and the funnel reads probe **68,280 / 687**, code execution **10,633 / 155**, overload
+  **5,928 / 154**, dropper **4,728 / 51**. The interval since 05:34 is **unmeasured**: the flat total is
+  missing data, not evidence of a quiet network, and no figure in this document should be read as covering
+  14 November after 05:34 UTC. The gap was first over 12 h at the 17:00 check (11 h 25 min then, under the
+  threshold) and crossed it before 18:00. Add the end time and increment when the window advances; if the
+  backlog lands in one step, that jump is backfill, not a surge.

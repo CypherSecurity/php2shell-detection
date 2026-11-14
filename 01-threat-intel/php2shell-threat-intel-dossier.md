@@ -2847,6 +2847,15 @@ UTC**. The total moved 85,982 → **86,018 (+36)**, source IPs 798 → **799**, 
 interval is partial. Pre-gap figures stand as of the 6 Nov cutoff; neither flat period is evidence of a quiet
 network.
 
+**Third telemetry gap (opened 14 Nov, still open at 22:00 UTC):** the data window last advanced to
+**2026-11-14 05:34:35 UTC**. By the 17:00 check it had been frozen for **11 h 25 min** (under the threshold,
+logged only); by 22:00 it was **16 h 25 min** and still frozen, so it is now documented as a measured gap.
+Figures at the 22:00 check: total **89,569**, source IPs **802**, code-or-dropper senders **182**, ASN 337,
+countries 74; funnel probe **68,280 / 687**, code execution **10,633 / 155**, overload **5,928 / 154**, dropper
+**4,728 / 51**. Everything after 05:34 on 14 November is **unmeasured**; the flat total is missing data, not a
+quiet network. The end time and increment will be recorded when the window advances (one rebuild then), and a
+single large catch-up jump with flat source counts would be backfill, not a surge.
+
 **On the guard module:** `HOSTED-POWER/php_uploadprogress_guard` v3.2.6 (2 Nov) fixes a fiber-isolation bug
 in the module itself (PHP 8.1+: saved `unserialize()` state could be restored after another fiber freed it).
 The project claims parity across the three issues above and a Valgrind-clean test matrix. We have **not**
