@@ -2648,13 +2648,15 @@ Siemens publishes.
 
 ### 69.1 Delft Threat Intelligence Lab — honeypots + network telescope
 New live source, `php2shell.delftintellab.com` (TU Delft; contributors Harm Griffioen, Zohar Cochavi, Murtuza
-Ali), publishing exploitation data since 20 Oct and refreshing every five minutes. Captured at **2026-11-02
-10:12 UTC**:
+Ali), publishing exploitation data since 20 Oct and refreshing every five minutes. First captured at **2026-11-02
+10:12 UTC**; refreshed **2026-11-15 16:41:48 UTC**:
 
-- **83,038 exploitation requests, 787 source IPs, 330 ASNs, 73 countries**, 21 Oct 08:37:17 to 2 Nov 10:08:07 UTC.
-- **181 source IPs sent code or a dropper.** Funnel: probe 61,797/672 IPs; code execution 10,597/154;
-  overload 5,916/152; dropper 4,728/51. Busiest hour **26 Oct 14:00 UTC, 8,179 requests**; 819 multipart
-  boundaries; 2,727 sensor addresses hit.
+- **89,570 exploitation requests, 802 source IPs, 337 ASNs, 74 countries**, 21 Oct 08:37:17 to 15 Nov 16:41:48 UTC
+  (2 Nov baseline: 83,038 requests, 787 IPs, 330 ASNs, 73 countries).
+- **182 source IPs sent code or a dropper.** Funnel: probe 68,281/687 IPs; code execution 10,633/155;
+  overload 5,928/154; dropper 4,728/51 (2 Nov: probe 61,797/672, 10,597/154, 5,916/152, 4,728/51).
+  Busiest hour **26 Oct 14:00 UTC, 8,179 requests**; 819 multipart boundaries; 2,727 sensor addresses hit.
+  **Dropper count has not moved since 2 Nov**, while probe volume has grown by about 6,500 requests.
 - First sightings on 21 Oct: request resembling PHP2Shell 08:37:17, high-interaction honeypot 13:00:12,
   first OS command 13:25:25, first UAF 13:42:29, first dropper 14:25:31, first session deserialization
   gadget 15:01:07.
@@ -2814,9 +2816,9 @@ confirms the record was reviewed; it does not mean NVD tested exploitation.
 tagged Third Party Advisory) — the telemetry source this dossier already uses throughout. Read directly from
 NVD: descriptions, NIST v3.1 9.8, vendor v4.0 9.2, the CWE set (1325 / 416 / 755 / 824) and 109619's record are
 all unchanged. `Modified` is NVD's workflow state for "the record is being edited", not a re-analysis and not
-a new authority; the substance of the record is as it was on 2 Nov. **No impact on guidance.** The package and
-public page still show "Analyzed, 11 references" until the next rebuild; this entry and §70's table are the
-current state.
+a new authority; the substance of the record is as it was on 2 Nov. **No impact on guidance.** The public page
+records the change in a 15 November entry; note that its 2 November entry still says "Analyzed, 11 references",
+which is correct as a description of the record on that date.
 
 
 ## 71. PHP follow-up issue status (2 Nov): a correction and a third route
@@ -2856,14 +2858,15 @@ UTC**. The total moved 85,982 → **86,018 (+36)**, source IPs 798 → **799**, 
 interval is partial. Pre-gap figures stand as of the 6 Nov cutoff; neither flat period is evidence of a quiet
 network.
 
-**Third telemetry gap (opened 14 Nov, still open at 22:00 UTC):** the data window last advanced to
-**2026-11-14 05:34:35 UTC**. By the 17:00 check it had been frozen for **11 h 25 min** (under the threshold,
-logged only); by 22:00 it was **16 h 25 min** and still frozen, so it is now documented as a measured gap.
-Figures at the 22:00 check: total **89,569**, source IPs **802**, code-or-dropper senders **182**, ASN 337,
-countries 74; funnel probe **68,280 / 687**, code execution **10,633 / 155**, overload **5,928 / 154**, dropper
-**4,728 / 51**. Everything after 05:34 on 14 November is **unmeasured**; the flat total is missing data, not a
-quiet network. The end time and increment will be recorded when the window advances (one rebuild then), and a
-single large catch-up jump with flat source counts would be backfill, not a surge.
+**Third telemetry gap (14–15 Nov), measured and closed:** the data window stalled at
+**2026-11-14 05:34:35 UTC** and did not advance for **35 h 07 min**, resuming at **2026-11-15 16:41:48 UTC**.
+It was 11 h 25 min behind at the 17:00 check on 14 Nov (under the 12 h threshold, logged only), 16 h 25 min at
+22:00 when it was documented as a gap, and 30 h 25 min at the 12:00 check on 15 Nov. When it resumed the total
+moved only **89,569 → 89,570 (+1)**, with source IPs flat at **802** and code-or-dropper senders flat at **182**;
+funnel probe **68,280 → 68,281 / 687**, every later step unchanged. **+1 across 35 h is far below the normal
+rate**, so either the interval carried almost no traffic or it was never replayed; this page cannot separate
+those readings, and the same ambiguity applied to the 40.4 h gap on 4–6 Nov (+4). Do not read the +1 as
+evidence of a quiet network or of a collapse in activity. Pre-gap figures stand as of the 14 Nov 05:34 cutoff.
 
 **On the guard module:** `HOSTED-POWER/php_uploadprogress_guard` v3.2.6 (2 Nov) fixes a fiber-isolation bug
 in the module itself (PHP 8.1+: saved `unserialize()` state could be restored after another fiber freed it).

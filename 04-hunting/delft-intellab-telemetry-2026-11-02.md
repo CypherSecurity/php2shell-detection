@@ -154,12 +154,13 @@ anonymisation layer. **AS presence is not attribution**; rented hosts are routin
   normally, so the interval is only partly covered. Treat pre-12:00 figures as of the 6 Nov 19:33 cutoff and
   do not read either flat period as a quiet network.
 
-- **Third coverage gap, open at time of writing (14 Nov):** the data window last advanced to
-  **2026-11-14 05:34:35 UTC**; at the **22:00 UTC** check it had not moved for **16 h 25 min** and was still
-  frozen. The total is flat at **89,569**, source IPs **802**, code-or-dropper senders **182**, ASN **337**,
-  countries **74**, and the funnel reads probe **68,280 / 687**, code execution **10,633 / 155**, overload
-  **5,928 / 154**, dropper **4,728 / 51**. The interval since 05:34 is **unmeasured**: the flat total is
-  missing data, not evidence of a quiet network, and no figure in this document should be read as covering
-  14 November after 05:34 UTC. The gap was first over 12 h at the 17:00 check (11 h 25 min then, under the
-  threshold) and crossed it before 18:00. Add the end time and increment when the window advances; if the
-  backlog lands in one step, that jump is backfill, not a surge.
+- **Third coverage gap, measured and closed (14–15 Nov):** the data window stalled at
+  **2026-11-14 05:34:35 UTC** and did not advance for **35 h 07 min**. It was 11 h 25 min behind at the 17:00
+  check on 14 Nov (under the threshold, logged only) and 16 h 25 min behind at 22:00, when it was written up
+  as an open gap. It resumed at **2026-11-15 16:41:48 UTC** with the total moving only **89,569 → 89,570
+  (+1)**, source IPs flat at **802** and code-or-dropper senders flat at **182**; funnel probe
+  **68,280 → 68,281 / 687**, with code execution, overload and dropper unchanged. **+1 across 35 h is far
+  below the rate seen while the window advances normally**, so the interval is largely or wholly unmeasured;
+  this document cannot tell "almost no traffic" from "never replayed", and the 40.4 h gap showed the same
+  ambiguity (+4). Treat pre-gap figures as of the 14 Nov 05:34 cutoff and do not read the flat totals as a
+  quiet network.
