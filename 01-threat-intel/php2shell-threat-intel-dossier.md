@@ -2793,8 +2793,8 @@ Both records finished re-analysis on **2026-11-02** and are now **`Analyzed`** (
 
 | Field | CVE-2026-109618 | CVE-2026-109619 |
 |---|---|---|
-| Status | **Analyzed** | **Analyzed** |
-| References | 11 | 19 |
+| Status | **Modified** (since 15 Nov 01:18 UTC; was Analyzed from 2 Nov) | **Analyzed** |
+| References | **12** (One added 15 Nov) | 19 |
 | Description | unchanged, longjmp/OOM corruption, request cleanup reads uninitialized memory, multiple OOM strategies → RCE | unchanged, stale global state pointing into freed request memory reused by later requests → RCE |
 | NIST v3.1 | 9.8 (AV:N/AC:L/PR:N/UI:N) | 8.1 (AV:N/AC:H/PR:N/UI:N) |
 | Vendor v4.0 | 9.2 (AV:N/AC:H/AT:P) | 9.2 |
@@ -2808,6 +2808,15 @@ release because of CVE-2026-115560, and treat `cgi.fix_pathinfo=0` only as a pre
 
 Note for the record: NVD's status labels are workflow states, not a quality statement. "Analyzed" here
 confirms the record was reviewed; it does not mean NVD tested exploitation.
+
+**Update, 15 November 01:18 UTC:** CVE-2026-109618 moved from `Analyzed` to **`Modified`** and gained a
+**12th reference**, which is the Delft Threat Intelligence Lab page (`https://php2shell.delftintellab.com`,
+tagged Third Party Advisory) — the telemetry source this dossier already uses throughout. Read directly from
+NVD: descriptions, NIST v3.1 9.8, vendor v4.0 9.2, the CWE set (1325 / 416 / 755 / 824) and 109619's record are
+all unchanged. `Modified` is NVD's workflow state for "the record is being edited", not a re-analysis and not
+a new authority; the substance of the record is as it was on 2 Nov. **No impact on guidance.** The package and
+public page still show "Analyzed, 11 references" until the next rebuild; this entry and §70's table are the
+current state.
 
 
 ## 71. PHP follow-up issue status (2 Nov): a correction and a third route
