@@ -2795,7 +2795,7 @@ Both records finished re-analysis on **2026-11-02** and are now **`Analyzed`** (
 
 | Field | CVE-2026-109618 | CVE-2026-109619 |
 |---|---|---|
-| Status | **Modified** (since 15 Nov 01:18 UTC; was Analyzed from 2 Nov) | **Analyzed** |
+| Status | **Analyzed** (back since 16 Nov 16:54 UTC; Modified 15 Nov 01:18 → 16 Nov) | **Analyzed** |
 | References | **12** (One added 15 Nov) | 19 |
 | Description | unchanged, longjmp/OOM corruption, request cleanup reads uninitialized memory, multiple OOM strategies → RCE | unchanged, stale global state pointing into freed request memory reused by later requests → RCE |
 | NIST v3.1 | 9.8 (AV:N/AC:L/PR:N/UI:N) | 8.1 (AV:N/AC:H/PR:N/UI:N) |
@@ -2819,6 +2819,13 @@ all unchanged. `Modified` is NVD's workflow state for "the record is being edite
 a new authority; the substance of the record is as it was on 2 Nov. **No impact on guidance.** The public page
 records the change in a 15 November entry; note that its 2 November entry still says "Analyzed, 11 references",
 which is correct as a description of the record on that date.
+
+**Further NVD churn, 16 November:** 109618 returned to **`Analyzed`** at `2026-11-16T16:54:58Z` with the
+12th reference (Delft lab) still in place, and 109619 was re-touched at `2026-11-16T16:17:46Z`. Read directly:
+refs **12 / 19**, NIST v3.1 **9.8 / 8.1**, vendor v4.0 **9.2 / 9.2**, CWE set **1325/416/755/824** on both, and
+descriptions unchanged. This is NVD workflow housekeeping after the reference edit, not a new assessment; the
+status will keep flipping between Analyzed and Modified as NIST edits, and it does not warrant a public update
+each time. Current state of record: **both Analyzed, refs 12 / 19, no substantive field change since 2 Nov.**
 
 
 ## 71. PHP follow-up issue status (2 Nov): a correction and a third route
