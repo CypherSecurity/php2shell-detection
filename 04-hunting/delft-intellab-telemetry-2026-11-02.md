@@ -164,3 +164,11 @@ anonymisation layer. **AS presence is not attribution**; rented hosts are routin
   this document cannot tell "almost no traffic" from "never replayed", and the 40.4 h gap showed the same
   ambiguity (+4). Treat pre-gap figures as of the 14 Nov 05:34 cutoff and do not read the flat totals as a
   quiet network.
+
+- **Fourth coverage gap, open at the 16 Nov 07:00 check:** the window advanced only to
+  **2026-11-15 17:08:49 UTC** after the third gap, then froze again. It was 4 h 48 min behind at 22:00 on
+  15 Nov (under the threshold) and **13 h 51 min** behind at 07:00 on 16 Nov, so it is now documented.
+  Current readings: total **89,571**, 802 source IPs, 182 code-or-dropper senders, funnel probe
+  **68,282 / 687** with code execution, overload and dropper unchanged (10,633 / 5,928 / 4,728). Everything
+  after 15 Nov 17:08 is unmeasured; the flat total is missing data. Rebuild deferred until the gap closes or
+  24 h pass with it still open.
