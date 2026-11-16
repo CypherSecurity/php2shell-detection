@@ -170,5 +170,6 @@ anonymisation layer. **AS presence is not attribution**; rented hosts are routin
   15 Nov (under the threshold) and **13 h 51 min** behind at 07:00 on 16 Nov, so it is now documented.
   Current readings: total **89,571**, 802 source IPs, 182 code-or-dropper senders, funnel probe
   **68,282 / 687** with code execution, overload and dropper unchanged (10,633 / 5,928 / 4,728). Everything
-  after 15 Nov 17:08 is unmeasured; the flat total is missing data. Rebuild deferred until the gap closes or
-  24 h pass with it still open.
+  after 15 Nov 17:08 is unmeasured; the flat total is missing data. **Still open at 28 h 51 min at the 22:00
+  check on 16 Nov**, so the 24 h cap was passed and the package was rebuilt with the gap open; end time and
+  increment to be added when the window advances.

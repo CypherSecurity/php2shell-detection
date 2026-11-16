@@ -2883,7 +2883,9 @@ countries 74; funnel probe **68,282 / 687**, code execution **10,633 / 155**, ov
 **4,728 / 51**. Everything after 15 Nov 17:08 is **unmeasured**; the flat total is missing data. Working
 practice for this gap: recorded here and in the hunting document now, with the single public rebuild deferred
 until the gap closes (or 24 h pass while it is open), to keep publication churn proportionate to a settled
-event.
+event. **At the 22:00 check on 16 November the gap was still open at 28 h 51 min**, so the 24 h cap was passed
+and the rebuild was made with the gap open; figures unchanged (89,571 / 802 / 182 / probe 68,282). The end time
+and increment will be added when the window advances, with one further rebuild.
 
 **On the guard module:** `HOSTED-POWER/php_uploadprogress_guard` v3.2.6 (2 Nov) fixes a fiber-isolation bug
 in the module itself (PHP 8.1+: saved `unserialize()` state could be restored after another fiber freed it).
