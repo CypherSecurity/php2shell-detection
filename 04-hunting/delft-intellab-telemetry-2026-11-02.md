@@ -171,5 +171,8 @@ anonymisation layer. **AS presence is not attribution**; rented hosts are routin
   Current readings: total **89,571**, 802 source IPs, 182 code-or-dropper senders, funnel probe
   **68,282 / 687** with code execution, overload and dropper unchanged (10,633 / 5,928 / 4,728). Everything
   after 15 Nov 17:08 is unmeasured; the flat total is missing data. **Still open at 28 h 51 min at the 22:00
-  check on 16 Nov**, so the 24 h cap was passed and the package was rebuilt with the gap open; end time and
-  increment to be added when the window advances.
+  check on 16 Nov**, so the 24 h cap was passed and the package was rebuilt with the gap open. It **closed at
+  2026-11-17 17:45:22 UTC**, a gap of **48 h 36 min**, with the total moving only **89,571 → 89,574 (+3)**;
+  source IPs 802 flat, code-or-dropper 182 flat, funnel probe 68,282 → **68,285 / 687**, code execution,
+  overload and dropper unchanged. +3 across 48.6 h is far below the normal rate, so the interval is largely
+  or wholly unmeasured; the flat totals are not evidence of a quiet network.

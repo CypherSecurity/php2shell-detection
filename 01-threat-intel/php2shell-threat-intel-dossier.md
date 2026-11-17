@@ -2649,11 +2649,11 @@ Siemens publishes.
 ### 69.1 Delft Threat Intelligence Lab — honeypots + network telescope
 New live source, `php2shell.delftintellab.com` (TU Delft; contributors Harm Griffioen, Zohar Cochavi, Murtuza
 Ali), publishing exploitation data since 20 Oct and refreshing every five minutes. First captured at **2026-11-02
-10:12 UTC**; refreshed **2026-11-15 16:41:48 UTC**:
+10:12 UTC**; refreshed **2026-11-17 17:45:22 UTC**:
 
-- **89,570 exploitation requests, 802 source IPs, 337 ASNs, 74 countries**, 21 Oct 08:37:17 to 15 Nov 16:41:48 UTC
+- **89,574 exploitation requests, 802 source IPs, 337 ASNs, 74 countries**, 21 Oct 08:37:17 to 17 Nov 17:45:22 UTC
   (2 Nov baseline: 83,038 requests, 787 IPs, 330 ASNs, 73 countries).
-- **182 source IPs sent code or a dropper.** Funnel: probe 68,281/687 IPs; code execution 10,633/155;
+- **182 source IPs sent code or a dropper.** Funnel: probe 68,285/687 IPs; code execution 10,633/155;
   overload 5,928/154; dropper 4,728/51 (2 Nov: probe 61,797/672, 10,597/154, 5,916/152, 4,728/51).
   Busiest hour **26 Oct 14:00 UTC, 8,179 requests**; 819 multipart boundaries; 2,727 sensor addresses hit.
   **Dropper count has not moved since 2 Nov**, while probe volume has grown by about 6,500 requests.
@@ -2884,8 +2884,11 @@ countries 74; funnel probe **68,282 / 687**, code execution **10,633 / 155**, ov
 practice for this gap: recorded here and in the hunting document now, with the single public rebuild deferred
 until the gap closes (or 24 h pass while it is open), to keep publication churn proportionate to a settled
 event. **At the 22:00 check on 16 November the gap was still open at 28 h 51 min**, so the 24 h cap was passed
-and the rebuild was made with the gap open; figures unchanged (89,571 / 802 / 182 / probe 68,282). The end time
-and increment will be added when the window advances, with one further rebuild.
+and the rebuild was made with the gap open. **It finally closed at 2026-11-17 17:45:22 UTC, a gap of
+48 h 36 min**, with the total moving only **89,571 → 89,574 (+3)**; source IPs flat at **802**, code-or-dropper
+senders flat at **182**, funnel probe **68,282 → 68,285 / 687** and every later step unchanged. As with the
+other long gaps, +3 across 48.6 h is far below the normal rate, so the interval is largely or wholly
+unmeasured; the flat period is not evidence of a quiet network.
 
 **On the guard module:** `HOSTED-POWER/php_uploadprogress_guard` v3.2.6 (2 Nov) fixes a fiber-isolation bug
 in the module itself (PHP 8.1+: saved `unserialize()` state could be restored after another fiber freed it).
