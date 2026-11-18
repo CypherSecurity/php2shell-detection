@@ -2890,6 +2890,14 @@ senders flat at **182**, funnel probe **68,282 → 68,285 / 687** and every late
 other long gaps, +3 across 48.6 h is far below the normal rate, so the interval is largely or wholly
 unmeasured; the flat period is not evidence of a quiet network.
 
+**Fifth telemetry gap (opened 17 Nov, open at the 18 Nov 07:00 check):** the window advanced only to
+**2026-11-17 17:45:22 UTC** at the end of the fourth gap and then froze again. At **07:00 on 18 November** it
+was **13 h 15 min** behind, so it is documented. Total **89,574**, source IPs **802**, code-or-dropper senders
+**182**, ASN 337, countries 74; funnel probe **68,285 / 687**, code execution **10,633 / 155**, overload
+**5,928 / 154**, dropper **4,728 / 51**. Everything after 17 Nov 17:45 is **unmeasured**. Same working practice:
+recorded here and in the hunting document now, public rebuild deferred to close or the 24 h cap, whichever
+comes first.
+
 **On the guard module:** `HOSTED-POWER/php_uploadprogress_guard` v3.2.6 (2 Nov) fixes a fiber-isolation bug
 in the module itself (PHP 8.1+: saved `unserialize()` state could be restored after another fiber freed it).
 The project claims parity across the three issues above and a Valgrind-clean test matrix. We have **not**
