@@ -2827,6 +2827,10 @@ descriptions unchanged. This is NVD workflow housekeeping after the reference ed
 status will keep flipping between Analyzed and Modified as NIST edits, and it does not warrant a public update
 each time. Current state of record: **both Analyzed, refs 12 / 19, no substantive field change since 2 Nov.**
 
+**18 November retouch:** `lastModified` moved to `2026-11-18T19:17Z` on both records with **no change in
+reference count or fields**; treat as NVD workflow editing, consistent with earlier retouches on 4, 5 and
+16 November.
+
 
 ## 71. PHP follow-up issue status (2 Nov): a correction and a third route
 
@@ -2850,6 +2854,17 @@ release since 21 Oct contains either fix, and #24488 is a regression the securit
 Practical advice is unchanged: patch to 8.5.12 / 8.4.27 / 8.3.36 / 8.2.35, keep
 `session.upload_progress.enabled=0` until the next release, and stage the upgrade where SimpleXML
 `json_encode`/`(array)` conversions run in reference cycles.
+
+**Upcoming PHP security release, 19 November 2026 (verified 18 Nov).** The PHP security team published
+an announcement on 18 November: security releases are scheduled for **Thursday, 19 November 2026 between
+14:00 and 14:30 UTC**, as part of PHP's regular four-week cycle, addressing vulnerabilities across all
+supported versions. The highest severity is **CRITICAL**, and the team states those CRITICAL issues
+"require either non-default configuration or uncommon setups". **Technical details and fixed version
+numbers will be published alongside the releases**, not before. The same date is the planned GA of PHP
+8.6.0. Practical reading: prepare to upgrade on 19 November, but do not assume which of the follow-up
+issues (#24481, #24674, #24488, CVE-2026-115560) are included until the release notes and advisories are
+read. Nothing in the announcement re-opens CVE-2026-109618/109619 or changes the current patch guidance
+before the release.
 
 **Telemetry gap (4–6 Nov), measured and closed:** the lab's data window stalled at **2026-11-04
 21:10:31 UTC** and did not advance for **~40.4 h**, its longest interruption. It resumed at **2026-11-06
@@ -2890,13 +2905,14 @@ senders flat at **182**, funnel probe **68,282 → 68,285 / 687** and every late
 other long gaps, +3 across 48.6 h is far below the normal rate, so the interval is largely or wholly
 unmeasured; the flat period is not evidence of a quiet network.
 
-**Fifth telemetry gap (opened 17 Nov, open at the 18 Nov 07:00 check):** the window advanced only to
-**2026-11-17 17:45:22 UTC** at the end of the fourth gap and then froze again. At **07:00 on 18 November** it
-was **13 h 15 min** behind, so it is documented. Total **89,574**, source IPs **802**, code-or-dropper senders
-**182**, ASN 337, countries 74; funnel probe **68,285 / 687**, code execution **10,633 / 155**, overload
-**5,928 / 154**, dropper **4,728 / 51**. Everything after 17 Nov 17:45 is **unmeasured**. Same working practice:
-recorded here and in the hunting document now, public rebuild deferred to close or the 24 h cap, whichever
-comes first.
+**Fifth telemetry gap (opened 17 Nov, still open at the 18 Nov 22:00 check, past the 24 h cap):** the
+window advanced only to **2026-11-17 17:45:22 UTC** at the end of the fourth gap and then froze again. It
+was 13 h 15 min behind at the 18 Nov 07:00 check and **28 h 15 min behind at the 22:00 check**, so the
+24 h cap passed and this is published as an open gap. Total **89,574**, source IPs **802**, code-or-dropper
+senders **182**, ASN 337, countries 74; funnel probe **68,285 / 687**, code execution **10,633 / 155**,
+overload **5,928 / 154**, dropper **4,728 / 51**. Everything after 17 Nov 17:45 is **unmeasured**; the flat
+total is missing data, not a quiet network. The end time and increment will be recorded when the window
+advances, with one more rebuild then.
 
 **On the guard module:** `HOSTED-POWER/php_uploadprogress_guard` v3.2.6 (2 Nov) fixes a fiber-isolation bug
 in the module itself (PHP 8.1+: saved `unserialize()` state could be restored after another fiber freed it).

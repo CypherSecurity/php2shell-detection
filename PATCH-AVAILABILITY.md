@@ -426,6 +426,15 @@ Practical read: patching to the 21 October releases remains correct and closes p
 separate, lower-impact issues that will land in a later PHP release; keep `session.upload_progress.enabled=0`
 until then, and if you run SimpleXML conversions in reference cycles, plan for the #24488 crash.
 
+**Scheduled PHP security release, 19 November 2026 (announced 18 November, verified).** The PHP security
+team announced security releases for **Thursday, 19 November 2026 between 14:00 and 14:30 UTC**, in its
+regular four-week cycle, covering all supported versions. The highest severity is **CRITICAL**; the team
+says those CRITICAL issues require non-default configuration or uncommon setups. Fixed version numbers and
+technical details will be published with the releases. Treat this as the window in which the follow-up
+fixes above may land: prepare to upgrade promptly, then read the release notes to see exactly which issues
+are fixed. Do not roll back to a vulnerable build to avoid the pending changes, and do not assume
+CVE-2026-109618/109619 guidance changes before the notes say so.
+
 ## 11. Community mitigation for hosts that cannot patch (third-party)
 
 `HOSTED-POWER/php_uploadprogress_guard` — a native PHP extension that mirrors the official fix for

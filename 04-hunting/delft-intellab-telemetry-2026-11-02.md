@@ -177,8 +177,10 @@ anonymisation layer. **AS presence is not attribution**; rented hosts are routin
   overload and dropper unchanged. +3 across 48.6 h is far below the normal rate, so the interval is largely
   or wholly unmeasured; the flat totals are not evidence of a quiet network.
 
-- **Fifth coverage gap, open at the 18 Nov 07:00 check:** the window advanced only to
-  **2026-11-17 17:45:22 UTC** on closing the fourth gap, then froze again. It was **13 h 15 min** behind at
-  07:00 on 18 Nov, so it is documented: total **89,574**, 802 source IPs, 182 code-or-dropper senders, funnel
-  probe **68,285 / 687** with code execution, overload and dropper unchanged. Everything after 17 Nov 17:45 is
-  unmeasured. Public rebuild deferred until the gap closes or 24 h pass with it open.
+- **Fifth coverage gap, open past the 24 h cap (18 Nov 22:00):** the window advanced only to
+  **2026-11-17 17:45:22 UTC** on closing the fourth gap, then froze again. 13 h 15 min behind at 07:00 on
+  18 Nov; **28 h 15 min behind at 22:00**, when the cap passed and this entry was published. Total **89,574**,
+  802 source IPs, 182 code-or-dropper senders, funnel probe **68,285 / 687** with code execution, overload and
+  dropper unchanged (10,633 / 5,928 / 4,728). Everything after 17 Nov 17:45 is unmeasured; the flat total is
+  missing data, not a quiet network. End time and increment to be added when the window advances, with one
+  more rebuild then.
