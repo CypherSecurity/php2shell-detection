@@ -2512,12 +2512,13 @@ detection suggestion is `%0a`/`%0d` in URI paths targeting `.php`.
    CGI bug from the CVE.
 
 ### 63.4 Monitoring
-**Update, 19 November 2026:** the underlying PHP-CGI `PATH_INFO` bug now has its own identifier and a
-release fix. PHP's 19 November security releases list **CVE-2026-129538**, "PHP-CGI out-of-bounds read
-and write during PATH_INFO correction" (GHSA-5j3f-64r7-f564, credited to Jakub Zelenka), fixed in
-**8.5.13 / 8.4.28 / 8.3.37 / 8.2.36**. That confirms the defect we analysed in this section was real
-and separate; it still is **not** CVE-2026-109618, and PR #23411 remains open (updated 19 November).
-Nothing here changes php2shell guidance.
+**Update, 19 November 2026 (resolved):** the underlying PHP-CGI `PATH_INFO` bug now has its own
+identifier and a release fix. PHP's 19 November security releases list **CVE-2026-129538**, "PHP-CGI
+out-of-bounds read and write during PATH_INFO correction" (GHSA-5j3f-64r7-f564, credited to Jakub
+Zelenka), fixed in **8.5.13 / 8.4.28 / 8.3.37 / 8.2.36**. PR **#23411 was then closed without merging**
+on 19 November at 16:18 UTC, with maintainer Ilia Alshanetsky commenting: *"Fixed by GHSA-5j3f-64r7-f564
+in 8.4.28, 8.5.13 and 8.6.0."* That definitively resolves this side-claim: the defect we analysed was
+real, was separate all along, and never was CVE-2026-109618. Nothing in this changes php2shell guidance.
 
 Added php-src PR #23411 state to the monitor (`php.cgi_pr23411=open|merged`), plus the Full Disclosure
 thread hash. If the PR merges or a CVE is assigned to the CGI bug, that becomes a separate advisory and this
@@ -2889,7 +2890,15 @@ with the releases.
 | **php-src#24488** — SimpleXML GC double-free introduced by 8.4.27/8.5.12 | **FIXED and released** | fix commit `f963484725` merged into the PHP-8.4 and PHP-8.5 branches on 22 Oct; **8.4.28 NEWS lists GH-24488 explicitly**, and the PHP-8.5 branch therefore carries it in 8.5.13 (the 8.5.13 NEWS omits the line) |
 | **php-src#24481** — `unserialize()` re-entrancy UAF | **not confirmed shipped** | issue closed 30 Oct; the branch fix PR #24546 was closed unmerged against master; no reference in the 19 Nov NEWS files. Treat as source-only/uncertain, not as fixed for customers |
 | **php-src#24674** — same class via further routes | **not fixed** | issue and fix PR #24751 remain open against master (last updated 31 Oct) |
-| **PHP-CGI `PATH_INFO` underflow** (our §63) | **CVE-2026-129538, fixed in all four releases** | GHSA-5j3f-64r7-f564, "PHP-CGI out-of-bounds read and write during PATH_INFO correction"; PR #23411 remains open |
+| **PHP-CGI `PATH_INFO` underflow** (our §63) | **CVE-2026-129538, fixed in all four releases; PR #23411 closed as fixed** | GHSA-5j3f-64r7-f564; PR closed 19 Nov with the maintainer comment "Fixed by GHSA-5j3f-64r7-f564 in 8.4.28, 8.5.13 and 8.6.0" |
+
+**CVE-2026-115560 is now published on NVD (19 November 15:17 UTC).** Previously unpublished, the record
+is now live with status **`Received`**, **CVSS 4.0 9.2** (measured by security@php.net,
+`AV:N/AC:H/AT:P/PR:N/UI:N/VC:H/VI:H/VA:H`), CWE-20 / CWE-502, and one reference (GHSA-658j-r8rw-q6mx).
+The description matches the session-serializer mismatch mechanism: attacker-controlled data stored in a
+session key via `php_binary`/`php_serialize`, later read with the `php` serializer when
+`session.serialize_handler` differs or changes at runtime. The fix shipped in the same day's releases, so
+the record is arriving after its fix, not before.
 
 **What else is in these releases.** They are a broad PHP security update, not only our follow-ups. From
 the changelogs: UAF in magic-method backtraces leading to RCE (**CVE-2026-129474**), UAF via
