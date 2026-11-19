@@ -497,11 +497,17 @@ government CERT:
   (`Vulnerable` / `Fix` / `Not vuln` / …), and links to the vendor's own advisory
 - TLP:CLEAR — safe to redistribute
 
-**Current inventory (12 Nov):** **972 products tracked, 212 vulnerable, 213 fixed** (status "12
-November 2026 08:56 CET"), after PR #84 merged at 11:39 UTC with eight vendor-confirmed fixed scopes
-(Cisco URWB/UIW, QNAP QNE, Xerox AltaLink/VersaLink, Trend Micro Apex One/Apex Central Japanese Windows,
-OroCommerce on OroCloud). No open PRs or issues remain. See the QNAP/Xerox/Trend Micro/OroCommerce
-subsection above and dossier §69.6.
+**Current inventory (19 Nov):** **976 products tracked, 211 vulnerable, 218 fixed** (status "18
+November 2026 15:41 CET"), after **PR #85 merged 19 November 21:15 UTC**. PR #85 reviewed 304
+Investigation/Vulnerable entries and added **five vendor-confirmed fixed scopes**: **RHEL 9 php:8.4
+module** (php-8.4.27-1.module+el9.9.0+25112+f4f032cf, **RHSA-2026:97880**); **Trend Micro Apex Central
+2019 English Windows** (Critical Patch 7351, PHP 8.2.35); **Trend Micro Apex One 2019 on-prem English
+Windows** (SP1 Critical Patch 20113); **X-Cart hosted stores** on patched PHP 7.4+ (vendor-confirmed 5
+Nov); **Xerox Worldwide Ticketing Tool** (hosted service remediated, XRX26-016 v7, no build published).
+Two entries we had carried as retained-vulnerable are now fixed: **Apex One / Apex Central English
+Windows** (previously only Japanese Windows) and **Xerox Worldwide Ticketing Tool**. Language-edition
+and hosting distinctions still matter. PR #85 also corrected timestamps on earlier entries. See dossier
+§69.6.
 
 **Why it matters for us:** it closes the gap our patch matrix cannot cover — **embedded PHP in
 commercial appliances**. Every "can't patch this product" question now has an authoritative place to

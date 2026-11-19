@@ -2657,11 +2657,11 @@ Siemens publishes.
 ### 69.1 Delft Threat Intelligence Lab — honeypots + network telescope
 New live source, `php2shell.delftintellab.com` (TU Delft; contributors Harm Griffioen, Zohar Cochavi, Murtuza
 Ali), publishing exploitation data since 20 Oct and refreshing every five minutes. First captured at **2026-11-02
-10:12 UTC**; refreshed **2026-11-17 17:45:22 UTC**:
+10:12 UTC**; refreshed **2026-11-19 17:04:50 UTC**:
 
-- **89,574 exploitation requests, 802 source IPs, 337 ASNs, 74 countries**, 21 Oct 08:37:17 to 17 Nov 17:45:22 UTC
+- **89,575 exploitation requests, 802 source IPs, 337 ASNs, 74 countries**, 21 Oct 08:37:17 to 19 Nov 17:04:50 UTC
   (2 Nov baseline: 83,038 requests, 787 IPs, 330 ASNs, 73 countries).
-- **182 source IPs sent code or a dropper.** Funnel: probe 68,285/687 IPs; code execution 10,633/155;
+- **182 source IPs sent code or a dropper.** Funnel: probe 68,286/687 IPs; code execution 10,633/155;
   overload 5,928/154; dropper 4,728/51 (2 Nov: probe 61,797/672, 10,597/154, 5,916/152, 4,728/51).
   Busiest hour **26 Oct 14:00 UTC, 8,179 requests**; 819 multipart boundaries; 2,727 sensor addresses hit.
   **Dropper count has not moved since 2 Nov**, while probe volume has grown by about 6,500 requests.
@@ -2796,6 +2796,26 @@ has picked it up. NCSC's guidance is unchanged (patch, keep `session.upload_prog
 PHP release). This is vendor-published status, not our testing.
 
 
+
+**Update, 19 November 2026 (PR #85, merged 21:15 UTC):** the inventory moved to **976 tracked / 218
+fixed / 211 vulnerable** (status 18 November 2026 15:41 CET), method note "inventory-updates". PR #85
+reviewed 304 entries that were Investigation or Vulnerable and added **five vendor-confirmed fixed
+scopes**:
+
+| Supplier | Scope | Fix evidence |
+|---|---|---|
+| Red Hat | RHEL 9 **php:8.4 module** | php-8.4.27-1.module+el9.9.0+25112+f4f032cf via **RHSA-2026:97880** |
+| Trend Micro | **Apex Central 2019, English Windows** | Critical Patch **7351**, bundled PHP 8.2.35 |
+| Trend Micro | **Apex One 2019 on-premises, English Windows** | SP1 Critical Patch **20113** |
+| X-Cart | Hosted stores on patched PHP 7.4+ | vendor applied update, confirmed 5 Nov |
+| Xerox | **Worldwide Ticketing Tool** | vendor-remediated hosted service, XRX26-016 **v7** (13 Nov); no build published |
+
+Two entries we had been carrying as retained-vulnerable are now **fixed**: **Apex One / Apex Central on
+English Windows** (previously confirmed only for Japanese Windows) and **Xerox Worldwide Ticketing Tool**
+(hosted service now remediated). The Japanese/English distinction still matters: the fixes are
+language-edition-specific. RHEL 9 php:8.4 is now vendor-fixed; other RHEL streams remain assessed
+separately. PR #85 also corrected timestamps on earlier entries.
+
 ## 70. NVD re-analysis closed (2 Nov): status Analyzed, no change of substance
 
 Both records finished re-analysis on **2026-11-02** and are now **`Analyzed`** (modified 2 Nov, were
@@ -2892,8 +2912,9 @@ with the releases.
 | **php-src#24674** — same class via further routes | **not fixed** | issue and fix PR #24751 remain open against master (last updated 31 Oct) |
 | **PHP-CGI `PATH_INFO` underflow** (our §63) | **CVE-2026-129538, fixed in all four releases; PR #23411 closed as fixed** | GHSA-5j3f-64r7-f564; PR closed 19 Nov with the maintainer comment "Fixed by GHSA-5j3f-64r7-f564 in 8.4.28, 8.5.13 and 8.6.0" |
 
-**CVE-2026-115560 is now published on NVD (19 November 15:17 UTC).** Previously unpublished, the record
-is now live with status **`Received`**, **CVSS 4.0 9.2** (measured by security@php.net,
+**CVE-2026-115560 is now published on NVD (19 November 15:17 UTC; status moved to `Awaiting Analysis`
+at 21:45 UTC).** Previously unpublished, the record
+is now live with status **`Awaiting Analysis`**, **CVSS 4.0 9.2** (measured by security@php.net,
 `AV:N/AC:H/AT:P/PR:N/UI:N/VC:H/VI:H/VA:H`), CWE-20 / CWE-502, and one reference (GHSA-658j-r8rw-q6mx).
 The description matches the session-serializer mismatch mechanism: attacker-controlled data stored in a
 session key via `php_binary`/`php_serialize`, later read with the `php` serializer when
@@ -2958,14 +2979,14 @@ senders flat at **182**, funnel probe **68,282 → 68,285 / 687** and every late
 other long gaps, +3 across 48.6 h is far below the normal rate, so the interval is largely or wholly
 unmeasured; the flat period is not evidence of a quiet network.
 
-**Fifth telemetry gap (opened 17 Nov, still open at the 18 Nov 22:00 check, past the 24 h cap):** the
-window advanced only to **2026-11-17 17:45:22 UTC** at the end of the fourth gap and then froze again. It
-was 13 h 15 min behind at the 18 Nov 07:00 check and **28 h 15 min behind at the 22:00 check**, so the
-24 h cap passed and this is published as an open gap. Total **89,574**, source IPs **802**, code-or-dropper
-senders **182**, ASN 337, countries 74; funnel probe **68,285 / 687**, code execution **10,633 / 155**,
-overload **5,928 / 154**, dropper **4,728 / 51**. Everything after 17 Nov 17:45 is **unmeasured**; the flat
-total is missing data, not a quiet network. The end time and increment will be recorded when the window
-advances, with one more rebuild then.
+**Fifth telemetry gap (17–19 Nov), measured and closed:** the window advanced only to
+**2026-11-17 17:45:22 UTC** at the end of the fourth gap and then froze again, staying frozen past the
+24 h cap (13 h 15 min behind at 07:00 on 18 Nov, 28 h 15 min at 22:00, ~47.3 h at its longest). It
+**resumed at 2026-11-19 17:04:50 UTC, a gap of 47 h 19 min 28 s**, with the total moving only
+**89,574 → 89,575 (+1)**; source IPs flat at **802**, code-or-dropper senders flat at **182**; funnel
+probe **68,285 → 68,286 / 687**, code execution 10,633 / 155, overload 5,928 / 154, dropper 4,728 / 51.
+**+1 across 47.3 h is far below the normal rate**, so the interval is largely or wholly unmeasured; the
+flat total must not be read as a quiet network. Pre-gap figures stand as of the 17 Nov 17:45 cutoff.
 
 **On the guard module:** `HOSTED-POWER/php_uploadprogress_guard` v3.2.6 (2 Nov) fixes a fiber-isolation bug
 in the module itself (PHP 8.1+: saved `unserialize()` state could be restored after another fiber freed it).
