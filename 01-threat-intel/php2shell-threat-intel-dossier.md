@@ -2512,6 +2512,13 @@ detection suggestion is `%0a`/`%0d` in URI paths targeting `.php`.
    CGI bug from the CVE.
 
 ### 63.4 Monitoring
+**Update, 19 November 2026:** the underlying PHP-CGI `PATH_INFO` bug now has its own identifier and a
+release fix. PHP's 19 November security releases list **CVE-2026-129538**, "PHP-CGI out-of-bounds read
+and write during PATH_INFO correction" (GHSA-5j3f-64r7-f564, credited to Jakub Zelenka), fixed in
+**8.5.13 / 8.4.28 / 8.3.37 / 8.2.36**. That confirms the defect we analysed in this section was real
+and separate; it still is **not** CVE-2026-109618, and PR #23411 remains open (updated 19 November).
+Nothing here changes php2shell guidance.
+
 Added php-src PR #23411 state to the monitor (`php.cgi_pr23411=open|merged`), plus the Full Disclosure
 thread hash. If the PR merges or a CVE is assigned to the CGI bug, that becomes a separate advisory and this
 entry gets a follow-up. NVD reference count is now 9 (was 8) and status `Modified`; neither changes the
@@ -2851,9 +2858,10 @@ non-php2shell PHP issues remain unfixed in any release. Verified directly agains
 **Do these re-open php2shell?** No. They are separate issues; the php2shell fixes shipped on 21 Oct close
 CVE-2026-109618/109619. But "#24481 and #24488 are closed" must not be read as "fixed for customers": no PHP
 release since 21 Oct contains either fix, and #24488 is a regression the security release itself introduced.
-Practical advice is unchanged: patch to 8.5.12 / 8.4.27 / 8.3.36 / 8.2.35, keep
-`session.upload_progress.enabled=0` until the next release, and stage the upgrade where SimpleXML
-`json_encode`/`(array)` conversions run in reference cycles.
+Practical advice **as of 19 November 2026 supersedes this paragraph**: patch to the new security
+releases (8.5.13 / 8.4.28 / 8.3.37 / 8.2.36), restart the workers, and see §71.2 for which follow-ups
+shipped. Before that release the advice was to keep `session.upload_progress.enabled=0` and stage the
+SimpleXML-backed upgrade.
 
 **Upcoming PHP security release, 19 November 2026 (verified 18 Nov).** The PHP security team published
 an announcement on 18 November: security releases are scheduled for **Thursday, 19 November 2026 between
@@ -2864,7 +2872,43 @@ numbers will be published alongside the releases**, not before. The same date is
 8.6.0. Practical reading: prepare to upgrade on 19 November, but do not assume which of the follow-up
 issues (#24481, #24674, #24488, CVE-2026-115560) are included until the release notes and advisories are
 read. Nothing in the announcement re-opens CVE-2026-109618/109619 or changes the current patch guidance
-before the release.
+before the release. **Released 19 November at 14:00 UTC; see §71.2.**
+
+### 71.2 PHP security releases of 19 November 2026 (verified from php.net, changelogs and release NEWS)
+
+Released **2026-11-19**: **PHP 8.5.13, 8.4.28, 8.3.37 and 8.2.36** (all "security release"), plus **PHP
+8.6.0** GA. PHP had announced the day before that the highest severity was CRITICAL and that those
+issues require non-default configuration or uncommon setups; details and fixed versions were published
+with the releases.
+
+**Follow-up issue resolution, read directly from each release's NEWS/changelog:**
+
+| Issue | Status at 19 Nov | Evidence |
+|---|---|---|
+| **CVE-2026-115560** — session serializer mismatch → RCE | **FIXED in all four security releases** | NEWS/changelog list GHSA-658j-r8rw-q6mx, "Session serializer mismatch can lead to remote code execution" (CVE-2026-115560) in 8.5.13, 8.4.28, 8.3.37 and 8.2.36 |
+| **php-src#24488** — SimpleXML GC double-free introduced by 8.4.27/8.5.12 | **FIXED and released** | fix commit `f963484725` merged into the PHP-8.4 and PHP-8.5 branches on 22 Oct; **8.4.28 NEWS lists GH-24488 explicitly**, and the PHP-8.5 branch therefore carries it in 8.5.13 (the 8.5.13 NEWS omits the line) |
+| **php-src#24481** — `unserialize()` re-entrancy UAF | **not confirmed shipped** | issue closed 30 Oct; the branch fix PR #24546 was closed unmerged against master; no reference in the 19 Nov NEWS files. Treat as source-only/uncertain, not as fixed for customers |
+| **php-src#24674** — same class via further routes | **not fixed** | issue and fix PR #24751 remain open against master (last updated 31 Oct) |
+| **PHP-CGI `PATH_INFO` underflow** (our §63) | **CVE-2026-129538, fixed in all four releases** | GHSA-5j3f-64r7-f564, "PHP-CGI out-of-bounds read and write during PATH_INFO correction"; PR #23411 remains open |
+
+**What else is in these releases.** They are a broad PHP security update, not only our follow-ups. From
+the changelogs: UAF in magic-method backtraces leading to RCE (**CVE-2026-129474**), UAF via
+`last_fatal_error_backtrace` after shutdown (**CVE-2026-129182**), PHP-CGI PATH_INFO OOB (above), timezone
+cache UAF to RCE (**CVE-2026-129496**), DOM XML double free (**CVE-2026-129501**), PHP-FPM epoll UAF to
+local privilege escalation (**CVE-2026-129291**), FPM request smuggling (**CVE-2026-129289**), FPM status
+XSS (**CVE-2026-129292**), PHAR OpenSSL signature bypass (**CVE-2026-128090**), SOAP UAF/info-disclosure
+(**CVE-2026-129506**, **CVE-2026-15353**), partially overwritten session files to RCE
+(**CVE-2026-126714**), session shutdown UAF (**CVE-2026-129481**), mixed-case HTTPS/FTPS plaintext
+exposure (**CVE-2026-128064**), folded-header DoS (**CVE-2026-127960**), plus uriparser and URI
+serialization fixes. Per branch: 8.2.36 and 8.3.37 carry the security set minus newer-branch-only items;
+8.4.28 additionally lists GH-24488; 8.5.13 adds the magic-backtrace and `last_fatal_error` UAFs.
+
+**Guidance as of release:** patch to the new builds and restart workers. The
+`session.upload_progress.enabled=0` workaround can be **retired on hosts verified to run a fixed
+runtime**; keeping it does no harm where applications do not need the feature. Stage testing where
+SimpleXML `json_encode`/`(array)` conversions run in reference cycles, because #24488's fix is new
+even though the regression it repairs is a month old. php2shell itself (CVE-2026-109618/109619) was
+already fixed on 21 October; these releases close the separate follow-ups, not a re-opened php2shell.
 
 **Telemetry gap (4–6 Nov), measured and closed:** the lab's data window stalled at **2026-11-04
 21:10:31 UTC** and did not advance for **~40.4 h**, its longest interruption. It resumed at **2026-11-06

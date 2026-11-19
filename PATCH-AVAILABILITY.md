@@ -435,6 +435,36 @@ fixes above may land: prepare to upgrade promptly, then read the release notes t
 are fixed. Do not roll back to a vulnerable build to avoid the pending changes, and do not assume
 CVE-2026-109618/109619 guidance changes before the notes say so.
 
+## 12. PHP security releases of 19 November 2026 (update)
+
+**Released 2026-11-19:** PHP **8.5.13, 8.4.28, 8.3.37 and 8.2.36** (security releases) and PHP **8.6.0**
+(GA). These are the releases the 18 November announcement referred to; details and fixed versions were
+published with them. Verified from php.net release pages, each release's changelog and NEWS.
+
+**Tracked follow-ups:**
+
+| Issue | Outcome on 19 Nov |
+|---|---|
+| **CVE-2026-115560** — session serializer mismatch to RCE | **FIXED** in all four security releases (GHSA-658j-r8rw-q6mx) |
+| **php-src#24488** — SimpleXML GC double-free from 8.4.27/8.5.12 | **FIXED and released**: fix merged to 8.4/8.5 branches 22 Oct; listed in 8.4.28 NEWS; carried in 8.5.13 |
+| **php-src#24481** — `unserialize()` re-entrancy UAF | **Not confirmed shipped**: issue closed 30 Oct, but the branch fix PR was closed unmerged and no NEWS reference exists. Do not claim fixed |
+| **php-src#24674** — same UAF, further routes | **Not fixed**; PR #24751 still open against master |
+| **PHP-CGI PATH_INFO underflow** (separate from CVE-2026-109618) | **CVE-2026-129538**, fixed in all four releases; PR #23411 remains open |
+
+**Also fixed in these releases** (not php2shell): CVE-2026-129474 (magic-backtrace UAF RCE),
+CVE-2026-129182 (`last_fatal_error_backtrace` UAF), CVE-2026-129496 (timezone cache UAF RCE),
+CVE-2026-129501 (DOM double free), CVE-2026-129291 (FPM epoll UAF LPE), CVE-2026-129289 (FPM request
+smuggling), CVE-2026-129292 (FPM status XSS), CVE-2026-128090 (PHAR signature bypass),
+CVE-2026-129506 / CVE-2026-15353 (SOAP), CVE-2026-126714 (session file overwrite RCE),
+CVE-2026-129481 (session shutdown UAF), CVE-2026-128064 (URL plaintext), CVE-2026-127960 (header DoS),
+CVE-2026-48841 (uriparser), CVE-2026-129438 (URI serialization).
+
+**What to do:** upgrade to 8.5.13 / 8.4.28 / 8.3.37 / 8.2.36 (or 8.6.0 where appropriate), then
+**restart the PHP workers**. The `session.upload_progress.enabled=0` workaround can be retired on hosts
+verified to run a fixed runtime; it remains reasonable defence-in-depth where applications do not need
+the feature. Stage SimpleXML-heavy applications before rollout because #24488's fix is new. Nothing in
+these releases re-opens CVE-2026-109618/109619 or changes the 21 October php2shell guidance.
+
 ## 11. Community mitigation for hosts that cannot patch (third-party)
 
 `HOSTED-POWER/php_uploadprogress_guard` — a native PHP extension that mirrors the official fix for
