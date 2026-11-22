@@ -184,3 +184,8 @@ anonymisation layer. **AS presence is not attribution**; rented hosts are routin
   **68,285 → 68,286 / 687** with code execution, overload and dropper unchanged (10,633 / 5,928 / 4,728).
   +1 across 47.3 h is far below the normal rate, so the interval is largely or wholly unmeasured; the flat
   total is not evidence of a quiet network.
+
+- **Sixth interval (19–21 Nov), same pattern:** window advanced **2026-11-19 17:04:50 → 2026-11-21
+  16:41:26 UTC** (47 h 36 min 36 s) with the total moving only **89,575 → 89,576 (+1)**; source IPs 802
+  and code-or-dropper 182 flat; funnel probe 68,286 → 68,287. Treat both long intervals as largely or
+  wholly unmeasured.

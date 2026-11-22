@@ -2657,11 +2657,11 @@ Siemens publishes.
 ### 69.1 Delft Threat Intelligence Lab — honeypots + network telescope
 New live source, `php2shell.delftintellab.com` (TU Delft; contributors Harm Griffioen, Zohar Cochavi, Murtuza
 Ali), publishing exploitation data since 20 Oct and refreshing every five minutes. First captured at **2026-11-02
-10:12 UTC**; refreshed **2026-11-19 17:04:50 UTC**:
+10:12 UTC**; refreshed **2026-11-21 16:41:26 UTC**:
 
-- **89,575 exploitation requests, 802 source IPs, 337 ASNs, 74 countries**, 21 Oct 08:37:17 to 19 Nov 17:04:50 UTC
+- **89,576 exploitation requests, 802 source IPs, 337 ASNs, 74 countries**, 21 Oct 08:37:17 to 21 Nov 16:41:26 UTC
   (2 Nov baseline: 83,038 requests, 787 IPs, 330 ASNs, 73 countries).
-- **182 source IPs sent code or a dropper.** Funnel: probe 68,286/687 IPs; code execution 10,633/155;
+- **182 source IPs sent code or a dropper.** Funnel: probe 68,287/687 IPs; code execution 10,633/155;
   overload 5,928/154; dropper 4,728/51 (2 Nov: probe 61,797/672, 10,597/154, 5,916/152, 4,728/51).
   Busiest hour **26 Oct 14:00 UTC, 8,179 requests**; 819 multipart boundaries; 2,727 sensor addresses hit.
   **Dropper count has not moved since 2 Nov**, while probe volume has grown by about 6,500 requests.
@@ -2915,7 +2915,13 @@ with the releases.
 **CVE-2026-115560 is now published on NVD (19 November 15:17 UTC; status moved to `Awaiting Analysis`
 at 21:45 UTC).** Previously unpublished, the record
 is now live with status **`Awaiting Analysis`**, **CVSS 4.0 9.2** (measured by security@php.net,
-`AV:N/AC:H/AT:P/PR:N/UI:N/VC:H/VI:H/VA:H`), CWE-20 / CWE-502, and one reference (GHSA-658j-r8rw-q6mx).
+`AV:N/AC:H/AT:P/PR:N/UI:N/VC:H/VI:H/VA:H`), CWE-20 / CWE-502. By **22 November it carried 4
+references**: the GHSA, the Red Hat CVE page, the Ubuntu tracker, and a **public PoC** in
+`murrez/php2shell` (`poc.py`, lines 776–791) that shapes `PHP_SESSION_UPLOAD_PROGRESS` values for
+`php_serialize` / `php_binary` handler-mismatch research. **That is the first public PoC we have seen for
+CVE-2026-115560**, and NVD citing it makes it part of the official record; hosts that have not taken the
+19 November releases are now demonstrably exposed to a public mechanism, while patched builds remain the
+complete fix.
 The description matches the session-serializer mismatch mechanism: attacker-controlled data stored in a
 session key via `php_binary`/`php_serialize`, later read with the `php` serializer when
 `session.serialize_handler` differs or changes at runtime. The fix shipped in the same day's releases, so
@@ -2987,6 +2993,13 @@ unmeasured; the flat period is not evidence of a quiet network.
 probe **68,285 → 68,286 / 687**, code execution 10,633 / 155, overload 5,928 / 154, dropper 4,728 / 51.
 **+1 across 47.3 h is far below the normal rate**, so the interval is largely or wholly unmeasured; the
 flat total must not be read as a quiet network. Pre-gap figures stand as of the 17 Nov 17:45 cutoff.
+
+**Sixth interval (19–21 Nov), same low-yield pattern:** the window then advanced from **2026-11-19
+17:04:50** to **2026-11-21 16:41:26 UTC**, a further **47 h 36 min 36 s**, with the total moving only
+**89,575 → 89,576 (+1)**; source IPs stayed at **802**, code-or-dropper senders at **182**, and the funnel
+moved probe **68,286 → 68,287 / 687** with code, overload and dropper flat. This repeats the fifth
+interval's shape almost exactly: two days of window for a single request. Treat both intervals as
+**largely or wholly unmeasured**, and do not compare their rates with earlier periods.
 
 **On the guard module:** `HOSTED-POWER/php_uploadprogress_guard` v3.2.6 (2 Nov) fixes a fiber-isolation bug
 in the module itself (PHP 8.1+: saved `unserialize()` state could be restored after another fiber freed it).
