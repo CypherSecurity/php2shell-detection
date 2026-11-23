@@ -2912,6 +2912,20 @@ with the releases.
 | **php-src#24674** — same class via further routes | **not fixed** | issue and fix PR #24751 remain open against master (last updated 31 Oct) |
 | **PHP-CGI `PATH_INFO` underflow** (our §63) | **CVE-2026-129538, fixed in all four releases; PR #23411 closed as fixed** | GHSA-5j3f-64r7-f564; PR closed 19 Nov with the maintainer comment "Fixed by GHSA-5j3f-64r7-f564 in 8.4.28, 8.5.13 and 8.6.0" |
 
+**Unit 42 revised its threat brief on 19 November (marker moved "Updated October 29" → "Updated
+November 19"; verified from the page on 23 November).** The new section summarises the 19 November PHP
+releases: **18 security vulnerabilities across all supported versions, seven rated Critical**, spanning
+memory-corruption flaws, HTTP request smuggling, cryptographic signature bypasses and input-handling
+bugs in session management, the execution engine and process managers; it repeats PHP's statement that
+the critical attack paths generally require non-default configurations or uncommon setups. The earlier
+Cambodia/UNC5174 retraction text is still present. This does not change our assessment; it is useful
+third-party corroboration of the release scale, and its "seven Critical" count is the vendor's
+categorisation rather than something we have counted independently.
+
+**Process note:** the revision marker changed between the 19 Nov 22:00 and 20 Nov 07:00 runs, but the
+monitor had **no alert wired for the Unit 42 marker**, so it went unnoticed for 13 runs. An alert rule
+was added on 23 November and the marker baseline is now tracked; this paragraph is the backfill.
+
 **CVE-2026-115560 is now published on NVD (19 November 15:17 UTC; status moved to `Awaiting Analysis`
 at 21:45 UTC).** Previously unpublished, the record
 is now live with status **`Awaiting Analysis`**, **CVSS 4.0 9.2** (measured by security@php.net,
