@@ -2645,6 +2645,15 @@ Companion **SSA-566435 V1.4 (30 Oct)** lists products determined not affected (P
 (109619), and moved both records back into analysis (`Undergoing Analysis` / `Modified`). No description or
 metric change yet; the OOM description stands.
 
+
+**Update, 24 November: Siemens Energy SSA-862892, CP61850.** A separate Siemens Energy advisory
+(**SSA-862892**, V1.0, published 24 November) covers **CP61850 (6DD7050-0AA80) for Simatic TDC, all
+versions >= V3.5.4**, affected by both php2shell CVEs, with **no fix available**. CVSS 3.1 9.8 /
+CVSS 4.0 9.2. Recommended handling: contact Siemens service for a firmware update through normal
+procedures, and review defence-in-depth controls, especially network-layer restrictions around the
+configuration interface. CP61850 is typically deployed on separate LAN segments, which lowers but does
+not eliminate exposure. NVD added the advisory as a reference to both CVEs, taking them to **13 and 20
+references** on 24 November.
 ### 68.3 Why this matters
 For energy/utility and industrial estates the question is no longer only "patch the firewall". Grid and
 energy-management applications on the list may have **no vendor fix**, so exposure reduction and compensating

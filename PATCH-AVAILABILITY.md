@@ -296,6 +296,14 @@ portfolio than the appliance. **Most of it has no fix.** Affected entries includ
 | Spectrum Power 7 (IHM/NagiosXI) | Red Hat PHP patch for RHEL 8/9 |
 | Spectrum Power TG (WebConsole/WebQuery on Windows) | Upgrade PHP to 8.5.12 |
 
+**New, 24 November: Siemens Energy SSA-862892** (V1.0, CVSS 3.1 **9.8** / CVSS 4.0 9.2) covers
+**CP61850 (6DD7050-0AA80) for Simatic TDC, all versions >= V3.5.4**, affected by **both**
+CVE-2026-109618 and CVE-2026-109619. **Currently no fix is available**; Siemens Energy says to contact
+customer service for a firmware update via normal procedures, and to review defence-in-depth controls,
+especially network-layer restrictions so the configuration interface is not reachable from other
+segments. CP61850 devices are typically on separate LAN segments, which limits exposure but does not
+remove it. NVD added this advisory as a reference to both CVEs on 24 November (refs now 13 and 20).
+
 A companion advisory, **SSA-566435 (V1.4, updated 30 Oct)**, lists products Siemens has determined are **not
 affected** (component not present). NVD added both SSA-166980 and SSA-566435 as references to both CVEs on
 30 Oct (refs now 11 for 109618, 19 for 109619). The practical point for energy/SCADA estates: this is no
