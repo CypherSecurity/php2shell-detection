@@ -2657,12 +2657,12 @@ Siemens publishes.
 ### 69.1 Delft Threat Intelligence Lab — honeypots + network telescope
 New live source, `php2shell.delftintellab.com` (TU Delft; contributors Harm Griffioen, Zohar Cochavi, Murtuza
 Ali), publishing exploitation data since 20 Oct and refreshing every five minutes. First captured at **2026-11-02
-10:12 UTC**; refreshed **2026-11-21 16:41:26 UTC**:
+10:12 UTC**; refreshed **2026-11-23 20:02:13 UTC**:
 
-- **89,576 exploitation requests, 802 source IPs, 337 ASNs, 74 countries**, 21 Oct 08:37:17 to 21 Nov 16:41:26 UTC
+- **89,579 exploitation requests, 803 source IPs, 338 ASNs, 74 countries**, 21 Oct 08:37:17 to 23 Nov 20:02:13 UTC
   (2 Nov baseline: 83,038 requests, 787 IPs, 330 ASNs, 73 countries).
-- **182 source IPs sent code or a dropper.** Funnel: probe 68,287/687 IPs; code execution 10,633/155;
-  overload 5,928/154; dropper 4,728/51 (2 Nov: probe 61,797/672, 10,597/154, 5,916/152, 4,728/51).
+- **183 source IPs sent code or a dropper.** Funnel: probe 68,289/687 IPs; code execution 10,633/155;
+  overload 5,928/154; dropper 4,729/52 (2 Nov: probe 61,797/672, 10,597/154, 5,916/152, 4,728/51).
   Busiest hour **26 Oct 14:00 UTC, 8,179 requests**; 819 multipart boundaries; 2,727 sensor addresses hit.
   **Dropper count has not moved since 2 Nov**, while probe volume has grown by about 6,500 requests.
 - First sightings on 21 Oct: request resembling PHP2Shell 08:37:17, high-interaction honeypot 13:00:12,
@@ -3014,6 +3014,15 @@ flat total must not be read as a quiet network. Pre-gap figures stand as of the 
 moved probe **68,286 → 68,287 / 687** with code, overload and dropper flat. This repeats the fifth
 interval's shape almost exactly: two days of window for a single request. Treat both intervals as
 **largely or wholly unmeasured**, and do not compare their rates with earlier periods.
+
+**Seventh interval (21–23 Nov): the first movement in the code/dropper count for weeks.** The window
+advanced from **2026-11-21 16:41:26** to **2026-11-23 20:02:13 UTC** (**51 h 20 min 47 s**), with the total
+**89,576 → 89,579 (+3)**, source IPs **802 → 803**, ASNs **337 → 338**, and code-or-dropper senders
+**182 → 183**. Funnel: probe **68,287 → 68,289 / 687** (source IPs unchanged), code execution
+**10,633 / 155** and overload **5,928 / 154** flat, **dropper 4,728 → 4,729 / 51 → 52** — the first new
+dropper IP since at least 2 November. Three requests in 51 hours is still far below the earlier rate, so
+the interval remains low-yield and mostly unmeasured; what matters is the **direction**: a new source and
+a new dropper sender, not just probe volume.
 
 **On the guard module:** `HOSTED-POWER/php_uploadprogress_guard` v3.2.6 (2 Nov) fixes a fiber-isolation bug
 in the module itself (PHP 8.1+: saved `unserialize()` state could be restored after another fiber freed it).

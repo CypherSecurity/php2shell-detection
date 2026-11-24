@@ -189,3 +189,9 @@ anonymisation layer. **AS presence is not attribution**; rented hosts are routin
   16:41:26 UTC** (47 h 36 min 36 s) with the total moving only **89,575 → 89,576 (+1)**; source IPs 802
   and code-or-dropper 182 flat; funnel probe 68,286 → 68,287. Treat both long intervals as largely or
   wholly unmeasured.
+
+- **Seventh interval (21–23 Nov), first dropper movement:** window **2026-11-21 16:41:26 → 2026-11-23
+  20:02:13 UTC** (51 h 20 min 47 s); total **89,576 → 89,579 (+3)**; source IPs **802 → 803**, ASNs
+  **337 → 338**, code-or-dropper **182 → 183**; probe 68,287 → 68,289 / 687, code 10,633 / 155 and
+  overload 5,928 / 154 flat, **dropper 4,728 → 4,729 / 51 → 52**. The first new dropper sender since at
+  least 2 Nov; still a low-yield interval overall.
