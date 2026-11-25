@@ -2666,11 +2666,11 @@ Siemens publishes.
 ### 69.1 Delft Threat Intelligence Lab — honeypots + network telescope
 New live source, `php2shell.delftintellab.com` (TU Delft; contributors Harm Griffioen, Zohar Cochavi, Murtuza
 Ali), publishing exploitation data since 20 Oct and refreshing every five minutes. First captured at **2026-11-02
-10:12 UTC**; refreshed **2026-11-23 20:02:13 UTC**:
+10:12 UTC**; refreshed **2026-11-25 16:31:26 UTC**:
 
-- **89,579 exploitation requests, 803 source IPs, 338 ASNs, 74 countries**, 21 Oct 08:37:17 to 23 Nov 20:02:13 UTC
+- **89,580 exploitation requests, 803 source IPs, 338 ASNs, 74 countries**, 21 Oct 08:37:17 to 25 Nov 16:31:26 UTC
   (2 Nov baseline: 83,038 requests, 787 IPs, 330 ASNs, 73 countries).
-- **183 source IPs sent code or a dropper.** Funnel: probe 68,289/687 IPs; code execution 10,633/155;
+- **183 source IPs sent code or a dropper.** Funnel: probe 68,290/687 IPs; code execution 10,633/155;
   overload 5,928/154; dropper 4,729/52 (2 Nov: probe 61,797/672, 10,597/154, 5,916/152, 4,728/51).
   Busiest hour **26 Oct 14:00 UTC, 8,179 requests**; 819 multipart boundaries; 2,727 sensor addresses hit.
   **Dropper count has not moved since 2 Nov**, while probe volume has grown by about 6,500 requests.
@@ -3032,6 +3032,22 @@ advanced from **2026-11-21 16:41:26** to **2026-11-23 20:02:13 UTC** (**51 h 20 
 dropper IP since at least 2 November. Three requests in 51 hours is still far below the earlier rate, so
 the interval remains low-yield and mostly unmeasured; what matters is the **direction**: a new source and
 a new dropper sender, not just probe volume.
+
+**Eighth interval (23–25 Nov): probe-only again.** The window advanced from **2026-11-23 20:02:13** to
+**2026-11-25 16:31:26 UTC** (**44 h 29 min 13 s**) with the total **89,579 → 89,580 (+1)**; source IPs,
+ASNs and countries unchanged at **803 / 338 / 74**; funnel probe **68,289 → 68,290 / 687**, with code
+execution (10,633 / 155), overload (5,928 / 154) and dropper (**4,729 / 52**) all flat. So the seventh
+interval's new dropper sender did not recur, and this interval is another low-yield, largely unmeasured
+window rather than a renewed drop.
+
+**EPSS dropped sharply on 25 November (verified directly from the FIRST API).** Both scores had been at
+**0.99999** (the model ceiling); on 25 November they fell to **CVE-2026-109618 0.45083 (99.081st
+percentile)** and **CVE-2026-109619 0.20754 (98.073rd percentile)**. That is a large move for a
+forecast metric and should be read carefully: EPSS estimates the probability of exploitation activity in
+the next 30 days from observed features, and it can fall as the disclosure ages and as no new
+exploitation signal enters its inputs. It does **not** mean the risk has halved, and it does not undo the
+**CISA KEV listing (26 October)** or the **confirmed PAN-OS campaign (29 October)**. Treat the drop as a
+forecast revision, not a status change, and keep it separate from the evidence record.
 
 **On the guard module:** `HOSTED-POWER/php_uploadprogress_guard` v3.2.6 (2 Nov) fixes a fiber-isolation bug
 in the module itself (PHP 8.1+: saved `unserialize()` state could be restored after another fiber freed it).

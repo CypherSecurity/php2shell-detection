@@ -195,3 +195,8 @@ anonymisation layer. **AS presence is not attribution**; rented hosts are routin
   **337 → 338**, code-or-dropper **182 → 183**; probe 68,287 → 68,289 / 687, code 10,633 / 155 and
   overload 5,928 / 154 flat, **dropper 4,728 → 4,729 / 51 → 52**. The first new dropper sender since at
   least 2 Nov; still a low-yield interval overall.
+
+- **Eighth interval (23–25 Nov), probe-only:** window **2026-11-23 20:02:13 → 2026-11-25 16:31:26 UTC**
+  (44 h 29 min 13 s); total **89,579 → 89,580 (+1)**; source IPs / ASNs / countries flat at 803 / 338 /
+  74; probe 68,289 → 68,290 / 687; code 10,633 / 155, overload 5,928 / 154, dropper **4,729 / 52** all
+  flat. The seventh interval's new dropper sender did not recur.
