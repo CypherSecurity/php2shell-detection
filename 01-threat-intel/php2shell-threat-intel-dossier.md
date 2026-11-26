@@ -3040,6 +3040,17 @@ execution (10,633 / 155), overload (5,928 / 154) and dropper (**4,729 / 52**) al
 interval's new dropper sender did not recur, and this interval is another low-yield, largely unmeasured
 window rather than a renewed drop.
 
+**Ninth interval (25 Nov, 32 minutes): +1 probe-only.** Shortly after the eighth interval closed, the
+window advanced again from **2026-11-25 16:31:26** to **2026-11-25 17:03:58 UTC** (32 min 32 s) with
+**89,580 → 89,581 (+1)**; funnel probe **68,290 → 68,291 / 687**, code execution, overload and dropper
+flat (10,633 / 5,928 / 4,729). A one-request increment over half an hour is within normal trickle; it is
+recorded for completeness rather than as a new pattern.
+
+**watchtowr page shrank (25 Nov, 467,589 → 243,293 bytes).** The live page is still a complete HTML
+document and still contains the php2shell material, so this is a **site template/content revision, not a
+fetch truncation**; the monitor tracks size only for that source, so no semantic conclusion is drawn from
+the byte drop.
+
 **EPSS dropped sharply on 25 November (verified directly from the FIRST API).** Both scores had been at
 **0.99999** (the model ceiling); on 25 November they fell to **CVE-2026-109618 0.45083 (99.081st
 percentile)** and **CVE-2026-109619 0.20754 (98.073rd percentile)**. That is a large move for a
