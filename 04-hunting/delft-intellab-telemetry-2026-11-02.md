@@ -204,3 +204,8 @@ anonymisation layer. **AS presence is not attribution**; rented hosts are routin
 - **Ninth interval (25 Nov, 32 min):** window **2026-11-25 16:31:26 → 17:03:58 UTC**, total **89,580 →
   89,581 (+1)**, probe 68,290 → 68,291 / 687, with code, overload and dropper all flat. Trickle-level,
   recorded for completeness.
+
+- **Tenth interval (25–27 Nov):** window **2026-11-25 17:03:58 → 2026-11-27 15:40:05 UTC** (46 h 36 min
+  7 s); total **89,581 → 89,582 (+1)**; probe 68,291 → 68,292 / 687; source IPs / ASNs / countries flat at
+  803 / 338 / 74; code, overload and dropper all flat. Three consecutive intervals with at most +1 and no
+  new code or dropper senders: steady low-yield state.

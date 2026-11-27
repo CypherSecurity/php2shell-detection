@@ -2666,11 +2666,11 @@ Siemens publishes.
 ### 69.1 Delft Threat Intelligence Lab — honeypots + network telescope
 New live source, `php2shell.delftintellab.com` (TU Delft; contributors Harm Griffioen, Zohar Cochavi, Murtuza
 Ali), publishing exploitation data since 20 Oct and refreshing every five minutes. First captured at **2026-11-02
-10:12 UTC**; refreshed **2026-11-25 16:31:26 UTC**:
+10:12 UTC**; refreshed **2026-11-27 15:40:05 UTC**:
 
-- **89,580 exploitation requests, 803 source IPs, 338 ASNs, 74 countries**, 21 Oct 08:37:17 to 25 Nov 16:31:26 UTC
+- **89,582 exploitation requests, 803 source IPs, 338 ASNs, 74 countries**, 21 Oct 08:37:17 to 27 Nov 15:40:05 UTC
   (2 Nov baseline: 83,038 requests, 787 IPs, 330 ASNs, 73 countries).
-- **183 source IPs sent code or a dropper.** Funnel: probe 68,290/687 IPs; code execution 10,633/155;
+- **183 source IPs sent code or a dropper.** Funnel: probe 68,292/687 IPs; code execution 10,633/155;
   overload 5,928/154; dropper 4,729/52 (2 Nov: probe 61,797/672, 10,597/154, 5,916/152, 4,728/51).
   Busiest hour **26 Oct 14:00 UTC, 8,179 requests**; 819 multipart boundaries; 2,727 sensor addresses hit.
   **Dropper count has not moved since 2 Nov**, while probe volume has grown by about 6,500 requests.
@@ -3045,6 +3045,13 @@ window advanced again from **2026-11-25 16:31:26** to **2026-11-25 17:03:58 UTC*
 **89,580 → 89,581 (+1)**; funnel probe **68,290 → 68,291 / 687**, code execution, overload and dropper
 flat (10,633 / 5,928 / 4,729). A one-request increment over half an hour is within normal trickle; it is
 recorded for completeness rather than as a new pattern.
+
+**Tenth interval (25–27 Nov): another probe-only +1.** The window advanced from **2026-11-25 17:03:58** to
+**2026-11-27 15:40:05 UTC** (**46 h 36 min 7 s**) with **89,581 → 89,582 (+1)**; source IPs, ASNs and
+countries unchanged at **803 / 338 / 74**; probe **68,291 → 68,292 / 687**, with code execution
+(10,633 / 155), overload (5,928 / 154) and dropper (**4,729 / 52**) flat. Three consecutive intervals now
+show at most +1 request and no new code or dropper senders; the telemetry is in a steady low-yield state,
+and the intervals remain largely unmeasured.
 
 **watchtowr page shrank (25 Nov, 467,589 → 243,293 bytes).** The live page is still a complete HTML
 document and still contains the php2shell material, so this is a **site template/content revision, not a
